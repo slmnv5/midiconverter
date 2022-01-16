@@ -7,7 +7,7 @@ killall -9 vmpk
 sleep 1
 
 # start this app.
-./mimap -c count.txt $@  &
+./mimap -c file_count.txt $@  &
 sleep 1
 
 # start vmpk keyboard for testing

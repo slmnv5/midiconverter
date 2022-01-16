@@ -21,14 +21,23 @@ vector<string> split_string(const string &s, const string &delimiter) {
 }
 
 int replace_all(string &s, const string &del, const string &repl) {
+	string::size_type delsz = del.size();
+	if (delsz == 0)
+		return 0;
 	int count = 0;
 	string::size_type n = 0;
 	while ((n = s.find(del, n)) != string::npos) {
-		s.replace(n, del.size(), repl);
+		s.replace(n, delsz, repl);
 		n += repl.size();
 		count++;
 	}
 	return count;
+}
+
+void remove_spaces(string &s) {
+	replace_all(s, " ", "");
+	replace_all(s, "\n", "");
+	replace_all(s, "\t", "");
 }
 
 string exec_command(const string &cmd) {

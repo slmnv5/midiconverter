@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
 void help() {
 	cout
 			<< "Usage: mimap3 -f <rules_file> [options] \n"
-					"  -r <rules_file> load file for MIDI mapping, see rules.txt for details\n"
-					"  -c <count_file> load file for MIDI count, see count.txt for details\n"
+					"  -r <rules_file> load file for MIDI mapping, see file_rules.txt for details\n"
+					"  -c <count_file> load file for MIDI count, see file_count.txt for details\n"
 					"  -h displays this info\n"
 					"  -v verbose output\n"
 					"  -vv more verbose\n";

@@ -11,9 +11,8 @@ OBJ_TST =  $(TMP2:.cpp=.o)
 TARGET = mimap
 BUILD_MODE ?= debug
 
-# added line 1
+
 LDFLAGS += -pthread -lasound
-# added line 2
 CPPFLAGS += -std=c++11 
  
 
@@ -30,7 +29,8 @@ else ifeq ($(BUILD_MODE),linuxtools)
 	EXTRA_CLEAN += mimap.gcda mimap.gcno $(PROJECT_ROOT)gmon.out
 	EXTRA_CMDS = rm -rf mimap.gcda
 else
-    $(error Build mode $(BUILD_MODE) not supported by this Makefile)
+	CFLAGS += -g
+    #$(error Build mode $(BUILD_MODE) not supported by this Makefile)
 endif
 
 all: info $(TARGET) 

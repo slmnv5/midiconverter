@@ -77,14 +77,14 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 //========================================
 
 void ValueRange::init(const string &s) {
-	string str1 = s.substr(0, s.find(";"));
-	replace_all(str1, " ", "");
-	replace_all(str1, "\t", "");
-	if (str1.empty()) {
+	string s1 = s.substr(0, s.find(";"));
+	replace_all(s1, " ", "");
+	replace_all(s1, "\t", "");
+	if (s1.empty()) {
 		lower = 0;
 		upper = max_value;
 	} else {
-		vector<string> parts = split_string(str1, ":");
+		vector<string> parts = split_string(s1, ":");
 		if (parts.size() == 1) {
 			lower = stoi(parts[0]);
 			upper = lower;
@@ -92,8 +92,7 @@ void ValueRange::init(const string &s) {
 			lower = stoi(parts[0]);
 			upper = stoi(parts[1]);
 		} else {
-			throw MidiAppError(
-					string(__func__) + "  Incorrect format: " + str1);
+			throw MidiAppError(string(__func__) + "  Incorrect format: " + s1);
 		}
 	}
 	lower = lower % (max_value + 1);
@@ -108,11 +107,17 @@ bool ValueRange::isValid() const {
 
 //======================================
 
-MidiEvent::MidiEvent(const string &s) {
+MidiEvent::MidiEvent(const string &s1) {
+	string s(s1);
+	remove_spaces(s);
 	vector<string> parts = split_string(s, ",");
 
 	if (parts.size() != 4) {
 		throw MidiAppError("Not valid MidiEvent, must have 4 parts: " + s);
+	}
+
+	if (parts[0].size() != 1) {
+		throw MidiAppError("MidiEvent, type must be single character: " + s);
 	}
 
 	try {
@@ -193,16 +198,14 @@ bool MidiEventRange::isValid() const {
 //===================================================
 
 MidiEventRule::MidiEventRule(const string &s) {
-	string str1 = s.substr(0, s.find(";"));
-	terminate = (replace_all(str1, ">", "=") > 0);
-	replace_all(str1, "\t", "");
-	replace_all(str1, " ", "");
-	if (str1.empty()) {
-		throw MidiAppError("MidiEventRule error: rule string is empty");
-	}
-	vector<string> parts = split_string(str1, "=");
+	string s1 = s.substr(0, s.find(";"));
+	terminate = (replace_all(s1, ">", "=") > 0);
+	replace_all(s1, "\t", "");
+	replace_all(s1, " ", "");
+
+	vector<string> parts = split_string(s1, "=");
 	if (parts.size() != 2) {
-		throw MidiAppError("Rule string must have 2 parts: " + str1);
+		throw MidiAppError("Rule string must have 2 parts: " + s1);
 	}
 
 	inEventRange = MidiEventRange(parts[0], false);

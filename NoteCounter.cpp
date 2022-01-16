@@ -27,6 +27,17 @@ NoteCounter::NoteCounter(const string &fileName) {
 	f.close();
 }
 
+void NoteCounter::parseString(const string &s) {
+	string s1 = s.substr(0, s.find(';'));
+	remove_spaces(s1);
+	vector<string> parts = split_string(s, "-");
+	if (parts.size() != 2)
+		throw MidiAppError("NoteCounter string must have 2 parts: " + s1);
+	midi_byte_t key = stoi(parts[0]);
+	midi_byte_t value = stoi(parts[1]);
+	count_map[key] = value;
+}
+
 bool NoteCounter::need_count(MidiEvent &ev) {
 	bool is_cc = ev.evtype == MidiEvType::CONTROLCHANGE;
 	bool is_on = ev.evtype == MidiEvType::NOTEON;

@@ -14,7 +14,30 @@ TEST_CASE( "Test split_string 1" , "[all][basic]" ) {
 		string s("12 - 15");
 		auto parts = split_string(s, "=");
 		REQUIRE(parts.size() == 1);
+	}
 
+	SECTION( "Section split parts 3" ) {
+		string s("");
+		auto parts = split_string(s, "=");
+		REQUIRE(parts.size() == 1);
+	}
+
+	SECTION( "Section split parts 4" ) {
+		string s("");
+		replace_all(s, ">", "=");
+		REQUIRE(s.empty() == true);
+	}
+
+	SECTION( "Section split parts 5" ) {
+		string s(">>>>>>");
+		replace_all(s, ">", "");
+		REQUIRE(s.empty() == true);
+	}
+
+	SECTION( "Section split parts 6" ) {
+		string s("some");
+		replace_all(s, "", "=");
+		REQUIRE(s.empty() == false);
 	}
 
 }

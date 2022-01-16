@@ -22,7 +22,7 @@
 ; 'n,15,,20' - convert to note on channel 15, the same MIDI value for note number, velocity 20
 
 
-n,,0:50,>n,2,22,22; catch left side notes
-o,,0:50,>o,2,22,22; catch left side notes
-n,,51:127,0:127>n,3,33,33; catch right side notes
-a,,,,,>n,0,0,0; finally catch any event and convert to a dumb note
+n,,0:50,>n,2,22,22;  
+n,,51:127,0:127>n,3,33,33;  
+o,,51:127,0:127>c,3,33,33;  
+a,,,,,>s,0,0,0; finally catch any event and convert to a zero note off

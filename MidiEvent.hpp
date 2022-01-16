@@ -63,12 +63,12 @@ public:
 class MidiEvType {
 public:
 	constexpr static midi_byte_t ANYTHING = 'a';
-	constexpr static midi_byte_t NOTEON = 'n';
-	constexpr static midi_byte_t NOTEOFF = 'o';
+	constexpr static midi_byte_t NOTEON = 'n'; // on
+	constexpr static midi_byte_t NOTEOFF = 'o'; // stop
 	constexpr static midi_byte_t CONTROLCHANGE = 'c';
 	constexpr static midi_byte_t PROGCHANGE = 'p';
 	static bool valid(midi_byte_t ch) {
-		vector<midi_byte_t> valid_ch { 'a', 'n', 'c', 'p' };
+		vector<midi_byte_t> valid_ch { 'a', 'n', 'o', 's', 'c', 'p' };
 		return std::find(valid_ch.begin(), valid_ch.end(), ch) != valid_ch.end();
 	}
 };
