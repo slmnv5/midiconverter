@@ -17,7 +17,6 @@ TEST_CASE("Test NoteCounter 1", "[all]") {
 			"c,12,33,22"), e5("c,100,33,22");
 	SECTION( "Section need count" ) {
 		REQUIRE(e1.v1 == 60);
-		REQUIRE(e1.evtype == MidiEvType::NOTEON);
 		REQUIRE(c1.need_count(e1) == true);
 		REQUIRE(c1.need_count(e2) == false);
 		REQUIRE(c1.need_count(e3) == true);

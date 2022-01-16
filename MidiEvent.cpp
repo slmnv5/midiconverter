@@ -76,10 +76,10 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 
 //========================================
 
-void ValueRange::init(const string &s) {
+ValueRange::ValueRange(const string &s) {
 	string s1 = s.substr(0, s.find(";"));
-	replace_all(s1, " ", "");
-	replace_all(s1, "\t", "");
+	remove_spaces(s1);
+
 	if (s1.empty()) {
 		lower = 0;
 		upper = max_value;
@@ -92,7 +92,7 @@ void ValueRange::init(const string &s) {
 			lower = stoi(parts[0]);
 			upper = stoi(parts[1]);
 		} else {
-			throw MidiAppError(string(__func__) + "  Incorrect format: " + s1);
+			throw MidiAppError("ValueRange incorrect format: " + s1);
 		}
 	}
 	lower = lower % (max_value + 1);
@@ -129,6 +129,14 @@ MidiEvent::MidiEvent(const string &s1) {
 		throw MidiAppError("Not valid MidiEvent: " + string(e.what()));
 	}
 
+	if (!(ch >= 0 && ch <= MIDI_MAXCH) || !(v1 >= 0 && v1 <= MIDI_MAX)
+			|| (v2 >= 0 && v2 <= MIDI_MAX)) {
+		throw MidiAppError("Not valid MidiEvent values: " + s);
+	}
+	if (!MidiEvType::isValid(evtype)) {
+		throw MidiAppError("Not valid MidiEvent type: " + s);
+	}
+
 }
 
 //========================================================
@@ -145,9 +153,9 @@ MidiEventRange::MidiEventRange(const string &s, bool out) :
 	if (!parts[0].empty())
 		evtype = static_cast<midi_byte_t>(parts[0][0]);
 
-	ch.init(parts[1]);
-	v1.init(parts[2]);
-	v2.init(parts[3]);
+	ch = ChannelRange(parts[1]);
+	v1 = ValueRange(parts[2]);
+	v2 = ValueRange(parts[3]);
 	if (!this->isValid())
 		throw MidiAppError("Not valid MidiEventRange: " + this->toString());
 }

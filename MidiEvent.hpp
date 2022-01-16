@@ -34,7 +34,7 @@ public:
 			ValueRange(MIDI_MAX, 0, MIDI_MAX) {
 	}
 
-	void init(const string &s);
+	ValueRange(const string &s);
 	bool isValid() const;
 	bool isInsideOf(ValueRange other) const {
 		return lower >= other.lower && upper <= other.upper;
@@ -56,6 +56,9 @@ public:
 	ChannelRange() :
 			ValueRange(MIDI_MAXCH, 0, MIDI_MAXCH) {
 	}
+	ChannelRange(const string &s) :
+			ValueRange(s) {
+	}
 };
 
 //==================== enums ===================================
@@ -63,13 +66,12 @@ public:
 class MidiEvType {
 public:
 	constexpr static midi_byte_t ANYTHING = 'a';
-	constexpr static midi_byte_t NOTEON = 'n'; // on
-	constexpr static midi_byte_t NOTEOFF = 'o'; // stop
+	constexpr static midi_byte_t NOTEON = 'n';
+	constexpr static midi_byte_t NOTEOFF = 'o';
 	constexpr static midi_byte_t CONTROLCHANGE = 'c';
 	constexpr static midi_byte_t PROGCHANGE = 'p';
-	static bool valid(midi_byte_t ch) {
-		vector<midi_byte_t> valid_ch { 'a', 'n', 'o', 's', 'c', 'p' };
-		return std::find(valid_ch.begin(), valid_ch.end(), ch) != valid_ch.end();
+	static bool isValid(midi_byte_t ch) {
+		return string("anocp").find(ch) != string::npos;
 	}
 };
 
@@ -96,6 +98,7 @@ public:
 				<< to_string(v2);
 		return ss.str();
 	}
+	bool isValid() const;
 };
 
 //============== free functions ==============================

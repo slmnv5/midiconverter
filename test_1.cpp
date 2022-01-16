@@ -43,13 +43,9 @@ TEST_CASE( "Test split_string 1" , "[all][basic]" ) {
 }
 
 TEST_CASE( "Test ValueRange 1" , "[all][basic]" ) {
-	ValueRange r0, r1, r2, r3, r4;
-	ChannelRange r5;
-	r1.init("    1 : 2    ; comment : 1: 2:");
-	r2.init("   ; comment : 1: 2:");
-	r3.init(to_string(20));
-	r4.init(" 1: 222");
-	r5.init("1");
+	ValueRange r0, r1("    1 : 2    ; comment : 1: 2:"), r2(
+			"   ; comment : 1: 2:"), r3(to_string(20)), r4(" 1: 222");
+	ChannelRange r5("1");
 
 	SECTION( "Section range 1" ) {
 		REQUIRE((r0.lower == 0 && r0.upper == MIDI_MAX));
@@ -61,7 +57,7 @@ TEST_CASE( "Test ValueRange 1" , "[all][basic]" ) {
 	}
 
 	SECTION( "Section range exception" ) {
-		REQUIRE_THROWS_AS(r1.init("  1 :  2:  5"), MidiAppError);
+		REQUIRE_THROWS_AS(ValueRange("  1 :  2:  5"), MidiAppError);
 	}
 }
 
@@ -75,6 +71,16 @@ TEST_CASE("Test MidiEvent 1", "[all][basic]") {
 	SECTION( "Section error 1" ) {
 		REQUIRE_THROWS_AS(MidiEvent("n,10,20,70,"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEvent("n,10,"), MidiAppError);
+	}
+}
+
+TEST_CASE( "Test MidiEvent 2" , "[all][basic]" ) {
+	SECTION( "Section range 1" ) {
+		REQUIRE_THROWS_AS(MidiEvent("k,2,2,3"), MidiAppError);
+		REQUIRE_THROWS_AS(MidiEvent("n,233,2,3"), MidiAppError);
+		REQUIRE_THROWS_AS(MidiEvent(",2,2,3"), MidiAppError);
+		REQUIRE_THROWS_AS(MidiEvent("a,992,2,3"), MidiAppError);
+
 	}
 }
 
