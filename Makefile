@@ -46,26 +46,35 @@ mimap: $(OBJ_APP)
 	$(CXX)  -o $@ $^  $(LDFLAGS)
 	$(EXTRA_CMDS)
 
-#%.o:	$(PROJECT_ROOT)%.cpp
-#	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CPPFLAGS) -o $@ $<
 
- 
+DEPENDS = $(shell find . -name "*.d")
+
+%.o: %.cpp 
+	$(CXX) $(WARNING) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+
+-include $(DEPENDS)
 
 clean:
 	rm -frv $(TARGET) $(OBJ_APP) $(OBJ_TST) $(EXTRA_CLEAN)
 
 	
+	
+	
+	
+	
 info:
 	cd $(PROJECT_ROOT)
-	@echo LDFLAGS  $(LDFLAGS)
-	@echo CPPFLAGS $(CPPFLAGS)
-	@echo CXXFLAGS $(CXXFLAGS)
-	@echo LDFLAGS $(LDFLAGS)
-	@echo LDLIBS $(LDLIBS)
-	@echo PROJECT_ROOT $(PROJECT_ROOT)
-	@echo BUILD_MODE $(BUILD_MODE)
-	@echo EXTRA_CLEAN $(EXTRA_CLEAN)
-	@echo MAKEFILE_LIST $(MAKEFILE_LIST)
-	@echo OBJ_APP $(OBJ_APP)
-	@echo OBJ_TST $(OBJ_TST)
+	@echo LDFLAGS  -- $(LDFLAGS)
+	@echo CPPFLAGS -- $(CPPFLAGS)
+	@echo CXXFLAGS -- $(CXXFLAGS)
+	@echo LDFLAGS -- $(LDFLAGS)
+	@echo LDLIBS -- $(LDLIBS)
+	@echo PROJECT_ROOT -- $(PROJECT_ROOT)
+	@echo BUILD_MODE -- $(BUILD_MODE)
+	@echo EXTRA_CLEAN -- $(EXTRA_CLEAN)
+	@echo MAKEFILE_LIST -- $(MAKEFILE_LIST)
+	@echo OBJ_APP -- $(OBJ_APP)
+	@echo OBJ_TST -- $(OBJ_TST)
+	@echo DEPENDS -- ${DEPENDS}
  

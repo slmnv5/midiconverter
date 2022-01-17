@@ -35,6 +35,7 @@ int replace_all(string &s, const string &del, const string &repl) {
 }
 
 void remove_spaces(string &s) {
+	s = s.substr(0, s.find(";"));
 	replace_all(s, " ", "");
 	replace_all(s, "\n", "");
 	replace_all(s, "\t", "");

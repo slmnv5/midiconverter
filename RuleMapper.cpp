@@ -58,7 +58,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) const {
 }
 
 const string RuleMapper::toString() const {
-	stringstream ss;
+	ostringstream ss;
 	for (size_t i = 0; i < getSize(); i++) {
 		ss << "#" << i << '\t' << (rules[i]).toString() << endl;
 	}

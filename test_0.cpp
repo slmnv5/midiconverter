@@ -1,15 +1,22 @@
-// In a Catch project with multiple files, dedicate one file to compile the
-// source code of Catch itself and reuse the resulting object file for linking.
 // Let Catch provide main():
-#define CATCH_CONFIG_MAIN
+//#define CATCH_CONFIG_MAIN
+// We have custom main():
+#define CATCH_CONFIG_RUNNER
+
 #include <catch2/catch.hpp>
+#include "log.hpp"
 
-// ^^^
+int main(int argc, char *argv[]) {
+	LOG::ReportingLevel() = loglevel::DEBUG;
+
+	int result = Catch::Session().run(argc, argv);
+
+	return (result < 0xff ? result : 0xff);
+}
+
 // Normally no TEST_CASEs in this file.
-
 // #Compile & run:
-// CATCH_SINGLE_INCLUDE=/usr/include/catch2
-// g++ -std=c++11 -Wall -I$CATCH_SINGLE_INCLUDE -c test_main.cpp
-// g++ -std=c++11 -Wall -I$CATCH_SINGLE_INCLUDE -o test_exe test_main.o test_1.cpp
-// ./test_exe --success
+// g++ -c test_main.cpp
+// g++ -o test_exe test_main.o test_1.cpp
+// run as: ./test_exe --success
 

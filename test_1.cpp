@@ -43,21 +43,50 @@ TEST_CASE( "Test split_string 1" , "[all][basic]" ) {
 }
 
 TEST_CASE( "Test ValueRange 1" , "[all][basic]" ) {
-	ValueRange r0, r1("    1 : 2    ; comment : 1: 2:"), r2(
-			"   ; comment : 1: 2:"), r3(to_string(20)), r4(" 1: 222");
-	ChannelRange r5("1");
 
 	SECTION( "Section range 1" ) {
-		REQUIRE((r0.lower == 0 && r0.upper == MIDI_MAX));
-		REQUIRE((r1.lower == 1 && r1.upper == 2));
-		REQUIRE((r2.lower == 0 && r2.upper == MIDI_MAX));
-		REQUIRE((r3.lower == r3.upper));
-		REQUIRE((r4.lower == 1 && r4.upper == 222 % (MIDI_MAX + 1)));
-		REQUIRE((r5.lower == 1 && r5.upper == 1));
-	}
+		ValueRange r0;
+		REQUIRE(r0.toString() == "0:127");
+		REQUIRE(r0.lower == 0);
+		REQUIRE(r0.upper == MIDI_MAX);
 
-	SECTION( "Section range exception" ) {
+		ValueRange r1("1 : 2 ");
+		REQUIRE(r1.toString() == "1:2");
+		REQUIRE(r1.lower == 1);
+		REQUIRE(r1.upper == 2);
+
+		ValueRange r2("   ; comment : 1: 2:");
+		REQUIRE(r2.lower == 0);
+		REQUIRE(r2.upper == MIDI_MAX);
+
+		ValueRange r3(to_string(20));
+		REQUIRE(r3.lower == r3.upper);
+		REQUIRE(r3.lower == 20);
+
+		REQUIRE_THROWS_AS(ValueRange("  1 : 222 "), MidiAppError);
 		REQUIRE_THROWS_AS(ValueRange("  1 :  2:  5"), MidiAppError);
+
+	}
+}
+
+TEST_CASE("Test ChannelRange 1", "[all][basic]") {
+
+	SECTION( "Section range 1" ) {
+		ChannelRange r0;
+		REQUIRE(r0.toString() == "0:15");
+		REQUIRE(r0.lower == 0);
+		REQUIRE(r0.upper == MIDI_MAXCH);
+
+		REQUIRE_THROWS_AS(ChannelRange(" 1: 22"), MidiAppError);
+		REQUIRE_THROWS_AS(ChannelRange("3:"), MidiAppError);
+
+		ChannelRange r2(" 3  : 8 ");
+		REQUIRE(r2.lower == 3);
+		REQUIRE(r2.upper == 8);
+
+		ChannelRange r3("3");
+		REQUIRE(r3.lower == 3);
+		REQUIRE(r3.upper == 3);
 	}
 }
 
@@ -74,7 +103,7 @@ TEST_CASE("Test MidiEvent 1", "[all][basic]") {
 	}
 }
 
-TEST_CASE( "Test MidiEvent 2" , "[all][basic]" ) {
+TEST_CASE("Test MidiEvent 2", "[all][basic]") {
 	SECTION( "Section range 1" ) {
 		REQUIRE_THROWS_AS(MidiEvent("k,2,2,3"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEvent("n,233,2,3"), MidiAppError);
@@ -86,7 +115,7 @@ TEST_CASE( "Test MidiEvent 2" , "[all][basic]" ) {
 
 TEST_CASE("Test MidiEventRange 1", "[all][basic]") {
 
-	MidiEventRange r1 = MidiEventRange("n,,,,", false);
+	MidiEventRange r1("n,,,,", false);
 
 	SECTION( "Section rule" ) {
 		REQUIRE(r1.isOutEvent == false);

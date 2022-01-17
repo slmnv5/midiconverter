@@ -41,11 +41,13 @@ void NoteCounter::parseString(const string &s) {
 bool NoteCounter::need_count(MidiEvent &ev) {
 	bool is_cc = ev.evtype == MidiEvType::CONTROLCHANGE;
 	bool is_on = ev.evtype == MidiEvType::NOTEON;
-	bool is_off = ev.evtype != MidiEvType::NOTEOFF;
+	bool is_off = ev.evtype == MidiEvType::NOTEOFF;
 	bool is_counted = count_map.count(ev.v1) > 0;
 	bool type_ok = is_cc || is_on || is_off;
 	if (type_ok && is_counted) {
 		if (is_cc) {
+			LOG(loglevel::DEBUG) << "Trying to convert CC to note: "
+					<< ev.toString();
 			return convert_cc_note(ev);
 		} else {
 			return true;
@@ -56,8 +58,9 @@ bool NoteCounter::need_count(MidiEvent &ev) {
 
 bool NoteCounter::convert_cc_note(MidiEvent &ev) {
 	if (ev.is_similar(last_cc)) {
-		auto save_ev = ev;
-		LOG(loglevel::DEBUG) << "Creating note from event: " << ev.toString();
+		last_cc = ev;
+		LOG(loglevel::DEBUG) << "Creating note from event: "
+				<< ev.toString();
 		if (last_cc.v2 < ev.v2) {
 			ev.evtype = MidiEvType::NOTEON;
 			ev.v2 = 101;
@@ -65,10 +68,11 @@ bool NoteCounter::convert_cc_note(MidiEvent &ev) {
 			ev.evtype = MidiEvType::NOTEOFF;
 			ev.v2 = 0;
 		}
-		last_cc = save_ev;
 		return true;
-	} else
-		return false;
+	}
+
+	last_cc = ev;
+	return false;
 }
 
 midi_byte_t NoteCounter::convert_v1(midi_byte_t v1) {

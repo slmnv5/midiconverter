@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[i], "-c") == 0) {
 			countFile = argv[i + 1];
 		} else if (strcmp(argv[i], "-v") == 0) {
-			LOG::gl_level = loglevel::INFO;
+			LOG::ReportingLevel() = loglevel::INFO;
 		} else if (strcmp(argv[i], "-vv") == 0) {
-			LOG::gl_level = loglevel::DEBUG;
+			LOG::ReportingLevel() = loglevel::DEBUG;
 		} else if (strcmp(argv[i], "-h") == 0) {
 			help();
 			exit(0);

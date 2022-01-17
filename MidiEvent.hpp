@@ -23,42 +23,70 @@ public:
 };
 
 class ValueRange {
+protected:
+	void init(const string &s, midi_byte_t max_value);
 public:
-	midi_byte_t max_value, lower, upper;
-
-	ValueRange(midi_byte_t max, midi_byte_t low, midi_byte_t up) :
-			max_value(max), lower(low), upper(up) {
+	midi_byte_t lower, upper;
+	ValueRange(midi_byte_t lw, midi_byte_t up) :
+			lower(lw), upper(up) {
+		if (!isValid()) {
+			throw MidiAppError(err_msg);
+		}
 	}
 
 	ValueRange() :
-			ValueRange(MIDI_MAX, 0, MIDI_MAX) {
+			ValueRange(0, MIDI_MAX) {
 	}
 
-	ValueRange(const string &s);
-	bool isValid() const;
+	ValueRange(const string &s) {
+		init(s, MIDI_MAX);
+		if (!isValid()) {
+			throw MidiAppError(err_msg);
+		}
+	}
+
 	bool isInsideOf(ValueRange other) const {
 		return lower >= other.lower && upper <= other.upper;
 	}
 
-	int size() const {
-		return upper - lower + 1;
-	}
-
 	string toString() const {
-		stringstream ss;
-		ss << static_cast<int>(lower) << ":" << static_cast<int>(upper);
+		std::ostringstream ss;
+		ss << to_string(lower) << ":" << to_string(upper);
 		return ss.str();
 	}
+	bool isValid() const {
+		return (lower >= 0 && lower <= MIDI_MAX)
+				&& (upper >= 0 && upper <= MIDI_MAX);
+	}
+private:
+	string err_msg = "Not valid values for ValueRange";
+
 };
 
 class ChannelRange: public ValueRange {
 public:
 	ChannelRange() :
-			ValueRange(MIDI_MAXCH, 0, MIDI_MAXCH) {
+			ValueRange(0, MIDI_MAXCH) {
 	}
-	ChannelRange(const string &s) :
-			ValueRange(s) {
+	ChannelRange(midi_byte_t lw, midi_byte_t up) :
+			ValueRange(lw, up) {
+		if (!isValid()) {
+			throw MidiAppError("err_msg");
+		}
 	}
+	ChannelRange(const string &s) {
+		init(s, MIDI_MAXCH);
+		if (!isValid()) {
+			throw MidiAppError(err_msg);
+		}
+	}
+	bool isValid() const {
+		return (lower >= 0 && lower <= MIDI_MAXCH)
+				&& (upper >= 0 && upper <= MIDI_MAXCH);
+	}
+private:
+	string err_msg = "Not valid values for ChannelRange";
+
 };
 
 //==================== enums ===================================
@@ -93,9 +121,9 @@ public:
 		return ch == other.ch && v1 == other.v1;
 	}
 	string toString() const {
-		ostringstream ss(ios::binary);
-		ss << evtype << "," << to_string(ch) << "," << to_string(v1) << ","
-				<< to_string(v2);
+		std::ostringstream ss;
+		ss << static_cast<char>(evtype) << "," << to_string(ch) << ","
+				<< to_string(v1) << "," << to_string(v2);
 		return ss.str();
 	}
 	bool isValid() const;
