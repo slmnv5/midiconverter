@@ -51,20 +51,20 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 		ev.v2 = event->data.note.velocity;
 		return true;
 	}
-	if (ev.evtype == SND_SEQ_EVENT_NOTEON) {
+	if (event->type  == SND_SEQ_EVENT_NOTEON) {
 		ev.evtype = MidiEvType::NOTEON;
 		ev.ch = event->data.note.channel;
 		ev.v1 = event->data.note.note;
 		ev.v2 = event->data.note.velocity;
 		return true;
 	}
-	if (ev.evtype == SND_SEQ_EVENT_PGMCHANGE) {
+	if (event->type  == SND_SEQ_EVENT_PGMCHANGE) {
 		ev.evtype = MidiEvType::PROGCHANGE;
 		ev.ch = event->data.control.channel;
 		ev.v1 = event->data.control.value;
 		return true;
 	}
-	if (ev.evtype == SND_SEQ_EVENT_CONTROLLER) {
+	if (event->type  == SND_SEQ_EVENT_CONTROLLER) {
 		ev.evtype = MidiEvType::CONTROLCHANGE;
 		ev.ch = event->data.control.channel;
 		ev.v1 = event->data.control.param;

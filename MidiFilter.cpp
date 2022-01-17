@@ -44,7 +44,7 @@ void MidiFilter::process_events(long count) {
 		}
 
 		if (!readMidiEvent(event, ev)) {
-			LOG(loglevel::DEBUG) << "Unknown MIDI message sent as is";
+			LOG(loglevel::DEBUG) << "Unknown MIDI message sent as is, type: " << to_string(event->type);
 			send_event(event);
 		} else {
 			LOG(loglevel::DEBUG) << "Processing known event: " << ev.toString();
