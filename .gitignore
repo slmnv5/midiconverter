@@ -1,6 +1,9 @@
-/build/
+/build
 /mimap
 /test
+
+*.log
+*.json
 
 # Prerequisites
 *.d
