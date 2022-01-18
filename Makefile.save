@@ -1,4 +1,4 @@
-.PHONY:   info clean  build_debug build_run build_test
+.PHONY: all info clean test_run 
 
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -13,22 +13,33 @@ BUILD_MODE ?= debug
 
 
 LDFLAGS += -pthread -lasound
-CPPFLAGS += -std=c++11 -g
+CPPFLAGS += -std=c++11 
  
 
-build_test: info $(OBJ_TST)
-	@echo "build test and run all tests"
+ifeq ($(BUILD_MODE),test)
+	TARGET = test
+	CFLAGS += -g
+else ifeq ($(BUILD_MODE),debug)
+	CFLAGS += -g
+else ifeq ($(BUILD_MODE),run)
+	CFLAGS += -O2
+else ifeq ($(BUILD_MODE),linuxtools)
+	CFLAGS += -g -pg -fprofile-arcs -ftest-coverage
+	LDFLAGS += -pg -fprofile-arcs -ftest-coverage
+	EXTRA_CLEAN += mimap.gcda mimap.gcno $(PROJECT_ROOT)gmon.out
+	EXTRA_CMDS = rm -rf mimap.gcda
+else
+	CFLAGS += -g
+    #$(error Build mode $(BUILD_MODE) not supported by this Makefile)
+endif
+
+all: info $(TARGET) 
+
+
+test: $(OBJ_TST)
+	@echo "build test"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
 	$(EXTRA_CMDS)
-	./test_0
-
-build_debug: info mimap
-	@echo "build debug and run integration test"
-	./start.sh
-
-build_run: CPPFLAGS = -std=c++11 -O2
-build_run: info mimap
-	@echo "build release, do i need to clean first?"
 
 mimap: $(OBJ_APP)
 	@echo "build app"
@@ -49,6 +60,9 @@ clean:
 
 	
 	
+	
+	
+	
 info:
 	cd $(PROJECT_ROOT)
 	@echo LDFLAGS  -- $(LDFLAGS)
@@ -63,6 +77,4 @@ info:
 	@echo OBJ_APP -- $(OBJ_APP)
 	@echo OBJ_TST -- $(OBJ_TST)
 	@echo DEPENDS -- ${DEPENDS}
-
-
  
