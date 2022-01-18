@@ -3,7 +3,7 @@
 /test
 
 *.log
-*.json
+#*.json
 
 # Prerequisites
 *.d

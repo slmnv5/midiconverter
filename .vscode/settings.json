@@ -1,0 +1,11 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+    "makefile.launchConfigurations": [
+        {
+            "name": "start integration test",
+            "cwd": "/home/pi/git/mimap5",
+            "binaryPath": "/home/pi/git/mimap5/mimap",
+            "binaryArgs": ["-c", "file_count.txt", "-vv"]
+        }
+    ]
+}
