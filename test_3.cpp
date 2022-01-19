@@ -3,15 +3,12 @@
 #include "NoteCounter.hpp"
 #include "catch.hpp"
 
-
-
 TEST_CASE("Test NoteCounter 1", "[all]") {
 	NoteCounter c1("count.txt");
 
-	SECTION( "Section size check" ) {
+	SECTION( "Section load file 1" ) {
 		REQUIRE(c1.get_size() > 2);
 		REQUIRE(c1.convert_v1(60) == 80);
-		REQUIRE(c1.convert_v1(12) == 90);
 	}
 }
 

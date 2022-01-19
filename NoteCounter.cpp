@@ -17,8 +17,12 @@ NoteCounter::NoteCounter(const string &fileName) {
 			if (s.empty())
 				continue;
 			vector<string> parts = split_string(s, "-");
-			key = stoi(parts[0]);
-			value = stoi(parts[1]);
+			if (parts.size() != 2) {
+				throw MidiAppError("String must have 2 parts: " + s);
+			}
+
+			key = std::atoi(parts[0].c_str());
+			value = std::atoi(parts[1].c_str());
 			count_map[key] = value;
 		} catch (exception &e) {
 			LOG(LogLvl::ERROR)

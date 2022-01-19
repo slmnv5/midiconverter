@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
 	char *ruleFile = nullptr;
 	char *countFile = nullptr;
-	const char *clientName = "mimap";
+	char *clientName = nullptr;
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
@@ -43,12 +43,13 @@ int main(int argc, char *argv[]) {
 
 	try {
 		MidiFilter *mf = nullptr;
+		const char *clName = clientName == nullptr ? "mimap" : clientName;
 		if (ruleFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start rule processing";
-			mf = new MidiFilterRule(clientName, ruleFile);
+			mf = new MidiFilterRule(clName, ruleFile);
 		} else if (countFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start count processing";
-			mf = new MidiFilterCount(clientName, countFile);
+			mf = new MidiFilterCount(clName, countFile);
 		}
 		LOG(LogLvl::INFO)
 				<< "Opening MIDI ports. Use 'aconnect' to see ports and connect to them";
