@@ -5,19 +5,19 @@
 
 using std::cout;
 
-enum class loglevel {
-	ERROR, WARN, INFO, DEBUG
+enum class LogLvl {
+	DEBUG, INFO, WARN, ERROR
 };
 
 class Log {
 public:
 	Log();
 	virtual ~Log();
-	std::ostream& Get(loglevel level = loglevel::INFO);
+	std::ostream& Get(LogLvl level = LogLvl::INFO);
 public:
-	static loglevel& ReportingLevel();
-	static std::string ToString(loglevel level);
-	static loglevel FromString(const std::string &level);
+	static LogLvl& ReportingLevel();
+	static std::string toString(LogLvl level);
+	static LogLvl FromString(const std::string &level);
 protected:
 
 private:
@@ -28,11 +28,8 @@ private:
 inline Log::Log() {
 }
 
-inline std::ostream& Log::Get(loglevel level) {
-	cout << ToString(level) << ": ";
-	int k = (int) level > (int) loglevel::DEBUG ?
-			(int) level - (int) loglevel::DEBUG : 0;
-	cout << std::string(k, '\t');
+inline std::ostream& Log::Get(LogLvl level) {
+	cout << toString(level) << ": ";
 	return cout;
 }
 
@@ -41,20 +38,20 @@ inline Log::~Log() {
 	cout.flush();
 }
 
-inline loglevel& Log::ReportingLevel() {
-	static loglevel reportingLevel = loglevel::DEBUG;
+inline LogLvl& Log::ReportingLevel() {
+	static LogLvl reportingLevel = LogLvl::DEBUG;
 	return reportingLevel;
 }
 
-inline std::string Log::ToString(loglevel level) {
-	static const char *const buffer[] = { "ERROR", "WARN", "INFO", "DEBUG" };
+inline std::string Log::toString(LogLvl level) {
+	static const char *const buffer[] = { "DEBUG", "INFO", "WARN", "ERROR" };
 	return buffer[(int) level];
 }
 
 typedef Log LOG;
 
 #define LOG(level) \
-    if (level > LOG::ReportingLevel()) ; \
+    if (level < LOG::ReportingLevel()) ; \
     else Log().Get(level)
 
 #endif

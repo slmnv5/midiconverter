@@ -19,7 +19,7 @@ NoteCounter::NoteCounter(const string &fileName) {
 			value = stoi(parts[1]);
 			count_map[key] = value;
 		} catch (exception &e) {
-			LOG(loglevel::ERROR)
+			LOG(LogLvl::ERROR)
 					<< "Line: " + to_string(k) + " in " + fileName + " Error: "
 							+ e.what();
 		}
@@ -46,7 +46,7 @@ bool NoteCounter::is_countable_note(MidiEvent &ev) {
 	bool type_ok = is_cc || is_on || is_off;
 	if (type_ok && is_counted) {
 		if (is_cc) {
-			LOG(loglevel::DEBUG) << "Trying to convert CC to note: "
+			LOG(LogLvl::DEBUG) << "Trying to convert CC to note: "
 					<< ev.toString();
 			return convert_cc_note(ev);
 		} else {
@@ -59,7 +59,7 @@ bool NoteCounter::is_countable_note(MidiEvent &ev) {
 bool NoteCounter::convert_cc_note(MidiEvent &ev) {
 	if (ev.is_similar(last_cc)) {
 		last_cc = ev;
-		LOG(loglevel::DEBUG) << "Creating note from event: "
+		LOG(LogLvl::DEBUG) << "Creating note from event: "
 				<< ev.toString();
 		if (last_cc.v2 < ev.v2) {
 			ev.evtype = MidiEvType::NOTEON;

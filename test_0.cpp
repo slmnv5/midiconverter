@@ -7,7 +7,7 @@
 #include "log.hpp"
 
 int main(int argc, char *argv[]) {
-	LOG::ReportingLevel() = loglevel::DEBUG;
+	LOG::ReportingLevel() = LogLvl::DEBUG;
 
 	int result = Catch::Session().run(argc, argv);
 

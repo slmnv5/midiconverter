@@ -17,13 +17,13 @@ int main(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
 			ruleFile = argv[i + 1];
-			LOG(loglevel::INFO) << "Loaded file: " << ruleFile;
+			LOG(LogLvl::INFO) << "Loaded file: " << ruleFile;
 		} else if (strcmp(argv[i], "-c") == 0) {
 			countFile = argv[i + 1];
 		} else if (strcmp(argv[i], "-v") == 0) {
-			LOG::ReportingLevel() = loglevel::INFO;
+			LOG::ReportingLevel() = LogLvl::INFO;
 		} else if (strcmp(argv[i], "-vv") == 0) {
-			LOG::ReportingLevel() = loglevel::DEBUG;
+			LOG::ReportingLevel() = LogLvl::DEBUG;
 		} else if (strcmp(argv[i], "-h") == 0) {
 			help();
 			exit(0);
@@ -38,18 +38,18 @@ int main(int argc, char *argv[]) {
 	try {
 		MidiFilter *mf = nullptr;
 		if (ruleFile != nullptr) {
-			LOG(loglevel::INFO) << "Start rule processing";
+			LOG(LogLvl::INFO) << "Start rule processing";
 			mf = new MidiFilterRule(ruleFile);
 		} else if (countFile != nullptr) {
-			LOG(loglevel::INFO) << "Start count processing";
+			LOG(LogLvl::INFO) << "Start count processing";
 			mf = new MidiFilterCount(countFile);
 		}
-		LOG(loglevel::INFO) << "Open MIDI ports";
+		LOG(LogLvl::INFO) << "Open MIDI ports";
 		mf->open_alsa_connection();
-		LOG(loglevel::INFO) << "Start MIDI messages processing";
+		LOG(LogLvl::INFO) << "Start MIDI messages processing";
 		mf->process_events(88888888);
 	} catch (exception &err) {
-		LOG(loglevel::ERROR) << "! Completed with error !" << err.what();
+		LOG(LogLvl::ERROR) << "! Completed with error !" << err.what();
 	}
 }
 

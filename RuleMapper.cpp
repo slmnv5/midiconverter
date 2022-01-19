@@ -13,7 +13,7 @@ RuleMapper::RuleMapper(const string &fileName) {
 			k++;
 			rules.push_back(MidiEventRule(s));
 		} catch (exception &e) {
-			LOG(loglevel::WARN)
+			LOG(LogLvl::WARN)
 					<< "Line: " + to_string(k) + " in " + fileName + " Error: "
 							+ e.what();
 
@@ -45,7 +45,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) const {
 		if (!inEvent.match(ev))
 			continue;
 
-		LOG(loglevel::DEBUG) << "Found match for event: " << ev.toString()
+		LOG(LogLvl::DEBUG) << "Found match for event: " << ev.toString()
 				<< ", in rule: " << oneRule.toString();
 
 		changed = true;

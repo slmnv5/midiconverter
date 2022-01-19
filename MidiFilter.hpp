@@ -72,7 +72,7 @@ public:
 	~MidiFilterCount() {
 	}
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev);
-	void send_event_delayed(MidiEvent ev, int c_on, int c_off);
+	void send_event_delayed(MidiEvent ev, int c_on);
 };
 
 #endif

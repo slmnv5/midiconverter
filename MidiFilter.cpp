@@ -40,19 +40,17 @@ void MidiFilter::process_events(long count) {
 	while (k++ < count) {
 		int result = snd_seq_event_input(seq_handle, &event);
 		if (result < 0) {
-			LOG(loglevel::WARN) << "Possible loss of MIDI events! "
+			LOG(LogLvl::WARN) << "Possible loss of MIDI events! "
 					<< result;
 			continue;
 		}
 
 		if (!readMidiEvent(event, ev)) {
-			LOG(loglevel::DEBUG)
+			LOG(LogLvl::DEBUG)
 					<< "Unknown MIDI message sent as is, type: "
 					<< to_string(event->type);
 			send_event(event);
 		} else {
-			LOG(loglevel::DEBUG) << "Processing known event: "
-					<< ev.toString();
 			process_one_event(event, ev);
 		}
 	}
@@ -73,10 +71,10 @@ void MidiFilter::send_event(snd_seq_event_t *event) const {
 //===============================================================
 void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	if (rule_mapper.applyRules(ev)) {
-		LOG(loglevel::DEBUG) << "Writing event: " << ev.toString();
+		LOG(LogLvl::DEBUG) << "Writing event: " << ev.toString();
 		writeMidiEvent(event, ev);
 	}
-	LOG(loglevel::DEBUG) << "Sending event: " << ev.toString();
+	LOG(LogLvl::DEBUG) << "Sending event: " << ev.toString();
 	send_event(event);
 }
 
@@ -84,7 +82,7 @@ void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 
 void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	if (!note_counter.is_countable_note(ev)) {
-		LOG(loglevel::DEBUG) << "Ignore non countable event: "
+		LOG(LogLvl::DEBUG) << "Ignore non countable event: "
 				<< ev.toString();
 		snd_seq_free_event(event);
 		return;
@@ -92,26 +90,24 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	bool is_on = ev.evtype == MidiEvType::NOTEON;
 	if (not_similar_or_delayed(ev)) {
 		if (is_on) {
-			LOG(loglevel::DEBUG)
+			LOG(LogLvl::DEBUG)
 					<< "New note, reset count and sent note ON as is: "
 					<< ev.toString();
 			last_ev = ev;
-			count_on = 1;
-			count_off = 0;
+			count_on = count_off = 0;
 		}
 		send_event(event);
 	}
+
 	if (!is_on && count_on == 1) {
 		send_event(event);
 	}
 	snd_seq_ev_clear(event);
-
+	LOG(LogLvl::DEBUG) << "Note: " << ev.toString() << ", on: "
+			<< count_on << ", off:" << count_off;
 	if (is_on) {
 		count_on++;
-		LOG(loglevel::DEBUG) << "Changed ON count for note: "
-				<< ev.toString();
-		thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on,
-				count_off);
+		thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on);
 		t1.detach();
 	} else {
 		count_off++;
@@ -126,11 +122,13 @@ bool MidiFilterCount::not_similar_or_delayed(const MidiEvent &ev) {
 	return !last_ev.is_similar(ev) || delta > millis_600;
 }
 
-void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on,
-		int cnt_off) {
+void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on) {
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on || count_off != cnt_off) {
-// new note came, counts changed, keep waiting
+	if (count_on != cnt_on) {
+		// new note came, count on changed, keep waiting
+		LOG(LogLvl::DEBUG) << "Delayed check note: " << ev.toString()
+				<< ", on: " << count_on << ", off:" << count_off << ", on1: "
+				<< cnt_on;
 		return;
 	}
 	ev.v1 = note_counter.convert_v1(ev.v1) + count_on
