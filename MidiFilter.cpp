@@ -89,53 +89,48 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 		snd_seq_free_event(event);
 		return;
 	}
-
-	auto moment = the_clock::now();
-	if (!last_ev.is_similar(ev)) {
-		LOG(loglevel::DEBUG)
-				<< "New note, reset count and sent note as is: "
-				<< ev.toString();
-		last_ev = ev;
-		last_moment = moment;
-		count_on = 1;
-		count_off = 0;
-		send_event(event);
-		return;
-	}
-
-	millis delta = std::chrono::duration_cast<millis>(moment - last_moment);
-	if (delta > millis_600) {
-		if (ev.evtype == MidiEvType::NOTEON) {
+	bool is_on = ev.evtype == MidiEvType::NOTEON;
+	if (not_similar_or_delayed(ev)) {
+		if (is_on) {
 			LOG(loglevel::DEBUG)
-					<< "After delay reset count and sent note as is: "
+					<< "New note, reset count and sent note ON as is: "
 					<< ev.toString();
 			last_ev = ev;
-			last_moment = moment;
 			count_on = 1;
 			count_off = 0;
-			send_event(event);
-			return;
 		}
+		send_event(event);
 	}
+	if (!is_on && count_on == 1) {
+		send_event(event);
+	}
+	snd_seq_ev_clear(event);
 
-	if (ev.evtype == MidiEvType::NOTEON)
+	if (is_on) {
 		count_on++;
-	else
+		LOG(loglevel::DEBUG) << "Changed ON count for note: "
+				<< ev.toString();
+		thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on,
+				count_off);
+		t1.detach();
+	} else {
 		count_off++;
-
-	snd_seq_free_event(event);
-
-	LOG(loglevel::DEBUG) << "Changed count for note: " << ev.toString();
-
-	thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on,
-			count_off);
-	t1.detach();
+	}
 }
+
+bool MidiFilterCount::not_similar_or_delayed(const MidiEvent &ev) {
+	// true if different from the latest note or note came too late
+	time_pt now = the_clock::now();
+	millis delta = std::chrono::duration_cast<millis>(now - last_moment);
+	last_moment = now;
+	return !last_ev.is_similar(ev) || delta > millis_600;
+}
+
 void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on,
 		int cnt_off) {
 	std::this_thread::sleep_for(millis_600);
 	if (count_on != cnt_on || count_off != cnt_off) {
-		// new note came, counts changed, keep waiting
+// new note came, counts changed, keep waiting
 		return;
 	}
 	ev.v1 = note_counter.convert_v1(ev.v1) + count_on

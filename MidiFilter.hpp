@@ -64,7 +64,7 @@ private:
 	int count_on = 0;
 	int count_off = 0;
 	NoteCounter note_counter;
-
+	bool not_similar_or_delayed(const MidiEvent &ev);
 public:
 	MidiFilterCount(const string &fileName) :
 			note_counter(fileName) {
