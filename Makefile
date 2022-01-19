@@ -1,4 +1,4 @@
-.PHONY:   info clean  build_debug build_run build_test run_test
+.PHONY: info clean build_debug build_run run_test
 
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -11,46 +11,41 @@ OBJ_TST =  $(TMP2:.cpp=.o)
 LDFLAGS += -pthread -lasound
 CPPFLAGS += -std=c++11 -g
  
-run_test: build_debug
-	./mimap -c file_cont.txt -vv
 
-
-build_test: $(OBJ_TST)
-	@echo "build test and run all tests"
+mimap_t: $(OBJ_TST)
+	@echo "build app test and run unit tests"
 	cd $(PROJECT_ROOT)
 	$(CXX)  -o $@ $^  $(LDFLAGS)
+	./mimap_t
 
-
-build_debug: info mimap
-	@echo "build debug and run integration test"
+mimap_d: $(OBJ_APP)
 	cd $(PROJECT_ROOT)
+	@echo "build app debug and run integration test"
+	$(CXX)  -o $@ $^  $(LDFLAGS)
+	./start.sh
+	
+	
 
-build_run: CPPFLAGS = -std=c++11 -O2
-build_run: info mimap
-	@echo "build release"
-	cd $(PROJECT_ROOT)
-
-
+mimap: CPPFLAGS = -std=c++11 -O2
 mimap: $(OBJ_APP)
-	@echo "build app"
 	cd $(PROJECT_ROOT)
+	@echo "build app"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
  
+pch.hpp.gch: pch.hpp
+	$(CXX) $(CXXFLAGS) -x c++-header -c $< -o $@
 
-
+ 
 DEPENDS = $(shell find . -name "*.d")
 
-%.o: %.cpp 
+%.o: %.cpp pch.hpp.gch
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
-
 
 -include $(DEPENDS)
 
 clean:
-	rm -frv  $(OBJ_APP) $(OBJ_TST)  
+	rm -fv  $(OBJ_APP) $(filter-out ./test_0.o, $(OBJ_TST)) ${DEPENDS} mimap_t mimap_d mimap
 
-	
-	
 info:
 	cd $(PROJECT_ROOT)
 	@echo CXX  -- $(CXX)
