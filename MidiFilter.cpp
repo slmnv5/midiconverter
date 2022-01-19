@@ -6,8 +6,7 @@
 
 using namespace std;
 
-void MidiFilter::open_alsa_connection()
-{
+void MidiFilter::open_alsa_connection() {
 	const char *clentName = "mimap_client";
 	const char *inPortName = "mimap_in_port";
 	const char *outPortName = "mimap_out_port";
@@ -19,50 +18,47 @@ void MidiFilter::open_alsa_connection()
 	client = snd_seq_client_id(seq_handle);
 
 	inport = snd_seq_create_simple_port(seq_handle, inPortName,
-										SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
-										SND_SEQ_PORT_TYPE_APPLICATION);
+	SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
+	SND_SEQ_PORT_TYPE_APPLICATION);
 	if (inport < 0)
 		throw MidiAppError("Error creating seq_handle IN port");
 
 	outport = snd_seq_create_simple_port(seq_handle, outPortName,
-										 SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
-										 SND_SEQ_PORT_TYPE_APPLICATION);
+	SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+	SND_SEQ_PORT_TYPE_APPLICATION);
 	if (outport < 0)
 		throw MidiAppError("Error creating seq_handle OUT port");
 
 	cout << "MIDI ports created: IN=" << client << ":" << inport << "   OUT="
-		 << client << ":" << outport << endl;
+			<< client << ":" << outport << endl;
 }
 
-void MidiFilter::process_events(long count)
-{
+void MidiFilter::process_events(long count) {
 	snd_seq_event_t *event = nullptr;
 	MidiEvent ev;
 	long k = 0;
-	while (k++ < count)
-	{
+	while (k++ < count) {
 		int result = snd_seq_event_input(seq_handle, &event);
-		if (result < 0)
-		{
-			LOG(loglevel::WARN) << "Possible loss of MIDI events! " << result;
+		if (result < 0) {
+			LOG(loglevel::WARN) << "Possible loss of MIDI events! "
+					<< result;
 			continue;
 		}
 
-		if (!readMidiEvent(event, ev))
-		{
-			LOG(loglevel::DEBUG) << "Unknown MIDI message sent as is, type: " << to_string(event->type);
+		if (!readMidiEvent(event, ev)) {
+			LOG(loglevel::DEBUG)
+					<< "Unknown MIDI message sent as is, type: "
+					<< to_string(event->type);
 			send_event(event);
-		}
-		else
-		{
-			LOG(loglevel::DEBUG) << "Processing known event: " << ev.toString();
+		} else {
+			LOG(loglevel::DEBUG) << "Processing known event: "
+					<< ev.toString();
 			process_one_event(event, ev);
 		}
 	}
 }
 
-void MidiFilter::send_event(snd_seq_event_t *event) const
-{
+void MidiFilter::send_event(snd_seq_event_t *event) const {
 	snd_seq_ev_set_direct(event);
 
 	// either send to 64:0
@@ -74,24 +70,9 @@ void MidiFilter::send_event(snd_seq_event_t *event) const
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiFilter::send_new(const MidiEvent &ev) const
-{
-
-	snd_seq_event_t *event = new snd_seq_event_t();
-	snd_seq_ev_clear(event);
-
-	if (!writeMidiEvent(event, ev))
-	{
-		snd_seq_free_event(event);
-		return;
-	}
-	send_event(event);
-}
 //===============================================================
-void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev)
-{
-	if (rule_mapper.applyRules(ev))
-	{
+void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
+	if (rule_mapper.applyRules(ev)) {
 		LOG(loglevel::DEBUG) << "Writing event: " << ev.toString();
 		writeMidiEvent(event, ev);
 	}
@@ -101,26 +82,40 @@ void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev)
 
 //===============================
 
-void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev)
-{
-	if (!note_counter.need_count(ev))
-	{
-		LOG(loglevel::DEBUG) << "Ignore non countable event: " << ev.toString();
+void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
+	if (!note_counter.is_countable_note(ev)) {
+		LOG(loglevel::DEBUG) << "Ignore non countable event: "
+				<< ev.toString();
 		snd_seq_free_event(event);
 		return;
 	}
 
 	auto moment = the_clock::now();
-	millis delta = std::chrono::duration_cast<millis>(moment - last_moment);
-	if (delta > millis_600)
-	{
-		LOG(loglevel::DEBUG) << "After delay reset count and sent event as is: "
-							 << ev.toString();
+	if (!last_ev.is_similar(ev)) {
+		LOG(loglevel::DEBUG)
+				<< "New note, reset count and sent note as is: "
+				<< ev.toString();
 		last_ev = ev;
 		last_moment = moment;
-		count_on = count_off = 0;
+		count_on = 1;
+		count_off = 0;
 		send_event(event);
 		return;
+	}
+
+	millis delta = std::chrono::duration_cast<millis>(moment - last_moment);
+	if (delta > millis_600) {
+		if (ev.evtype == MidiEvType::NOTEON) {
+			LOG(loglevel::DEBUG)
+					<< "After delay reset count and sent note as is: "
+					<< ev.toString();
+			last_ev = ev;
+			last_moment = moment;
+			count_on = 1;
+			count_off = 0;
+			send_event(event);
+			return;
+		}
 	}
 
 	if (ev.evtype == MidiEvType::NOTEON)
@@ -128,30 +123,30 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev)
 	else
 		count_off++;
 
-	LOG(loglevel::DEBUG) << "Changed count for event: " << ev.toString();
+	snd_seq_free_event(event);
 
-	
+	LOG(loglevel::DEBUG) << "Changed count for note: " << ev.toString();
 
-	thread t1(&MidiFilterCount::send_event_delayed, this, event, ev, count_on,
-			  count_off);
+	thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on,
+			count_off);
 	t1.detach();
 }
-void MidiFilterCount::send_event_delayed(snd_seq_event_t *event, MidiEvent ev,
-										 int cnt_on, int cnt_off)
-{
+void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on,
+		int cnt_off) {
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on || count_off != cnt_off)
-	{
+	if (count_on != cnt_on || count_off != cnt_off) {
 		// new note came, counts changed, keep waiting
+		return;
+	}
+	ev.v1 = note_counter.convert_v1(ev.v1) + count_on
+			+ (count_on > count_off ? 5 : 0);
+	count_on = count_off = 0;
+	snd_seq_event_t *event = new snd_seq_event_t();
+	snd_seq_ev_clear(event);
+
+	if (!writeMidiEvent(event, ev)) {
 		snd_seq_free_event(event);
 		return;
 	}
-	else
-	{
-		ev.v1 = note_counter.convert_v1(ev.v1) + count_on + (count_on > count_off ? 5 : 0);
-		writeMidiEvent(event, ev);
-		count_on = count_off = 0;
-		LOG(loglevel::DEBUG) << "Sending event: " << ev.toString();
-		send_event(event);
-	}
+	send_event(event);
 }
