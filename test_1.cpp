@@ -36,7 +36,8 @@ TEST_CASE( "Test split_string 1" , "[all][basic]" ) {
 	}
 
 	SECTION( "Section split parts 2" ) {
-		string s("12 - 15");
+		string s(" 12 – 40;  may send 12, 41, 42, 43, 44, 45, 46, 47  ");
+		remove_spaces(s);
 		auto parts = split_string(s, "=");
 		REQUIRE(parts.size() == 1);
 	}

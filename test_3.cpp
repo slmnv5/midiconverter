@@ -3,7 +3,19 @@
 #include "NoteCounter.hpp"
 #include "catch.hpp"
 
+
+
 TEST_CASE("Test NoteCounter 1", "[all]") {
+	NoteCounter c1("count.txt");
+
+	SECTION( "Section size check" ) {
+		REQUIRE(c1.get_size() > 2);
+		REQUIRE(c1.convert_v1(60) == 80);
+		REQUIRE(c1.convert_v1(12) == 90);
+	}
+}
+
+TEST_CASE("Test NoteCounter 2", "[all]") {
 	NoteCounter c1 { };
 	c1.parseString("60 - 80");
 	c1.parseString("12 - 90");

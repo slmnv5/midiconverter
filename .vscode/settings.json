@@ -10,6 +10,8 @@
     "files.associations": {
         "optional": "cpp",
         "variant": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "chrono": "cpp",
+        "iostream": "cpp"
     }
 }

@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
     {
-        "name": "(gdb) Launch",
+        "name": "my_debug",
         "type": "cppdbg",
         "request": "launch",
-        "program": "./mimap -c file_count.txt -vv",
-        "args": [],
-        "stopAtEntry": true,
+        "program": "./mimap_d",
+        "args": ["-c", "count.txt ", "-vvv"],
+        "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
         "externalConsole": false,

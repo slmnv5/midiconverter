@@ -10,6 +10,7 @@ OBJ_TST =  $(TMP2:.cpp=.o)
 
 LDFLAGS += -pthread -lasound
 CPPFLAGS += -std=c++11 -g
+CXXFLAGS += -std=c++11 -g
  
 
 mimap_t: $(OBJ_TST)
@@ -20,14 +21,16 @@ mimap_t: $(OBJ_TST)
 
 mimap_d: $(OBJ_APP)
 	cd $(PROJECT_ROOT)
-	@echo "build app debug and run integration test"
+	@echo "build debug version"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
-	./start_test.sh
-	
-	
 
+	
+	
+mimap5: extraclean
 mimap5: CPPFLAGS = -std=c++11 -O2
+mimap5: CXXFLAGS = -std=c++11 -O2
 mimap5: $(OBJ_APP)
+	@echo "Build release version"
 	cd $(PROJECT_ROOT)
 	@echo "build app"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
