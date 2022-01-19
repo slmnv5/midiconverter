@@ -1,9 +1,7 @@
-// Let Catch provide main():
-//#define CATCH_CONFIG_MAIN
-// We have custom main():
+// custom main() and we need this in 1-st line:
 #define CATCH_CONFIG_RUNNER
 
-#include <catch2/catch.hpp>
+#include "catch.hpp"
 #include "log.hpp"
 
 int main(int argc, char *argv[]) {

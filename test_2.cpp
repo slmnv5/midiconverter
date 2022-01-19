@@ -2,6 +2,7 @@
 #include "MidiEvent.hpp"
 #include "MidiRange.hpp"
 #include "RuleMapper.hpp"
+#include "catch.hpp"
 
 TEST_CASE( "Test RuleMapper 1" , "[all]" ) {
 	RuleMapper r1 = RuleMapper { };

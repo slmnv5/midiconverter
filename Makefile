@@ -1,11 +1,11 @@
-.PHONY: info clean
+.PHONY: info clean extraclean
 
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 TMP1 = $(shell find . -name "*.cpp" ! -name "test_*cpp")
 OBJ_APP = $(TMP1:.cpp=.o)
 
-TMP2 = $(shell find . -name "*.cpp" ! -name "mimap*cpp")
+TMP2 = $(shell find . -name "*.cpp" ! -name "app_main*cpp")
 OBJ_TST =  $(TMP2:.cpp=.o)
 
 LDFLAGS += -pthread -lasound
@@ -22,12 +22,12 @@ mimap_d: $(OBJ_APP)
 	cd $(PROJECT_ROOT)
 	@echo "build app debug and run integration test"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
-	./start.sh
+	./start_test.sh
 	
 	
 
-mimap: CPPFLAGS = -std=c++11 -O2
-mimap: $(OBJ_APP)
+mimap5: CPPFLAGS = -std=c++11 -O2
+mimap5: $(OBJ_APP)
 	cd $(PROJECT_ROOT)
 	@echo "build app"
 	$(CXX)  -o $@ $^  $(LDFLAGS)
@@ -44,8 +44,13 @@ DEPENDS = $(shell find . -name "*.d")
 -include $(DEPENDS)
 
 clean:
-	rm -fv  $(OBJ_APP) $(filter-out ./test_0.o, $(OBJ_TST)) ${DEPENDS} mimap_t mimap_d mimap
+	cd $(PROJECT_ROOT)
+	rm -fv  $(OBJ_APP) $(filter-out ./test_main.o, $(OBJ_TST)) ${DEPENDS} mimap_t mimap_d mimap5
 
+extraclean:
+	cd $(PROJECT_ROOT)
+	rm -fv  ./*.o ./*.d pch.hpp.gch mimap_t mimap_d mimap5
+	
 info:
 	cd $(PROJECT_ROOT)
 	@echo CXX  -- $(CXX)

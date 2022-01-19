@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
 #include "NoteCounter.hpp"
+#include "catch.hpp"
 
 TEST_CASE("Test NoteCounter 1", "[all]") {
 	NoteCounter c1 { };
