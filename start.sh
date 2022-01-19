@@ -3,14 +3,14 @@
 # prepare all
 aconnect -x
 killall aseqdump
-killall -9 mimap
+killall -9 mimap_d
 killall -9 vmpk
 sleep 2
 
 # start this app.
 vmpk &
 sleep 1
-./mimap -c file_count.txt $@  &
+./mimap_d -c file_count.txt $@  &
 sleep 2
 
 

@@ -1,4 +1,4 @@
-.PHONY: info clean build_debug build_run run_test
+.PHONY: info clean
 
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
