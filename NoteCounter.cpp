@@ -13,7 +13,9 @@ NoteCounter::NoteCounter(const string &fileName) {
 	while (getline(f, s)) {
 		try {
 			k++;
-			s = s.substr(0, s.find(';'));
+			remove_spaces(s);
+			if (s.empty())
+				continue;
 			vector<string> parts = split_string(s, "-");
 			key = stoi(parts[0]);
 			value = stoi(parts[1]);
@@ -59,8 +61,7 @@ bool NoteCounter::is_countable_note(MidiEvent &ev) {
 bool NoteCounter::convert_cc_note(MidiEvent &ev) {
 	if (ev.is_similar(last_cc)) {
 		last_cc = ev;
-		LOG(LogLvl::DEBUG) << "Creating note from event: "
-				<< ev.toString();
+		LOG(LogLvl::DEBUG) << "Creating note from event: " << ev.toString();
 		if (last_cc.v2 < ev.v2) {
 			ev.evtype = MidiEvType::NOTEON;
 			ev.v2 = 101;

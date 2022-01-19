@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
 
 	char *ruleFile = nullptr;
 	char *countFile = nullptr;
+	const char *clientName = "mimap";
+
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
@@ -20,6 +22,8 @@ int main(int argc, char *argv[]) {
 			LOG(LogLvl::INFO) << "Loaded file: " << ruleFile;
 		} else if (strcmp(argv[i], "-c") == 0) {
 			countFile = argv[i + 1];
+		} else if (strcmp(argv[i], "-n") == 0) {
+			clientName = argv[i + 1];
 		} else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
 		} else if (strcmp(argv[i], "-vv") == 0) {
@@ -41,14 +45,15 @@ int main(int argc, char *argv[]) {
 		MidiFilter *mf = nullptr;
 		if (ruleFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start rule processing";
-			mf = new MidiFilterRule(ruleFile);
+			mf = new MidiFilterRule(clientName, ruleFile);
 		} else if (countFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start count processing";
-			mf = new MidiFilterCount(countFile);
+			mf = new MidiFilterCount(clientName, countFile);
 		}
-		LOG(LogLvl::INFO) << "Open MIDI ports";
+		LOG(LogLvl::INFO)
+				<< "Opening MIDI ports. Use 'aconnect' to see ports and connect to them";
 		mf->open_alsa_connection();
-		LOG(LogLvl::INFO) << "Start MIDI messages processing";
+		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		mf->process_events(88888888);
 	} catch (exception &err) {
 		LOG(LogLvl::ERROR) << "! Completed with error !" << err.what();
@@ -57,10 +62,12 @@ int main(int argc, char *argv[]) {
 
 void help() {
 	cout
-			<< "Usage: mimap3 -f <rules_file> [options] \n"
-					"  -r <rules_file> load file for MIDI mapping, see file_rules.txt for details\n"
-					"  -c <count_file> load file for MIDI count, see file_count.txt for details\n"
+			<< "Usage: mimap3 <-r | -c file> [options] \n"
+					"  -r <file> load file for MIDI mapping, see rules.txt for details\n"
+					"  -c <file> load file for MIDI counting, see count.txt for details\n"
+					"	options:\n"
 					"  -h displays this info\n"
+					"  -n [name] MIDI client name\n"
 					"  -v verbose output\n"
 					"  -vv more verbose\n"
 					"  -vvv even more verbose\n";

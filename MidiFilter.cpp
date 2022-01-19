@@ -7,23 +7,22 @@
 using namespace std;
 
 void MidiFilter::open_alsa_connection() {
-	const char *clentName = "mimap_client";
-	const char *inPortName = "mimap_in_port";
-	const char *outPortName = "mimap_out_port";
+	const string inPortName = clientName + "_in";
+	const string outPortName = clientName + "_out";
 
 	if (snd_seq_open(&seq_handle, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0)
 		throw MidiAppError("Error opening ALSA seq_handle");
 
-	snd_seq_set_client_name(seq_handle, clentName);
+	snd_seq_set_client_name(seq_handle, clientName.c_str());
 	client = snd_seq_client_id(seq_handle);
 
-	inport = snd_seq_create_simple_port(seq_handle, inPortName,
+	inport = snd_seq_create_simple_port(seq_handle, inPortName.c_str(),
 	SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
 	SND_SEQ_PORT_TYPE_APPLICATION);
 	if (inport < 0)
 		throw MidiAppError("Error creating seq_handle IN port");
 
-	outport = snd_seq_create_simple_port(seq_handle, outPortName,
+	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
 	SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
 	SND_SEQ_PORT_TYPE_APPLICATION);
 	if (outport < 0)
@@ -40,14 +39,12 @@ void MidiFilter::process_events(long count) {
 	while (k++ < count) {
 		int result = snd_seq_event_input(seq_handle, &event);
 		if (result < 0) {
-			LOG(LogLvl::WARN) << "Possible loss of MIDI events! "
-					<< result;
+			LOG(LogLvl::WARN) << "Possible loss of MIDI events! " << result;
 			continue;
 		}
 
 		if (!readMidiEvent(event, ev)) {
-			LOG(LogLvl::DEBUG)
-					<< "Unknown MIDI message sent as is, type: "
+			LOG(LogLvl::DEBUG) << "Unknown MIDI message sent as is, type: "
 					<< to_string(event->type);
 			send_event(event);
 		} else {
@@ -59,9 +56,9 @@ void MidiFilter::process_events(long count) {
 void MidiFilter::send_event(snd_seq_event_t *event) const {
 	snd_seq_ev_set_direct(event);
 
-	// either send to 64:0
-	// snd_seq_ev_set_dest(event, 64, 0);
-	// or send to subscribers of source port
+// either send to 64:0
+// snd_seq_ev_set_dest(event, 64, 0);
+// or send to subscribers of source port
 	snd_seq_ev_set_subs(event);
 
 	snd_seq_ev_set_source(event, outport);
@@ -103,8 +100,8 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 		send_event(event);
 	}
 	snd_seq_ev_clear(event);
-	LOG(LogLvl::DEBUG) << "Note: " << ev.toString() << ", on: "
-			<< count_on << ", off:" << count_off;
+	LOG(LogLvl::DEBUG) << "Note: " << ev.toString() << ", on: " << count_on
+			<< ", off:" << count_off;
 	if (is_on) {
 		count_on++;
 		thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on);
@@ -115,7 +112,7 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 }
 
 bool MidiFilterCount::not_similar_or_delayed(const MidiEvent &ev) {
-	// true if different from the latest note or note came too late
+// true if different from the latest note or note came too late
 	time_pt now = the_clock::now();
 	millis delta = std::chrono::duration_cast<millis>(now - last_moment);
 	last_moment = now;

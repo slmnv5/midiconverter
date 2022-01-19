@@ -14,9 +14,10 @@ protected:
 	int inport = -1;
 	int outport = -1;
 	snd_seq_t *seq_handle = nullptr;
-
+	const string &clientName;
 public:
-	MidiFilter() {
+	MidiFilter(const string &clentName) :
+			clientName(clentName) {
 	}
 	virtual ~MidiFilter() {
 	}
@@ -34,8 +35,8 @@ private:
 	const RuleMapper rule_mapper;
 
 public:
-	MidiFilterRule(const string &ruleFile) :
-			rule_mapper(ruleFile) {
+	MidiFilterRule(const string &clientName, const string &ruleFile) :
+			MidiFilter(clientName), rule_mapper(ruleFile) {
 	}
 	virtual ~MidiFilterRule() {
 	}
@@ -66,8 +67,8 @@ private:
 	NoteCounter note_counter;
 	bool not_similar_or_delayed(const MidiEvent &ev);
 public:
-	MidiFilterCount(const string &fileName) :
-			note_counter(fileName) {
+	MidiFilterCount(const string &clientName, const string &fileName) :
+			MidiFilter(clientName), note_counter(fileName) {
 	}
 	~MidiFilterCount() {
 	}
