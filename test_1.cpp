@@ -1,6 +1,5 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
-#include "MidiRange.hpp"
 #include "utils.hpp"
 #include "log.hpp"
 #include "catch.hpp"

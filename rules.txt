@@ -1,20 +1,20 @@
 ; Below are rules for matching incoming MIDI messages and converting them to other messages.
 ; Every incoming messages goes trough the list of rules from top to bottom
-; Semicolumn starts a comment that goes to the end of the line
+; Semicolon starts a comment that goes to the end of the line
 
 ; If a message matches first part of a rule, it is converted as described by the second part of the rule.
 ; Rule parts are separated by '=' or '>'
-; With '>' - the rule is terminating, scanning rules stops if match is found
-; With '=' - the rule is not terminating, newly converted message goes throgh remaining rules
+; With '>' the rule is terminating, scanning rules stops if match is found
+; With '=' the rule is not terminating, newly converted message goes throgh remaining rules
 
 ; First part of rule matches event by type, channel and  2 MIDI values e.g. 'n,5,10,20'
-; Second part describes converted message e.g. 'n,6,20,30'
+; Second part describes converted message e. g. 'n,6,20,30'
 ; Message types are few: n-note on, o-note off, p-program change, c-control change, a-any type
 ; MIDI channel is number in the range 0:15. MIDI values are numbers in the range 0:127 
 
 ; Examples of 1st part of a rule:
 ; 'n,2,30:40,120:127' - matches note on channel 2, note number 30:40, velocity 120:127   
-; 'c,,,120:127' - matches control on any channel (i.e. 0:15), any control number (0:127), and control value 120:127   
+; 'c,,,120:127' - matches control on any channel (0:15), any control number (0:127), and control value in 120:127   
 
 ; Example of 2nd part of rule:
 ; 'c,2, , ,' - convert to CC on channel 2, keep MIDI values the same

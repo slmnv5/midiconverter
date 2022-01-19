@@ -1,7 +1,5 @@
 #include "pch.hpp"
 #include "utils.hpp"
-//#include "MidiEvent.hpp"
-//#include "MidiRange.hpp"
 
 using namespace std;
 

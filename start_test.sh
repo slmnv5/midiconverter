@@ -8,16 +8,15 @@ killall -9 vmpk
 sleep 2
 
 # start this app.
-vmpk &
-sleep 2
 ./mimap_d -c count.txt -n counter $@  &
 sleep 2
+vmpk &
+sleep 2
 
-
-CLIENT=$(aconnect -l | awk '/counter/ {print $2}')
-INPORT=$(aconnect -l | awk '/counter_in/ {print $1}')
-OUTPORT=$(aconnect -l | awk '/counter_out/ {print $1}')
-MIDIKEYS=$(aconnect -l | awk '/VMPK Output/ {print $2}')
+CLIENT=$(aconnect -l | awk '/counter/ {print $2;exit}')
+INPORT=$(aconnect -l | awk '/counter_in/ {print $1;exit}')
+OUTPORT=$(aconnect -l | awk '/counter_out/ {print $1;exit}')
+MIDIKEYS=$(aconnect -l | awk '/VMPK Output/ {print $2;exit}')
 echo aconnect ${MIDIKEYS}0 ${CLIENT}${INPORT} 
 aconnect ${MIDIKEYS}0 ${CLIENT}${INPORT}  || exit 1
 
