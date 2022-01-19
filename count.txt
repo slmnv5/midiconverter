@@ -26,6 +26,7 @@
 
 ; Below rules are for Irig Blueboard MIDI controller that has four notes: 60, 62, 64, 65 and two CC 12, 13
 
+2 - 5; ss ddf g 2, 42, 5,
 12 – 40;  may send 12, 41, 42, 43, 44, 45, 46, 47
 13 - 50
 60 - 80
