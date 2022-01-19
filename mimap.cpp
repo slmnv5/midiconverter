@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
 	char *ruleFile = nullptr;
 	char *countFile = nullptr;
-
+	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
 			ruleFile = argv[i + 1];
@@ -21,8 +21,10 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[i], "-c") == 0) {
 			countFile = argv[i + 1];
 		} else if (strcmp(argv[i], "-v") == 0) {
-			LOG::ReportingLevel() = LogLvl::INFO;
+			LOG::ReportingLevel() = LogLvl::WARN;
 		} else if (strcmp(argv[i], "-vv") == 0) {
+			LOG::ReportingLevel() = LogLvl::INFO;
+		} else if (strcmp(argv[i], "-vvv") == 0) {
 			LOG::ReportingLevel() = LogLvl::DEBUG;
 		} else if (strcmp(argv[i], "-h") == 0) {
 			help();
@@ -60,8 +62,8 @@ void help() {
 					"  -c <count_file> load file for MIDI count, see file_count.txt for details\n"
 					"  -h displays this info\n"
 					"  -v verbose output\n"
-					"  -vv more verbose\n";
-
+					"  -vv more verbose\n"
+					"  -vvv even more verbose\n";
 	exit(0);
 }
 
