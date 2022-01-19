@@ -1,0 +1,34 @@
+; Below is a map to count incoming MIDI notes to create other notes.
+; This may be useful with a MIDI controller that has few buttons but needs to send many different messages.
+; Below rules are for Irig Blueboard MIDI pedal that may send four notes: 60, 62, 64, 65 and two CC messages 12, 13
+; With these rules the number of messages is increased 6-7 times.
+
+; If note number is in the left column this note is counted, otherwise it is ignored
+; Application finds a mapped note in the right colum (e.g. 60 - 80)
+; Then it starts counting of similar notes (same channel and same note) that follow.
+; When count is over app. sends new note  equal to:
+; mapped note + number of note ONs + 5 if the last note OFF was delayed.
+; If similar note does not arrive in 0.6 seconds or some other note arrives the count is over
+
+; Examples:
+; double tap of note 60 will send counted note: 80 + 2 = 82 
+; double tap of note 60 with hold at the end will send note:  80 + 2 + 5 = 87
+; triple tap of note 60 with hold at the end will send note:  80 + 3 + 5 = 88
+; In every example note 60 (ON and OFF) is send as well but only one time.
+
+; Instead of note a control change (CC) message may be used. CC is converted to the note with the same MIDI number.
+; Note ON is generated when CC value is increased. Note OFF - when CC value goes is decreased. 
+; In other words an expression pedal may be used to create counted notes. 
+ 
+; Application creates 2 MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
+; Example of command line:
+; mimap -c count.txt 
+
+12 - 40
+13 - 50
+60 - 80
+62 - 90
+64 - 100
+65 - 110
+
+

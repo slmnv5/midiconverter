@@ -10,7 +10,7 @@ sleep 2
 # start this app.
 vmpk &
 sleep 1
-./mimap_d -c file_count.txt $@  &
+./mimap_d -c count.txt $@  &
 sleep 2
 
 
