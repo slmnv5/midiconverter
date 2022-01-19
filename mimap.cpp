@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 		LOG(loglevel::INFO) << "Start MIDI messages processing";
 		mf->process_events(88888888);
 	} catch (exception &err) {
-		LOG(loglevel::ERROR) << err.what();
+		LOG(loglevel::ERROR) << "! Completed with error !" << err.what();
 	}
 }
 

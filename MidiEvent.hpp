@@ -131,7 +131,7 @@ public:
 
 //============== free functions ==============================
 
-void writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
+bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
 bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);
 
 //=============================================================
