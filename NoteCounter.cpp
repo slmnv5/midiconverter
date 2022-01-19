@@ -38,7 +38,7 @@ void NoteCounter::parseString(const string &s) {
 	count_map[key] = value;
 }
 
-bool NoteCounter::need_count(MidiEvent &ev) {
+bool NoteCounter::is_countable_note(MidiEvent &ev) {
 	bool is_cc = ev.evtype == MidiEvType::CONTROLCHANGE;
 	bool is_on = ev.evtype == MidiEvType::NOTEON;
 	bool is_off = ev.evtype == MidiEvType::NOTEOFF;

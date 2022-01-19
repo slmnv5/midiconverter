@@ -18,11 +18,11 @@ TEST_CASE("Test NoteCounter 1", "[all]") {
 				"c,1,12,33"), e5("c,1,100,33");
 
 		REQUIRE(e1.v1 == 60);
-		REQUIRE(c1.need_count(e1) == true);
-		REQUIRE(c1.need_count(e2) == false);
-		REQUIRE(c1.need_count(e3) == true);
-		REQUIRE(c1.need_count(e4) == false);
-		REQUIRE(c1.need_count(e5) == false);
+		REQUIRE(c1.is_countable_note(e1) == true);
+		REQUIRE(c1.is_countable_note(e2) == false);
+		REQUIRE(c1.is_countable_note(e3) == true);
+		REQUIRE(c1.is_countable_note(e4) == false);
+		REQUIRE(c1.is_countable_note(e5) == false);
 
 	}
 
@@ -30,11 +30,11 @@ TEST_CASE("Test NoteCounter 1", "[all]") {
 		MidiEvent e1("c,1,12,33"), e2("c,1,12,34"), e3("c,1,12,35"), e4(
 				"c,1,12,36"), e5("c,1,0,37");
 
-		REQUIRE(c1.need_count(e1) == false);
-		REQUIRE(c1.need_count(e2) == true);
-		REQUIRE(c1.need_count(e3) == true);
-		REQUIRE(c1.need_count(e4) == true);
-		REQUIRE(c1.need_count(e5) == false);
+		REQUIRE(c1.is_countable_note(e1) == false);
+		REQUIRE(c1.is_countable_note(e2) == true);
+		REQUIRE(c1.is_countable_note(e3) == true);
+		REQUIRE(c1.is_countable_note(e4) == true);
+		REQUIRE(c1.is_countable_note(e5) == false);
 
 	}
 
