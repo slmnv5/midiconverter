@@ -82,8 +82,15 @@ void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	if (!note_counter.is_countable(ev)) {
 		LOG(LogLvl::DEBUG) << "Ignore non countable event: "
 				<< ev.toString();
-	} else if (ev.isCc() && note_counter.convert_cc_note(ev)) {
-		process_note(ev);
+	} else if (ev.isCc()) {
+		int on_off = note_counter.convert_cc_note(ev);
+		if (on_off > 0) {
+			MidiEvent e1(MidiEventType::NOTEON, ev.ch, ev.v1, 100);
+			process_note(e1);
+		} else if (on_off < 0) {
+			MidiEvent e1(MidiEventType::NOTEOFF, ev.ch, ev.v1, 0);
+			process_note(e1);
+		}
 	} else if (ev.isNote()) {
 		process_note(ev);
 	}

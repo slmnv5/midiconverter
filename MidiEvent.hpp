@@ -125,6 +125,11 @@ public:
 	midi_byte_t v1; // MIDI note or cc
 	midi_byte_t v2; // MIDI velocity or cc value
 
+	inline bool operator==(MidiEvent other) const {
+		return evtype == other.evtype && ch == other.ch && v1 == other.v1
+				&& v2 == other.v2;
+	}
+
 	inline bool is_similar(const MidiEvent &other) const {
 		return ch == other.ch && v1 == other.v1;
 	}

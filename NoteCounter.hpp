@@ -7,10 +7,11 @@ using namespace std;
 
 class NoteCounter {
 private:
-	MidiEvent last_cc;
-	bool sent_on = false;
+
 	count_map_t count_map;
 public:
+	MidiEvent last_cc;
+	bool sent_on = false;
 	NoteCounter() :
 			count_map { } {
 	}
@@ -19,7 +20,7 @@ public:
 	inline bool is_countable(MidiEvent &ev) {
 		return count_map.count(ev.v1) > 0;
 	}
-	bool convert_cc_note(MidiEvent &ev);
+	int convert_cc_note(const MidiEvent &ev);
 	midi_byte_t convert_v1(midi_byte_t v1);
 	inline size_t get_size() const {
 		return count_map.size();

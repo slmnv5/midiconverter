@@ -49,15 +49,36 @@ TEST_CASE("Test NoteCounter 2", "[all]") {
 		MidiEvent e1("c,1,12,33"), e2("c,1,12,34"), e3("c,1,12,35"), e4(
 				"c,1,12,36"), e5("c,1,0,37");
 
-		REQUIRE(c1.convert_cc_note(e1) == false);
-		REQUIRE(c1.convert_cc_note(e2) == false);
-		REQUIRE(c1.convert_cc_note(e3) == false);
-		REQUIRE(c1.convert_cc_note(e4) == false);
-		REQUIRE(c1.convert_cc_note(e5) == false);
-		REQUIRE(c1.convert_cc_note(e4) == true);
-		REQUIRE(c1.convert_cc_note(e3) == false);
-		REQUIRE(c1.convert_cc_note(e2) == false);
-		REQUIRE(c1.convert_cc_note(e1) == false);
+		REQUIRE(c1.convert_cc_note(e1) == 0);
+		REQUIRE(c1.last_cc == e1);
+		REQUIRE(c1.sent_on == false);
+
+		REQUIRE(c1.convert_cc_note(e2) == 0);
+		REQUIRE(c1.last_cc == e2);
+		REQUIRE(c1.sent_on == false);
+
+		REQUIRE(c1.convert_cc_note(e3) == 0);
+		REQUIRE(c1.last_cc == e3);
+		REQUIRE(c1.sent_on == false);
+
+		REQUIRE(c1.convert_cc_note(e4) == 0);
+		REQUIRE(c1.last_cc == e4);
+		REQUIRE(c1.sent_on == false);
+
+		REQUIRE(c1.convert_cc_note(e5) == 0);
+		REQUIRE(c1.last_cc == e5);
+		REQUIRE(c1.sent_on == false);
+
+		REQUIRE(c1.convert_cc_note(e4) == 1);
+		REQUIRE(c1.last_cc == e4);
+		REQUIRE(c1.sent_on == true);
+
+		REQUIRE(c1.convert_cc_note(e3) == 0);
+		REQUIRE(c1.last_cc == e3);
+		REQUIRE(c1.sent_on == true);
+
+		REQUIRE(c1.convert_cc_note(e2) == 0);
+		REQUIRE(c1.convert_cc_note(e1) == 0);
 	}
 
 	SECTION( "Section convert to note 2" ) {
