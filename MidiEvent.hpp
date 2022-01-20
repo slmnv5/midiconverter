@@ -91,16 +91,12 @@ private:
 
 //==================== enums ===================================
 
-class MidiEvType {
-public:
-	constexpr static midi_byte_t ANYTHING = 'a';
-	constexpr static midi_byte_t NOTEON = 'n';
-	constexpr static midi_byte_t NOTEOFF = 'o';
-	constexpr static midi_byte_t CONTROLCHANGE = 'c';
-	constexpr static midi_byte_t PROGCHANGE = 'p';
-	static bool isValid(midi_byte_t ch) {
-		return string("anocp").find(ch) != string::npos;
-	}
+enum class MidiEventType : midi_byte_t {
+	ANYTHING = 'a',
+	NOTEON = 'n',
+	NOTEOFF = 'o',
+	CONTROLCHANGE = 'c',
+	PROGCHANGE = 'p'
 };
 
 //=============================================================
@@ -108,11 +104,23 @@ public:
 class MidiEvent {
 public:
 	MidiEvent() :
-			evtype(MidiEvType::ANYTHING), ch(0), v1(0), v2(0) {
+			evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
+	}
+	MidiEvent(MidiEventType evtp, midi_byte_t chan, midi_byte_t val1,
+			midi_byte_t val2) :
+			evtype(evtp), ch(chan), v1(val1), v2(val2) {
+		if (!isValid())
+			throw MidiAppError("Not valid MidiEvent: " + toString());
+	}
+	MidiEvent(const MidiEvent &ev) :
+			evtype(ev.evtype), ch(ev.ch), v1(ev.v1), v2(ev.v2) {
+		if (!isValid())
+			throw MidiAppError("Not valid MidiEvent: " + toString());
 	}
 
 	MidiEvent(const string&);
-	midi_byte_t evtype;
+
+	MidiEventType evtype;
 	midi_byte_t ch; // MIDI channel
 	midi_byte_t v1; // MIDI note or cc
 	midi_byte_t v2; // MIDI velocity or cc value
@@ -126,7 +134,34 @@ public:
 				<< to_string(v1) << "," << to_string(v2);
 		return ss.str();
 	}
-	bool isValid() const;
+
+	inline char typeToChar() const {
+		return static_cast<char>(evtype);
+	}
+	inline bool isTypeValid() const {
+		static const std::string s("anocp");
+		return (s.find(typeToChar()) != std::string::npos);
+	}
+	inline bool isValid() const {
+		return isTypeValid() && (ch >= 0 && ch <= MIDI_MAXCH)
+				&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
+	}
+	inline bool isNote() const {
+		return isNoteOn() || isNoteOff();
+	}
+	inline bool isNoteOn() const {
+		return evtype == MidiEventType::NOTEON;
+	}
+	inline bool isNoteOff() const {
+		return evtype == MidiEventType::NOTEOFF;
+	}
+	inline bool isCc() const {
+		return evtype == MidiEventType::CONTROLCHANGE;
+	}
+	inline bool isPc() const {
+		return evtype == MidiEventType::PROGCHANGE;
+	}
+
 };
 
 //============== free functions ==============================
@@ -139,7 +174,7 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);
 class MidiEventRange {
 public:
 	MidiEventRange() :
-			evtype('a') {
+			evtype(MidiEventType::ANYTHING) {
 	}
 	MidiEventRange(const string &s, bool isOutEvent);
 	string toString() const;
@@ -148,7 +183,7 @@ public:
 	bool isValid() const;
 
 	bool isOutEvent = false;
-	midi_byte_t evtype;
+	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
 	ValueRange v1; // MIDI note or cc
 	ValueRange v2; // MIDI velocity or cc value

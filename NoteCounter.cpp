@@ -44,40 +44,24 @@ void NoteCounter::parseString(const string &s) {
 	count_map[key] = value;
 }
 
-bool NoteCounter::is_countable_note(MidiEvent &ev) {
-	bool is_cc = ev.evtype == MidiEvType::CONTROLCHANGE;
-	bool is_on = ev.evtype == MidiEvType::NOTEON;
-	bool is_off = ev.evtype == MidiEvType::NOTEOFF;
-	bool is_counted = count_map.count(ev.v1) > 0;
-	bool type_ok = is_cc || is_on || is_off;
-	if (type_ok && is_counted) {
-		if (is_cc) {
-			LOG(LogLvl::DEBUG) << "Trying to convert CC to note: "
-					<< ev.toString();
-			return convert_cc_note(ev);
-		} else {
-			return true;
-		}
-	} else
-		return false;
-}
-
 bool NoteCounter::convert_cc_note(MidiEvent &ev) {
-	if (ev.is_similar(last_cc)) {
-		last_cc = ev;
-		LOG(LogLvl::DEBUG) << "Creating note from event: " << ev.toString();
-		if (last_cc.v2 < ev.v2) {
-			ev.evtype = MidiEvType::NOTEON;
-			ev.v2 = 101;
-		} else {
-			ev.evtype = MidiEvType::NOTEOFF;
-			ev.v2 = 0;
-		}
-		return true;
+	bool result = false;
+	if (!ev.is_similar(last_cc)) {
+		sent_on = false;
+		result = false;
+	} else if (last_cc.v2 > ev.v2 and !sent_on) {
+		ev.evtype = MidiEventType::NOTEON;
+		ev.v2 = 100;
+		sent_on = true;
+		result = true;
+	} else if (last_cc.v2 < ev.v2 and sent_on) {
+		ev.evtype = MidiEventType::NOTEOFF;
+		ev.v2 = 0;
+		sent_on = false;
+		result = true;
 	}
-
 	last_cc = ev;
-	return false;
+	return result;
 }
 
 midi_byte_t NoteCounter::convert_v1(midi_byte_t v1) {

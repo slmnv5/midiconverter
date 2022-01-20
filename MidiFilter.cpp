@@ -78,45 +78,43 @@ void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 //===============================
 
 void MidiFilterCount::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
-	if (!note_counter.is_countable_note(ev)) {
+	snd_seq_free_event(event);
+	if (!note_counter.is_countable(ev)) {
 		LOG(LogLvl::DEBUG) << "Ignore non countable event: "
 				<< ev.toString();
-		snd_seq_free_event(event);
-		return;
-	}
-	bool is_on = ev.evtype == MidiEvType::NOTEON;
-	if (not_similar_or_delayed(ev)) {
-		if (is_on) {
-			LOG(LogLvl::DEBUG)
-					<< "New note, reset count and sent note ON as is: "
-					<< ev.toString();
-			last_ev = ev;
-			count_on = count_off = 0;
-		}
-		send_event(event);
-	}
-
-	if (!is_on && count_on == 1) {
-		send_event(event);
-	}
-	snd_seq_ev_clear(event);
-	LOG(LogLvl::DEBUG) << "Note: " << ev.toString() << ", on: " << count_on
-			<< ", off:" << count_off;
-	if (is_on) {
-		count_on++;
-		thread t1(&MidiFilterCount::send_event_delayed, this, ev, count_on);
-		t1.detach();
-	} else {
-		count_off++;
+	} else if (ev.isCc() && note_counter.convert_cc_note(ev)) {
+		process_note(ev);
+	} else if (ev.isNote()) {
+		process_note(ev);
 	}
 }
 
-bool MidiFilterCount::not_similar_or_delayed(const MidiEvent &ev) {
-// true if different from the latest note or note came too late
+void MidiFilterCount::process_note(MidiEvent &ev) {
+	if (!similar_and_fast(ev)) {
+		if (ev.isNoteOn()) {
+			LOG(LogLvl::DEBUG)
+					<< "New note, reset count and sent note ON/OFF: "
+					<< ev.toString();
+			last_ev = ev;
+			count_on = count_off = 0;
+			send_on_off(ev);
+		}
+	}
+
+	if (ev.isNoteOn()) {
+		thread(&MidiFilterCount::send_event_delayed, this, ev, count_on++).detach();
+	} else {
+		count_off++;
+	}
+
+}
+
+bool MidiFilterCount::similar_and_fast(const MidiEvent &ev) {
+// true if event is similar to latest note and came fast
 	time_pt now = the_clock::now();
 	millis delta = std::chrono::duration_cast<millis>(now - last_moment);
 	last_moment = now;
-	return !last_ev.is_similar(ev) || delta > millis_600;
+	return last_ev.is_similar(ev) && delta < millis_600;
 }
 
 void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on) {
@@ -130,13 +128,25 @@ void MidiFilterCount::send_event_delayed(MidiEvent ev, int cnt_on) {
 	}
 	ev.v1 = note_counter.convert_v1(ev.v1) + count_on
 			+ (count_on > count_off ? 5 : 0);
+	assert(ev.isNoteOn() && ev.isValid());
 	count_on = count_off = 0;
+	send_new(ev);
+}
+
+void MidiFilterCount::send_new(const MidiEvent &ev) const {
 	snd_seq_event_t *event = new snd_seq_event_t();
 	snd_seq_ev_clear(event);
-
 	if (!writeMidiEvent(event, ev)) {
 		snd_seq_free_event(event);
+		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
 		return;
-	}
-	send_event(event);
+	};
+}
+
+void MidiFilterCount::send_on_off(const MidiEvent &ev) const {
+	MidiEvent e1(ev);
+	assert(e1.isNoteOn());
+	send_new(e1);
+	e1.evtype = MidiEventType::NOTEOFF;
+	send_new(e1);
 }

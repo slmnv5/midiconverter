@@ -25,7 +25,6 @@ public:
 	void send_event(snd_seq_event_t *event) const;
 	void open_alsa_connection();
 	void process_events(long count);
-	void send_new(const MidiEvent &ev) const;
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	}
 };
@@ -65,7 +64,11 @@ private:
 	int count_on = 0;
 	int count_off = 0;
 	NoteCounter note_counter;
-	bool not_similar_or_delayed(const MidiEvent &ev);
+	bool similar_and_fast(const MidiEvent &ev);
+	void process_cc(MidiEvent &ev);
+	void process_note(MidiEvent &ev);
+	void send_new(const MidiEvent &ev) const;
+	void send_on_off(const MidiEvent &ev) const;
 public:
 	MidiFilterCount(const string &clientName, const string &fileName) :
 			MidiFilter(clientName), note_counter(fileName) {

@@ -131,6 +131,7 @@ TEST_CASE("Test MidiEvent 1", "[all][basic]") {
 
 TEST_CASE("Test MidiEvent 2", "[all][basic]") {
 	SECTION( "Section range 1" ) {
+
 		REQUIRE_THROWS_AS(MidiEvent("k,2,2,3"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEvent("n,233,2,3"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEvent(",2,2,3"), MidiAppError);
