@@ -9,6 +9,7 @@ typedef std::map<midi_byte_t, midi_byte_t> count_map_t;
 extern const midi_byte_t MIDI_MAX;
 extern const midi_byte_t MIDI_MAXCH;
 
+//=============================================================
 class MidiAppError: public std::exception {
 private:
 	string msg;
@@ -21,7 +22,7 @@ public:
 		return this->msg.c_str();
 	}
 };
-
+//=============================================================
 class ValueRange {
 protected:
 	void init(const string &s, midi_byte_t max_value);
@@ -45,10 +46,6 @@ public:
 		}
 	}
 
-	bool isInsideOf(ValueRange other) const {
-		return lower >= other.lower && upper <= other.upper;
-	}
-
 	string toString() const {
 		std::ostringstream ss;
 		ss << to_string(lower) << ":" << to_string(upper);
@@ -62,7 +59,7 @@ private:
 	string err_msg = "Not valid values for ValueRange";
 
 };
-
+//=============================================================
 class ChannelRange: public ValueRange {
 public:
 	ChannelRange() :
@@ -112,11 +109,6 @@ public:
 		if (!isValid())
 			throw MidiAppError("Not valid MidiEvent: " + toString());
 	}
-	MidiEvent(const MidiEvent &ev) :
-			evtype(ev.evtype), ch(ev.ch), v1(ev.v1), v2(ev.v2) {
-		if (!isValid())
-			throw MidiAppError("Not valid MidiEvent: " + toString());
-	}
 
 	MidiEvent(const string&);
 
@@ -124,11 +116,6 @@ public:
 	midi_byte_t ch; // MIDI channel
 	midi_byte_t v1; // MIDI note or cc
 	midi_byte_t v2; // MIDI velocity or cc value
-
-	inline bool operator==(MidiEvent other) const {
-		return evtype == other.evtype && ch == other.ch && v1 == other.v1
-				&& v2 == other.v2;
-	}
 
 	inline bool is_similar(const MidiEvent &other) const {
 		return ch == other.ch && v1 == other.v1;
@@ -168,12 +155,9 @@ public:
 	}
 
 };
-
 //============== free functions ==============================
-
 bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
 bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);
-
 //=============================================================
 
 class MidiEventRange {
@@ -187,7 +171,7 @@ public:
 	void transform(MidiEvent &ev) const;
 	bool isValid() const;
 
-	bool isOutEvent = false;
+	bool isOut = false;
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
 	ValueRange v1; // MIDI note or cc

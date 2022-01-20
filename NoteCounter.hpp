@@ -7,11 +7,10 @@ using namespace std;
 
 class NoteCounter {
 private:
-
+	MidiEvent prev_cc;
+	bool sent_on = false;
 	count_map_t count_map;
 public:
-	MidiEvent last_cc;
-	bool sent_on = false;
 	NoteCounter() :
 			count_map { } {
 	}

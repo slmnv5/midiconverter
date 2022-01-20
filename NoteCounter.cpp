@@ -46,23 +46,19 @@ void NoteCounter::parseString(const string &s) {
 
 int NoteCounter::convert_cc_note(const MidiEvent &ev) {
 	int result = 0;
-	if (!ev.is_similar(last_cc)) {
-		cout << "not simi" << last_cc.toString() << endl;
+	if (!ev.is_similar(prev_cc)) {
 		sent_on = false;
 		result = 0;
-	} else if (last_cc.v2 > ev.v2 and !sent_on) {
-		cout << "v2 more" << last_cc.toString() << endl;
+	} else if (prev_cc.v2 > ev.v2 and !sent_on) {
 		sent_on = true;
 		result = 1;
-	} else if (last_cc.v2 < ev.v2 and sent_on) {
-		cout << "v2 less" << last_cc.toString() << endl;
+	} else if (prev_cc.v2 < ev.v2 and sent_on) {
 		sent_on = false;
 		result = -1;
 	} else {
 		result = 0;
-		cout << "strange" << last_cc.toString() << endl;
 	}
-	last_cc = ev;
+	prev_cc = ev;
 	return result;
 }
 

@@ -145,14 +145,14 @@ TEST_CASE("Test MidiEventRange 1", "[all][basic]") {
 	MidiEventRange r1("n,,,,", false);
 
 	SECTION( "Section rule" ) {
-		REQUIRE(r1.isOutEvent == false);
+		REQUIRE(r1.isOut == false);
 		REQUIRE(r1.ch.toString() == "0:15");
 	}
 }
 
 TEST_CASE("Test MidiEventRule 1", "[all][basic]") {
 
-	MidiEventRule rule = MidiEventRule("n,5,,,>n,2,3,5");
+	MidiEventRule rule("n,5,,,>n,2,3,5");
 
 	SECTION( "Section rule" ) {
 		REQUIRE(rule.terminate == true);
@@ -167,7 +167,7 @@ TEST_CASE("Test MidiEventRule 1", "[all][basic]") {
 
 TEST_CASE("Test MidiEventRule 2", "[all][basic]") {
 
-	MidiEventRule rule = MidiEventRule("n,5,,,=n,2,3,5");
+	MidiEventRule rule("n,5,,,=n,2,3,5");
 	MidiEvent e1("n,5,22,33"), e2("n,6,33,22");
 
 	SECTION( "Section rule" ) {

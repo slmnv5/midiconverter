@@ -132,7 +132,7 @@ MidiEvent::MidiEvent(const string &s1) {
 //========================================================
 
 MidiEventRange::MidiEventRange(const string &s, bool out) :
-		isOutEvent(out), evtype(MidiEventType::ANYTHING) {
+		isOut(out), evtype(MidiEventType::ANYTHING) {
 
 	vector<string> parts = split_string(s, ",");
 
@@ -158,8 +158,8 @@ string MidiEventRange::toString() const {
 }
 
 bool MidiEventRange::match(const MidiEvent &ev) const {
-	if (isOutEvent)
-		throw MidiAppError(string(__func__) + "  Not used for OUT event");
+	if (isOut)
+		throw MidiAppError("Match used for OUT range");
 
 	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING)
 			&& ev.ch >= ch.lower && ev.ch <= ch.upper && ev.v1 >= v1.lower
@@ -167,8 +167,8 @@ bool MidiEventRange::match(const MidiEvent &ev) const {
 }
 
 void MidiEventRange::transform(MidiEvent &ev) const {
-	if (!isOutEvent)
-		throw MidiAppError(string(__func__) + "  Not used for IN event");
+	if (!isOut)
+		throw MidiAppError("Transform used for IN range");
 	ev.evtype = evtype;
 	if (ch.lower == ch.upper)
 		ev.ch = ch.lower;
@@ -180,7 +180,7 @@ void MidiEventRange::transform(MidiEvent &ev) const {
 
 bool MidiEventRange::isValid() const {
 	bool ok = ch.isValid() && v1.isValid() && v2.isValid();
-	if (!isOutEvent) {
+	if (!isOut) {
 		return ok;
 	} else {
 		return (ch.lower == ch.upper) && (v1.lower == v1.upper)
