@@ -31,19 +31,24 @@
 ; Example of command line:
 ; mimap -r rules.txt 
 
-; CC 12 to note ON/OFF
-c,0,12,50:127=n,,40,77=s; CC big value to note ON   
-c,0,12,0:50=n,,40,0=s; CC small value to note OFF 
-; CC 13 to note ON/OFF
-c,0,13,50:127=n,,50,77=s; CC big value to note ON   
-c,0,13,0:50=n,,50,0=s; CC small value to note OFF
+; CC 12 to note 12 ON/OFF
+c,0,12,50:127=n,,12,77=p; CC big value to note ON   
+c,0,12,0:50=n,,12,0=p; CC small value to note OFF 
+
+; CC 13 to note 13 ON/OFF
+c,0,13,50:127=n,,13,77=p; CC big value to note ON   
+c,0,13,0:50=n,,13,0=p; CC small value to note OFF
 
 ; count notes
+n,0,12,=n,,40,=c      
+n,0,13,=n,,60,=c      
 n,0,60,=n,,80,=c; count note 60    
-n,0,62,=n,,90,=c;  
-n,0,64,=n,,100,=c;  
-n,0,65,=n,,110,=c;
-a,,,,=a,,,=p; any other pass as is, without this rule it will be blocked
+n,0,62,=n,,90,=c  
+n,0,64,=n,,100,=c  
+n,0,65,=n,,110,=c
+
+; any other pass as is, without this rule it will be blocked
+a,,,,=a,,,=p
 
  
  
