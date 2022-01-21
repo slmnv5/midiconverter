@@ -8,7 +8,7 @@ killall -9 vmpk
 sleep 2
 
 # start this app.
-./mimap_d -c count.txt -n counter $@  &
+./mimap_d -r rules.txt -n counter $@  &
 sleep 2
 vmpk &
 sleep 2

@@ -111,7 +111,7 @@ bool RuleMapper::similar_and_fast(const MidiEvent &ev) {
 	time_point now = the_clock::now();
 	millis delta = std::chrono::duration_cast<millis>(now - prev_moment);
 	prev_moment = now;
-	return prev_ev == ev && delta < millis_600;
+	return prev_ev.isEqual(ev) && delta < millis_600;
 }
 
 void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {

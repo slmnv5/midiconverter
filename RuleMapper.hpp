@@ -2,9 +2,10 @@
 #define RULEMAPPER_H
 #include "pch.hpp"
 #include "MidiEvent.hpp"
-#include "MidiClient.hpp"
 #include "log.hpp"
 using namespace std;
+
+class MidiClient;
 
 class RuleMapper {
 

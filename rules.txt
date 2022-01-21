@@ -20,12 +20,17 @@
 ; 'c,2, , ,' - convert to CC on channel 2, keep MIDI values the same
 ; 'n,15,,20' - convert to note on channel 15, the same MIDI value for note number, velocity 20
 
+; Example of rule:
+; o,,,=n,,,0=p; convert all note OFF to note ON with zero velocity. This makes rules more simple
+; n,,,0:5=n,0,0,0=p;   
+; n,,,101:127=n,2,,; all loud notes send to channel #2 
+; a,,,,,>o,0,0,0=s; catch any event and convert to a zero note off
+
+
 ; Application creates 2 MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
 ; Example of command line:
 ; mimap -r rules.txt 
 
 
-o,,,=n,,,0; convert all note OFF to note ON with zero velocity. This makes rules more simple
-n,,,0:50>o,,,0; silence all notes on all channels with velocity 0:50  
-n,,,51:127>n,2,,; all notes with velocity > 50 send to channel #2 
-a,,,,,>o,0,0,0; final rule to catch any event and convert to a zero note off
+o,,,=n,,,0=p; convert all note OFF to note ON with zero velocity. This makes rules more simple
+n,,,0:50=n,11,11,11=c; count lower notes   

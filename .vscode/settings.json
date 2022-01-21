@@ -12,6 +12,8 @@
         "variant": "cpp",
         "ostream": "cpp",
         "chrono": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "exception": "cpp",
+        "thread": "cpp"
     }
 }

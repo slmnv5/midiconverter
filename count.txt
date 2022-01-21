@@ -1,36 +1,20 @@
-; Below is a map to count incoming MIDI notes to create other notes.
-; This may be useful with a MIDI controller that has few buttons but needs to send many different messages.
-; With these rules the number of possible messages is increased many times.
+; Why do we need to count incoming MIDI messages just to create other messages?
+; This may be useful for most MIDI controllers that have few buttons but need to send many messages.
+; With counting number of possible messages is increased many times.
 
-; If note number is in the left column it is counted, otherwise it is ignored
-; Application finds a “mapped note” in the right column (e. g. 60 - 80)
-; Then it starts counting of similar notes with the same channel and the same note number
-; When count is over application sends new note  equal to:
+ 
+; Application counts similar notes with the same channel and the same note number.
+; When count is over application sends new note equal to:
 ; mapped note + number of counted note ON messages + 5 if the last note OFF was delayed.
-; If similar note does not arrive in 0.6 seconds or some other note arrives the count stops.
+; If a similar note does not arrive in 0.6 seconds or some other note arrives the count stops.
 
 ; Examples:
-; double tap on note 60 will send counted note: 80 + 2 = 82 
-; double tap on note 60 with a hold at the end will send note:  80 + 2 + 5 = 87
-; triple tap of note 60 with a hold at the end will send note:  80 + 3 + 5 = 88
-; In every example note 60 (ON and OFF) is sent as well but only one time.
+; double tap on note 60 will send counted note: 60 + 2 = 62 
+; double tap on note 60 with a hold at the end will send note:  60 + 2 + 5 = 67
+; triple tap of note 60 with a hold at the end will send note:  60 + 3 + 5 = 68
+; In every example note 60 is sent as well but only one time.
 
-; Instead of a note message a control change (CC) message may be used. 
-; CC is converted to note on same channel with same number
-; Note ON is generated when CC value is increased. Note OFF - when CC value is decreased. 
-; In other words an expression pedal may be used to create counted notes as well. 
- 
-; Application creates 2 MIDI ports IN and OUT that are used to connect with hardware or software MIDI ports.
-; Example of command line:
-; mimap5 -c count.txt  -n my_counter
-
-; Below rules are for Irig Blueboard MIDI controller that has four notes: 60, 62, 64, 65 and two CC 12, 13
 
  
-12 - 40;  may send 12, 41, 42, 43, 44, 45, 46, 47
-13 - 50
-60 - 80
-62 - 90
-64 - 100
-65 - 110
 
+ 
