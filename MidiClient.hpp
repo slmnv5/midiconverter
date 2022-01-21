@@ -24,7 +24,7 @@ public:
 	}
 
 	void send_event(snd_seq_event_t *event) const;
-	void send_new111(const MidiEvent &ev) const;
+	void send_new(const MidiEvent &ev) const;
 	void open_alsa_connection();
 	void process_events(long count);
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {}
@@ -39,7 +39,6 @@ private:
 public:
 	MidiConverter(const string &clientName, const string &ruleFile) : MidiClient(clientName), rule_mapper(ruleFile, *this)
 	{
-		;
 	}
 	virtual ~MidiConverter()
 	{

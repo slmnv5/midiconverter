@@ -14,6 +14,7 @@
         "chrono": "cpp",
         "iostream": "cpp",
         "exception": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "*.tcc": "cpp"
     }
 }

@@ -26,28 +26,25 @@ public:
 	}
 };
 //=============================================================
-class ValueRange
+template <midi_byte_t max>
+class MidiRange
 {
 protected:
-	void init(const string &s, midi_byte_t max_value);
+	void init(const string &s);
 
 public:
+	static const midi_byte_t max_value = max;
 	midi_byte_t lower, upper;
-	ValueRange(midi_byte_t lw, midi_byte_t up) : lower(lw), upper(up)
+
+	MidiRange()
 	{
-		if (!isValid())
-		{
-			throw MidiAppError(err_msg);
-		}
+		lower = 0;
+		upper = max_value;
 	}
 
-	ValueRange() : ValueRange(0, MIDI_MAX)
+	MidiRange(const string &s)
 	{
-	}
-
-	ValueRange(const string &s)
-	{
-		init(s, MIDI_MAX);
+		init(s);
 		if (!isValid())
 		{
 			throw MidiAppError(err_msg);
@@ -60,44 +57,29 @@ public:
 		ss << to_string(lower) << ":" << to_string(upper);
 		return ss.str();
 	}
-	bool isValid() const
+	inline bool isValid() const
 	{
-		return (lower >= 0 && lower <= MIDI_MAX) && (upper >= 0 && upper <= MIDI_MAX);
+		return (lower >= 0 && lower <= max_value) && (upper >= 0 && upper <= max_value);
+	}
+	inline bool isValidToTransform() const
+	{
+		return (lower == 0 && upper == max_value) || (lower == upper && (lower >= 0 && lower <= max_value));
+	}
+	inline bool match(midi_byte_t v) const
+	{
+		return lower <= v && v <= upper;
+	}
+	inline void transform(midi_byte_t v) const
+	{
+		v = lower == upper ? lower : v;
 	}
 
 private:
-	string err_msg = "Not valid values for ValueRange";
+	string err_msg = "Not valid values, must be in range: 0-" + to_string(max_value);
 };
-//=============================================================
-class ChannelRange : public ValueRange
-{
-public:
-	ChannelRange() : ValueRange(0, MIDI_MAXCH)
-	{
-	}
-	ChannelRange(midi_byte_t lw, midi_byte_t up) : ValueRange(lw, up)
-	{
-		if (!isValid())
-		{
-			throw MidiAppError("err_msg");
-		}
-	}
-	ChannelRange(const string &s)
-	{
-		init(s, MIDI_MAXCH);
-		if (!isValid())
-		{
-			throw MidiAppError(err_msg);
-		}
-	}
-	bool isValid() const
-	{
-		return (lower >= 0 && lower <= MIDI_MAXCH) && (upper >= 0 && upper <= MIDI_MAXCH);
-	}
 
-private:
-	string err_msg = "Not valid values for ChannelRange";
-};
+using ValueRange = MidiRange<127>;
+using ChannelRange = MidiRange<15>;
 
 //==================== enums ===================================
 

@@ -33,4 +33,4 @@
 
 
 o,,,=n,,,0=p; convert all note OFF to note ON with zero velocity. This makes rules more simple
-n,,,0:50=n,11,11,11=c; count lower notes   
+;n,,0:50,=n,11,11,11=c; count lower notes   

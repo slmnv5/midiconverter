@@ -84,8 +84,8 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev)
 }
 
 //========================================
-
-void ValueRange::init(const string &s, midi_byte_t max_value)
+template <midi_byte_t max>
+void MidiRange<max>::init(const string &s)
 {
 	string s1(s);
 	remove_spaces(s1);
@@ -185,7 +185,7 @@ bool MidiEventRange::match(const MidiEvent &ev) const
 	if (isOut)
 		throw MidiAppError("Match used for OUT range");
 
-	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING) && ev.ch >= ch.lower && ev.ch <= ch.upper && ev.v1 >= v1.lower && ev.v1 <= v1.upper && ev.v2 >= v2.lower && ev.v2 <= v2.upper;
+	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING) && ch.match(ev.ch) && v1.match(ev.v1) && v2.match(ev.v2);
 }
 
 void MidiEventRange::transform(MidiEvent &ev) const
@@ -193,24 +193,20 @@ void MidiEventRange::transform(MidiEvent &ev) const
 	if (!isOut)
 		throw MidiAppError("Transform used for IN range");
 	ev.evtype = evtype;
-	if (ch.lower == ch.upper)
-		ev.ch = ch.lower;
-	if (v1.lower == v1.upper)
-		ev.v1 = v1.lower;
-	if (v2.lower == v2.upper)
-		ev.v2 = v2.lower;
+	ch.transform(ev.ch);
+	v1.transform(ev.v1);
+	v2.transform(ev.v2);
 }
 
 bool MidiEventRange::isValid() const
 {
-	bool ok = ch.isValid() && v1.isValid() && v2.isValid();
 	if (!isOut)
 	{
-		return ok;
+		return ch.isValid() && v1.isValid() && v2.isValid();
 	}
 	else
 	{
-		return (ch.lower == ch.upper) && (v1.lower == v1.upper) && (v2.lower == v2.upper) && ok;
+		return ch.isValidToTransform() && v1.isValidToTransform() && v2.isValidToTransform();
 	}
 }
 
