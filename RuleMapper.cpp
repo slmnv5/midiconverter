@@ -6,63 +6,54 @@
 
 using namespace std;
 
-RuleMapper::RuleMapper(const string& fileName, const MidiClient& mc) : midi_client(mc)
-{
+RuleMapper::RuleMapper(const string &fileName, const MidiClient &mc) :
+		midi_client(mc) {
 	ifstream f(fileName);
 	string s;
 	int k = 0;
-	while (getline(f, s))
-	{
-		try
-		{
+	while (getline(f, s)) {
+		try {
 			k++;
 			rules.push_back(MidiEventRule(s));
-		}
-		catch (exception& e)
-		{
+		} catch (exception &e) {
 			LOG(LogLvl::WARN)
-				<< "Line: " + to_string(k) + " in " + fileName + " Error: " + e.what();
+					<< "Line: " + to_string(k) + " in " + fileName + " Error: "
+							+ e.what();
 		}
 	}
 	f.close();
 }
-void RuleMapper::parseString(const string& s)
-{
-	MidiEventRule rule{ s };
+void RuleMapper::parseString(const string &s) {
+	MidiEventRule rule { s };
 	rules.push_back(rule);
 }
 
-int RuleMapper::findMatchingRule(const MidiEvent& ev, int startPos) const
-{
-	for (size_t i = startPos; i < getSize(); i++)
-	{
-		const MidiEventRule& oneRule = rules[i];
+int RuleMapper::findMatchingRule(const MidiEvent &ev, int startPos) const {
+	for (size_t i = startPos; i < getSize(); i++) {
+		const MidiEventRule &oneRule = rules[i];
 		if (oneRule.inEventRange.match(ev))
 			return i;
 	}
 	return -1;
 }
 
-bool RuleMapper::applyRules(MidiEvent& ev)
-{
+bool RuleMapper::applyRules(MidiEvent &ev) {
 	// returns true if matching rule found
 	bool changed = false;
 	bool stop = false;
 	bool count = false;
 
-	for (size_t i = 0; i < getSize() && !stop; i++)
-	{
-		const MidiEventRule& oneRule = rules[i];
-		const MidiEventRange& inEvent = oneRule.inEventRange;
+	for (size_t i = 0; i < getSize() && !stop; i++) {
+		const MidiEventRule &oneRule = rules[i];
+		const MidiEventRange &inEvent = oneRule.inEventRange;
 		if (!inEvent.match(ev))
 			continue;
 
 		LOG(LogLvl::INFO) << "Found match for event: " << ev.toString()
-			<< ", in rule: " << oneRule.toString();
+				<< ", in rule: " << oneRule.toString();
 
 		changed = true;
-		switch (oneRule.rutype)
-		{
+		switch (oneRule.rutype) {
 		case MidiRuleType::STOP:
 			oneRule.outEventRange.transform(ev);
 			stop = true;
@@ -85,42 +76,34 @@ bool RuleMapper::applyRules(MidiEvent& ev)
 	return changed;
 }
 
-const string RuleMapper::toString() const
-{
+const string RuleMapper::toString() const {
 	ostringstream ss;
-	for (size_t i = 0; i < getSize(); i++)
-	{
+	for (size_t i = 0; i < getSize(); i++) {
 		ss << "#" << i << '\t' << (rules[i]).toString() << endl;
 	}
 	return ss.str();
 }
 
-void RuleMapper::count_event(const MidiEvent& ev)
-{
+void RuleMapper::count_event(const MidiEvent &ev) {
 	if (!similar_and_fast(ev)) {
-		if (ev.isNoteOn())
-		{
+		if (ev.isNoteOn()) {
 			LOG(LogLvl::INFO) << "New note, reset count and sent: "
-				<< ev.toString();
+					<< ev.toString();
 			prev_ev = ev;
 			count_on = count_off = 0;
 			midi_client.send_new(ev);
 		}
 	}
 
-	if (ev.isNoteOn())
-	{
+	if (ev.isNoteOn()) {
 		count_on++;
 		thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
-	}
-	else
-	{
+	} else {
 		count_off++;
 	}
 }
 
-bool RuleMapper::similar_and_fast(const MidiEvent& ev)
-{
+bool RuleMapper::similar_and_fast(const MidiEvent &ev) {
 	// true if event is similar to latest note and came fast
 	time_point now = the_clock::now();
 	millis delta = std::chrono::duration_cast<millis>(now - prev_moment);
@@ -128,20 +111,18 @@ bool RuleMapper::similar_and_fast(const MidiEvent& ev)
 	return prev_ev.isEqual(ev) && delta < millis_600;
 }
 
-void RuleMapper::send_event_delayed(const MidiEvent& ev, int cnt_on)
-{
+void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on)
-	{
+	if (count_on != cnt_on) {
 		// new note came, count on changed, keep waiting
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: "
-			<< ev.toString() << ", on: " << count_on << ", off:"
-			<< count_off << ", prev_on: " << cnt_on;
+				<< ev.toString() << ", on: " << count_on << ", off:"
+				<< count_off << ", prev_on: " << cnt_on;
 		return;
 	}
 	LOG(LogLvl::DEBUG) << "Delayed check, count NOT changed: "
-		<< ev.toString() << ", on: " << count_on << ", off:" << count_off
-		<< ", prev_on: " << cnt_on;
+			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
+			<< ", prev_on: " << cnt_on;
 
 	midi_byte_t v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
 	MidiEvent e(MidiEventType::NOTEON, ev.ch, v1, 100);

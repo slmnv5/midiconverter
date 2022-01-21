@@ -6,8 +6,7 @@
 
 using namespace std;
 
-class MidiClient
-{
+class MidiClient {
 protected:
 	int client = -1;
 	int inport = -1;
@@ -16,32 +15,30 @@ protected:
 	const string &clientName;
 
 public:
-	MidiClient(const string &clentName) : clientName(clentName)
-	{
+	MidiClient(const string &clentName) :
+			clientName(clentName) {
 	}
-	virtual ~MidiClient()
-	{
+	virtual ~MidiClient() {
 	}
 
 	void send_event(snd_seq_event_t *event) const;
 	void send_new(const MidiEvent &ev) const;
 	void open_alsa_connection();
 	void process_events(long count);
-	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {}
+	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
+	}
 };
 //=============== class that maps in event to out events ============================
 
-class MidiConverter : public MidiClient
-{
+class MidiConverter: public MidiClient {
 private:
 	RuleMapper rule_mapper;
 
 public:
-	MidiConverter(const string &clientName, const string &ruleFile) : MidiClient(clientName), rule_mapper(ruleFile, *this)
-	{
+	MidiConverter(const string &clientName, const string &ruleFile) :
+			MidiClient(clientName), rule_mapper(ruleFile, *this) {
 	}
-	virtual ~MidiConverter()
-	{
+	virtual ~MidiConverter() {
 	}
 
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev);
