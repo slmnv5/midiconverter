@@ -42,8 +42,9 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 	bool changed = false;
 	bool stop = false;
 	bool count = false;
+	MidiEvent ev1;
 
-	for (size_t i = 0; i < getSize() && !stop; i++) {
+	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule &oneRule = rules[i];
 		const MidiEventRange &inEvent = oneRule.inEventRange;
 		if (!inEvent.match(ev))
@@ -62,12 +63,13 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			oneRule.outEventRange.transform(ev);
 			break;
 		case MidiRuleType::COUNT:
-			oneRule.outEventRange.transform(ev);
-			count_event(ev);
+			ev1 = ev;
+			oneRule.outEventRange.transform(ev1);
+			count_event(ev1);
 			stop = true;
 			break;
 		default:
-			throw MidiAppError("");
+			throw MidiAppError("Unknown rule type: " + oneRule.toString());
 		}
 
 		if (stop)
@@ -87,11 +89,10 @@ const string RuleMapper::toString() const {
 void RuleMapper::count_event(const MidiEvent &ev) {
 	if (!similar_and_fast(ev)) {
 		if (ev.isNoteOn()) {
-			LOG(LogLvl::INFO) << "New note, reset count and sent: "
+			LOG(LogLvl::INFO) << "New note, reset count for: "
 					<< ev.toString();
 			prev_ev = ev;
 			count_on = count_off = 0;
-			midi_client.send_new(ev);
 		}
 	}
 
@@ -124,8 +125,9 @@ void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
 			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
 			<< ", prev_on: " << cnt_on;
 
-	midi_byte_t v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
-	MidiEvent e(MidiEventType::NOTEON, ev.ch, v1, 100);
+	midi_byte_t counted_v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
+	MidiEvent e1 = ev;
+	e1.v1 = counted_v1;
 	count_on = count_off = 0;
-	midi_client.send_new(e);
+	midi_client.send_new(e1);
 }

@@ -61,7 +61,7 @@ public:
 	inline bool match(midi_byte_t v) const {
 		return lower <= v && v <= upper;
 	}
-	inline void transform(midi_byte_t v) const {
+	inline void transform(midi_byte_t &v) const {
 		v = lower == upper ? lower : v;
 	}
 
@@ -89,12 +89,6 @@ class MidiEvent {
 public:
 	MidiEvent() :
 			evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
-	}
-	MidiEvent(MidiEventType evtp, midi_byte_t chan, midi_byte_t val1,
-			midi_byte_t val2) :
-			evtype(evtp), ch(chan), v1(val1), v2(val2) {
-		if (!isValid())
-			throw MidiAppError("Not valid MidiEvent: " + toString());
 	}
 
 	MidiEvent(const string&);
@@ -126,13 +120,14 @@ public:
 				&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
 	}
 	inline bool isNote() const {
-		return isNoteOn() || isNoteOff();
+		return evtype == MidiEventType::NOTEON
+				|| evtype == MidiEventType::NOTEOFF;
 	}
 	inline bool isNoteOn() const {
-		return evtype == MidiEventType::NOTEON;
+		return evtype == MidiEventType::NOTEON && v2 > 0;
 	}
 	inline bool isNoteOff() const {
-		return evtype == MidiEventType::NOTEOFF;
+		return evtype == MidiEventType::NOTEOFF || v2 == 0;
 	}
 	inline bool isCc() const {
 		return evtype == MidiEventType::CONTROLCHANGE;
