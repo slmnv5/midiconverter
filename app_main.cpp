@@ -9,12 +9,12 @@ using namespace std;
 
 void help();
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
-	char *ruleFile = nullptr;
+	char* ruleFile = nullptr;
 
-	char *clientName = nullptr;
+	char* clientName = nullptr;
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++)
@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		MidiClient *mf = nullptr;
-		const char *clName = clientName == nullptr ? "mimap" : clientName;
+		MidiClient* mf = nullptr;
+		const char* clName = clientName == nullptr ? "mimap" : clientName;
 
 		LOG(LogLvl::INFO) << "Start rule processing";
 		mf = new MidiConverter(clName, ruleFile);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		mf->process_events(88888888);
 	}
-	catch (exception &err)
+	catch (exception& err)
 	{
 		LOG(LogLvl::ERROR) << "! Completed with error !" << err.what();
 	}
@@ -76,12 +76,12 @@ void help()
 {
 	cout
 		<< "Usage: mimap3 <-r | -c file> [options] \n"
-		   "  -r <file> to load, see rules.txt for details\n"
-		   "	options:\n"
-		   "  -h displays this info\n"
-		   "  -n [name] MIDI client name\n"
-		   "  -v verbose output\n"
-		   "  -vv more verbose\n"
-		   "  -vvv even more verbose\n";
+		"  -r <file> to load, see rules.txt for details\n"
+		"	options:\n"
+		"  -h displays this info\n"
+		"  -n [name] MIDI client name\n"
+		"  -v verbose output\n"
+		"  -vv more verbose\n"
+		"  -vvv even more verbose\n";
 	exit(0);
 }

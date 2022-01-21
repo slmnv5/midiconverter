@@ -16,11 +16,11 @@ private:
 	string msg;
 
 public:
-	MidiAppError(const string &msg) noexcept : msg(msg)
+	MidiAppError(const string& msg) noexcept : msg(msg)
 	{
 	}
 
-	const char *what() const noexcept
+	const char* what() const noexcept
 	{
 		return this->msg.c_str();
 	}
@@ -30,7 +30,7 @@ template <midi_byte_t max>
 class MidiRange
 {
 protected:
-	void init(const string &s);
+	void init(const string& s);
 
 public:
 	static const midi_byte_t max_value = max;
@@ -42,7 +42,7 @@ public:
 		upper = max_value;
 	}
 
-	MidiRange(const string &s)
+	MidiRange(const string& s)
 	{
 		init(s);
 		if (!isValid())
@@ -51,14 +51,12 @@ public:
 		}
 	}
 
-	string toString() const
-	{
+	string toString() const {
 		std::ostringstream ss;
 		ss << to_string(lower) << ":" << to_string(upper);
 		return ss.str();
 	}
-	inline bool isValid() const
-	{
+	inline bool isValid() const {
 		return (lower >= 0 && lower <= max_value) && (upper >= 0 && upper <= max_value);
 	}
 	inline bool isValidToTransform() const
@@ -101,13 +99,13 @@ public:
 	{
 	}
 	MidiEvent(MidiEventType evtp, midi_byte_t chan, midi_byte_t val1,
-			  midi_byte_t val2) : evtype(evtp), ch(chan), v1(val1), v2(val2)
+		midi_byte_t val2) : evtype(evtp), ch(chan), v1(val1), v2(val2)
 	{
 		if (!isValid())
 			throw MidiAppError("Not valid MidiEvent: " + toString());
 	}
 
-	MidiEvent(const string &);
+	MidiEvent(const string&);
 
 	MidiEventType evtype;
 	midi_byte_t ch; // MIDI channel
@@ -118,10 +116,10 @@ public:
 	{
 		std::ostringstream ss;
 		ss << static_cast<char>(evtype) << "," << to_string(ch) << ","
-		   << to_string(v1) << "," << to_string(v2);
+			<< to_string(v1) << "," << to_string(v2);
 		return ss.str();
 	}
-	inline bool isEqual(const MidiEvent &other) const
+	inline bool isEqual(const MidiEvent& other) const
 	{
 		return evtype == other.evtype && ch == other.ch && v1 == other.v1 && v2 == other.v2;
 	}
@@ -160,8 +158,8 @@ public:
 	}
 };
 //============== free functions ==============================
-bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
-bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
 //=============================================================
 
 class MidiEventRange
@@ -170,10 +168,10 @@ public:
 	MidiEventRange() : evtype(MidiEventType::ANYTHING)
 	{
 	}
-	MidiEventRange(const string &s, bool isOutEvent);
+	MidiEventRange(const string& s, bool isOutEvent);
 	string toString() const;
-	bool match(const MidiEvent &) const;
-	void transform(MidiEvent &ev) const;
+	bool match(const MidiEvent&) const;
+	void transform(MidiEvent& ev) const;
 	bool isValid() const;
 
 	bool isOut = false;
@@ -194,7 +192,7 @@ enum class MidiRuleType : midi_byte_t
 class MidiEventRule
 {
 public:
-	MidiEventRule(const string &s);
+	MidiEventRule(const string& s);
 	string toString() const;
 
 	bool count = false;
