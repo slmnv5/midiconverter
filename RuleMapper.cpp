@@ -39,9 +39,8 @@ int RuleMapper::findMatchingRule(const MidiEvent &ev, int startPos) const {
 
 bool RuleMapper::applyRules(MidiEvent &ev) {
 	// returns true if matching rule found
-	bool found = false;
+	bool changed = false;
 	bool stop = false;
-
 	MidiEvent ev1;
 
 	for (size_t i = 0; i < getSize(); i++) {
@@ -53,7 +52,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 		LOG(LogLvl::INFO) << "Found match for event: " << ev.toString()
 				<< ", in rule: " << oneRule.toString();
 
-		found = true;
+		changed = true;
 		switch (oneRule.rutype) {
 		case MidiRuleType::STOP:
 			oneRule.outEventRange.transform(ev);
@@ -75,7 +74,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 		if (stop)
 			break;
 	}
-	return found;
+	return changed;
 }
 
 const string RuleMapper::toString() const {
@@ -97,10 +96,14 @@ void RuleMapper::count_event(const MidiEvent &ev) {
 	}
 
 	if (ev.isNoteOn()) {
-		count_on++;
-		thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
+		if (count_off >= count_on) {
+			count_on++;
+			thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
+		}
 	} else {
-		count_off++;
+		if (count_off < count_on) {
+			count_off++;
+		}
 	}
 }
 
