@@ -6,6 +6,11 @@
 using namespace std;
 
 class RuleMapper {
+
+	typedef std::chrono::steady_clock the_clock;
+	typedef the_clock::time_point time_point;
+	typedef std::chrono::milliseconds millis;
+	millis millis_600 { 600 };
 public:
 	RuleMapper() :
 			rules { } {
@@ -14,7 +19,7 @@ public:
 
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
-	bool applyRules(MidiEvent &ev) const;
+	bool applyRules(MidiEvent &ev);
 	MidiEventRule& getRule(int i) {
 		return rules[i];
 	}
@@ -24,7 +29,19 @@ public:
 	const string toString() const;
 
 private:
+	time_point prev_moment = the_clock::now();
+	MidiEvent prev_ev;
+	int count_on = 0;
+	int count_off = 0;
+	bool sent_on = false;
+
 	vector<MidiEventRule> rules;
+
+	void count_event(const MidiEvent &ev);
+
+	bool similar_and_fast(const MidiEvent &ev);
+
+	void send_event_delayed(const MidiEvent &ev, int cnt_on);
 
 };
 

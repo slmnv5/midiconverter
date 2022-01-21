@@ -193,20 +193,22 @@ bool MidiEventRange::isValid() const {
 MidiEventRule::MidiEventRule(const string &s) {
 	string s1(s);
 	remove_spaces(s1);
-	terminate = (replace_all(s1, ">", "=") > 0);
-
 	vector<string> parts = split_string(s1, "=");
-	if (parts.size() != 2) {
-		throw MidiAppError("Rule string must have 2 parts: " + s1);
+	if (parts.size() != 3) {
+		throw MidiAppError("Rule string must have 3 parts: " + s1);
+	}
+	if (parts[2].size() != 1) {
+		throw MidiAppError("Rule type must be one character: " + s1);
 	}
 
 	inEventRange = MidiEventRange(parts[0], false);
 	outEventRange = MidiEventRange(parts[1], true);
+	rutype = static_cast<MidiRuleType>(parts[2][0]);
 }
 
 string MidiEventRule::toString() const {
 	ostringstream ss;
-	ss << inEventRange.toString() << (terminate ? ">" : "=")
-			<< outEventRange.toString();
+	ss << inEventRange.toString() << "=" << outEventRange.toString()
+			<< static_cast<char>(rutype);
 	return ss.str();
 }

@@ -117,9 +117,6 @@ public:
 	midi_byte_t v1; // MIDI note or cc
 	midi_byte_t v2; // MIDI velocity or cc value
 
-	inline bool is_similar(const MidiEvent &other) const {
-		return ch == other.ch && v1 == other.v1;
-	}
 	string toString() const {
 		std::ostringstream ss;
 		ss << static_cast<char>(evtype) << "," << to_string(ch) << ","
@@ -180,14 +177,20 @@ public:
 };
 
 //=============================================================
+enum class MidiRuleType : midi_byte_t {
+	PASS = 'p', STOP = 's', COUNT = 'c'
+};
+
 class MidiEventRule {
 public:
 	MidiEventRule(const string &s);
 	string toString() const;
 
 	bool terminate = false;
+	bool count = false;
 	MidiEventRange inEventRange;
 	MidiEventRange outEventRange;
+	MidiRuleType rutype;
 };
 
 #endif

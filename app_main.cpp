@@ -1,9 +1,9 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
-#include "MidiFilter.hpp"
 #include "RuleMapper.hpp"
 #include "utils.hpp"
 #include "log.hpp"
+#include "MidiClient.hpp"
 
 using namespace std;
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	try {
-		MidiFilter *mf = nullptr;
+		MidiClient *mf = nullptr;
 		const char *clName = clientName == nullptr ? "mimap" : clientName;
 		if (ruleFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start rule processing";

@@ -36,10 +36,13 @@ int RuleMapper::findMatchingRule(const MidiEvent &ev, int startPos) const {
 	return -1;
 }
 
-bool RuleMapper::applyRules(MidiEvent &ev) const {
+bool RuleMapper::applyRules(MidiEvent &ev) {
 // returns true if matching rule found
 	bool changed = false;
-	for (size_t i = 0; i < getSize(); i++) {
+	bool stop = false;
+	bool count = false;
+
+	for (size_t i = 0; i < getSize() && !stop; i++) {
 		const MidiEventRule &oneRule = rules[i];
 		const MidiEventRange &inEvent = oneRule.inEventRange;
 		if (!inEvent.match(ev))
@@ -49,9 +52,24 @@ bool RuleMapper::applyRules(MidiEvent &ev) const {
 				<< ", in rule: " << oneRule.toString();
 
 		changed = true;
-		const MidiEventRange &outEvent = oneRule.outEventRange;
-		outEvent.transform(ev);
-		if (oneRule.terminate)
+		switch (oneRule.rutype) {
+		case MidiRuleType::STOP:
+			oneRule.outEventRange.transform(ev);
+			stop = true;
+			break;
+		case MidiRuleType::PASS:
+			oneRule.outEventRange.transform(ev);
+			break;
+		case MidiRuleType::COUNT:
+			oneRule.outEventRange.transform(ev);
+			count_event(ev);
+			stop = true;
+			break;
+		default:
+			throw MidiAppError("");
+		}
+
+		if (stop)
 			break;
 	}
 	return changed;
@@ -63,4 +81,52 @@ const string RuleMapper::toString() const {
 		ss << "#" << i << '\t' << (rules[i]).toString() << endl;
 	}
 	return ss.str();
+}
+
+void RuleMapper::count_event(const MidiEvent &ev) {
+	if (!similar_and_fast(ev)) {
+		if (ev.isNoteOn()) {
+			LOG(LogLvl::DEBUG) << "New note, reset count and sent note: "
+					<< ev.toString();
+			prev_ev = ev;
+			count_on = count_off = 0;
+			send_new(ev);
+		}
+	}
+
+	if (ev.isNoteOn()) {
+		count_on++;
+		thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
+	} else {
+		count_off++;
+	}
+
+}
+
+bool RuleMapper::similar_and_fast(const MidiEvent &ev) {
+// true if event is similar to latest note and came fast
+	time_point now = the_clock::now();
+	millis delta = std::chrono::duration_cast<millis>(now - prev_moment);
+	prev_moment = now;
+	return prev_ev == ev && delta < millis_600;
+}
+
+void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
+	std::this_thread::sleep_for(millis_600);
+	if (count_on != cnt_on) {
+		// new note came, count on changed, keep waiting
+		LOG(LogLvl::DEBUG) << "Delayed check, count changed: "
+				<< ev.toString() << ", on: " << count_on << ", off:"
+				<< count_off << ", prev_on: " << cnt_on;
+		return;
+	}
+	LOG(LogLvl::DEBUG) << "Delayed check, count NOT changed: "
+			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
+			<< ", prev_on: " << cnt_on;
+
+	midi_byte_t v1 = note_counter.convert_v1(ev.v1) + count_on
+			+ (count_on > count_off ? 5 : 0);
+	MidiEvent e(MidiEventType::NOTEON, ev.ch, v1, 100);
+	count_on = count_off = 0;
+	send_new(e);
 }

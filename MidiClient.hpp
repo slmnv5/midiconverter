@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class MidiFilter {
+class MidiClient {
 protected:
 	int client = -1;
 	int inport = -1;
@@ -16,26 +16,26 @@ protected:
 	snd_seq_t *seq_handle = nullptr;
 	const string &clientName;
 public:
-	MidiFilter(const string &clentName) :
+	MidiClient(const string &clentName) :
 			clientName(clentName) {
 	}
-	virtual ~MidiFilter() {
+	virtual ~MidiClient() {
 	}
 
 	void send_event(snd_seq_event_t *event) const;
+	void send_new111(const MidiEvent &ev) const;
 	void open_alsa_connection();
 	void process_events(long count);
-	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
-	}
+	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) = 0;
 };
 //=============== class that maps in event to out events ============================
-class MidiFilterRule: public MidiFilter {
+class MidiFilterRule: public MidiClient {
 private:
 	const RuleMapper rule_mapper;
 
 public:
 	MidiFilterRule(const string &clientName, const string &ruleFile) :
-			MidiFilter(clientName), rule_mapper(ruleFile) {
+			MidiClient(clientName), rule_mapper(ruleFile) {
 	}
 	virtual ~MidiFilterRule() {
 	}
@@ -44,32 +44,21 @@ public:
 };
 
 //========= class that convert CC to notes and count in events =======================
-class MidiFilterCount: public MidiFilter {
+class MidiFilterCount: public MidiClient {
 	/*Same as parent but converts CC to notes.
 	 * When  CC value increases first time, it makes note ON and ignores next increases.
 	 * When CC value decrease it makes note OFF and ignores next decreases.
 	 * When new channel or CC number comes all is reset.
 	 * Generated note number is same as CC number */
 
-	typedef std::chrono::steady_clock the_clock;
-	typedef the_clock::time_point time_pt;
-	typedef std::chrono::milliseconds millis;
-	millis millis_600 { 600 };
-
 private:
-	time_pt prev_moment = the_clock::now();
-	MidiEvent prev_ev;
-	int count_on = 0;
-	int count_off = 0;
-	NoteCounter note_counter;
 
 	bool similar_and_fast(const MidiEvent &ev);
 	void process_note(const MidiEvent &ev);
-	void send_new(const MidiEvent &ev) const;
 
 public:
 	MidiFilterCount(const string &clientName, const string &fileName) :
-			MidiFilter(clientName), note_counter(fileName) {
+			MidiClient(clientName), note_counter(fileName) {
 	}
 	~MidiFilterCount() {
 	}
