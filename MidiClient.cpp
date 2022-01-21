@@ -1,7 +1,8 @@
-#include "MidiClient.hpp"
-
 #include "pch.hpp"
 #include "MidiEvent.hpp"
+#include "RuleMapper.hpp"
+#include "MidiClient.hpp"
+
 #include <alsa/asoundlib.h>
 #include "log.hpp"
 
@@ -77,7 +78,7 @@ void MidiClient::send_new111(const MidiEvent &ev) const {
 	send_event(event);
 }
 //===============================================================
-void MidiFilterRule::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
+void MidiConverter::process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	if (rule_mapper.applyRules(ev)) {
 		LOG(LogLvl::DEBUG) << "Writing event: " << ev.toString();
 		writeMidiEvent(event, ev);

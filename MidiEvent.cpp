@@ -1,5 +1,4 @@
 #include "pch.hpp"
-
 #include "MidiEvent.hpp"
 #include "utils.hpp"
 #include "log.hpp"

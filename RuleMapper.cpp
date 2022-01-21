@@ -1,10 +1,13 @@
 #include "pch.hpp"
+#include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
+#include "MidiClient.hpp"
 #include "log.hpp"
 
 using namespace std;
 
-RuleMapper::RuleMapper(const string &fileName) {
+RuleMapper::RuleMapper(const string &fileName, const MidiClient &mc) :
+		midi_client(mc) {
 	ifstream f(fileName);
 	string s;
 	int k = 0;
@@ -90,7 +93,7 @@ void RuleMapper::count_event(const MidiEvent &ev) {
 					<< ev.toString();
 			prev_ev = ev;
 			count_on = count_off = 0;
-			send_new(ev);
+			midi_client.send_new111(ev);
 		}
 	}
 
@@ -124,9 +127,8 @@ void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
 			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
 			<< ", prev_on: " << cnt_on;
 
-	midi_byte_t v1 = note_counter.convert_v1(ev.v1) + count_on
-			+ (count_on > count_off ? 5 : 0);
+	midi_byte_t v1 = 55 + count_on + (count_on > count_off ? 5 : 0);
 	MidiEvent e(MidiEventType::NOTEON, ev.ch, v1, 100);
 	count_on = count_off = 0;
-	send_new(e);
+	midi_client.send_new111(e);
 }

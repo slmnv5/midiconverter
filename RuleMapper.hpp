@@ -2,6 +2,7 @@
 #define RULEMAPPER_H
 #include "pch.hpp"
 #include "MidiEvent.hpp"
+#include "MidiClient.hpp"
 #include "log.hpp"
 using namespace std;
 
@@ -12,10 +13,7 @@ class RuleMapper {
 	typedef std::chrono::milliseconds millis;
 	millis millis_600 { 600 };
 public:
-	RuleMapper() :
-			rules { } {
-	}
-	RuleMapper(const string &fileName);
+	RuleMapper(const string &fileName, const MidiClient&);
 
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
@@ -29,6 +27,7 @@ public:
 	const string toString() const;
 
 private:
+	const MidiClient &midi_client;
 	time_point prev_moment = the_clock::now();
 	MidiEvent prev_ev;
 	int count_on = 0;

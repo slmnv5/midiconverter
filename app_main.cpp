@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		const char *clName = clientName == nullptr ? "mimap" : clientName;
 		if (ruleFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start rule processing";
-			mf = new MidiFilterRule(clName, ruleFile);
+			mf = new MidiConverter(clName, ruleFile);
 		} else if (countFile != nullptr) {
 			LOG(LogLvl::INFO) << "Start count processing";
 			mf = new MidiFilterCount(clName, countFile);
