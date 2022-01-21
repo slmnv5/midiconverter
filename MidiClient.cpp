@@ -20,24 +20,24 @@ void MidiClient::open_alsa_connection()
 	client = snd_seq_client_id(seq_handle);
 
 	inport = snd_seq_create_simple_port(seq_handle, inPortName.c_str(),
-										SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
-										SND_SEQ_PORT_TYPE_APPLICATION);
+		SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
+		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (inport < 0)
 		throw MidiAppError("Error creating seq_handle IN port");
 
 	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
-										 SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
-										 SND_SEQ_PORT_TYPE_APPLICATION);
+		SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (outport < 0)
 		throw MidiAppError("Error creating seq_handle OUT port");
 
 	cout << "MIDI ports created: IN=" << client << ":" << inport << "   OUT="
-		 << client << ":" << outport << endl;
+		<< client << ":" << outport << endl;
 }
 
 void MidiClient::process_events(long count)
 {
-	snd_seq_event_t *event = nullptr;
+	snd_seq_event_t* event = nullptr;
 	MidiEvent ev;
 	long k = 0;
 	while (k++ < count)
@@ -61,7 +61,7 @@ void MidiClient::process_events(long count)
 	}
 }
 
-void MidiClient::send_event(snd_seq_event_t *event) const
+void MidiClient::send_event(snd_seq_event_t* event) const
 {
 	snd_seq_ev_set_direct(event);
 
@@ -74,9 +74,9 @@ void MidiClient::send_event(snd_seq_event_t *event) const
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiClient::send_new(const MidiEvent &ev) const
+void MidiClient::send_new(const MidiEvent& ev) const
 {
-	snd_seq_event_t *event = new snd_seq_event_t();
+	snd_seq_event_t* event = new snd_seq_event_t();
 	snd_seq_ev_clear(event);
 	if (!writeMidiEvent(event, ev))
 	{
@@ -87,11 +87,11 @@ void MidiClient::send_new(const MidiEvent &ev) const
 	send_event(event);
 }
 //===============================================================
-void MidiConverter::process_one_event(snd_seq_event_t *event, MidiEvent &ev)
+void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev)
 {
 	if (rule_mapper.applyRules(ev))
 	{
-		LOG(LogLvl::DEBUG) << "Writing transformed event: " << ev.toString();
+		LOG(LogLvl::INFO) << "Writing transformed event: " << ev.toString();
 		writeMidiEvent(event, ev);
 		send_event(event);
 	}
