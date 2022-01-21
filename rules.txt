@@ -7,40 +7,36 @@
 ; With '>' the rule is terminating, scanning rules stops if match is found
 ; With '=' the rule is not terminating, newly converted message goes throgh remaining rules
 
-; First part of rule matches event by type, channel and  2 MIDI values e.g. 'o,5,10,20'
-; Second part describes converted message e. g. 'o,6,20,30'
-; Message types are few: o-note on, f-note off, n-note on or off, p-program change (PC), c-control change (CC), a-any type
+; First part of rule matches event by type, channel and  2 MIDI values e.g. 'n,5,10,20'
+; Second part describes converted message e. g. 'n,6,20,30'
+; Message types are few: n-note on/off (on/off depends on velocity), p-program change (PC), c-control change (CC), a-any type
 ; MIDI channel is number in the range 0:15. MIDI values are numbers in the range 0:127 
 
 ; Examples of 1st part of a rule:
-; 'o,2,30:40,120:127' - matches note on channel 2, note number 30:40, velocity 120:127   
-; 'c,,,120:127' - matches control on any channel (0:15), any control number (0:127), and control value in 120:127   
+; 'n,2,30:40,1:127' - matches note ON channel 2, note number 30:40, any velocity   
+; 'n,2,30:40,0' - matches note OFF channel 2, note number 30:40   
+; 'c,,,120:127' - matches CC on any channel (0:15), any control number (0:127), and control value 120:127   
 
 ; Example of 2nd part of rule:
 ; 'c,2, , ,' - convert to CC on channel 2, keep MIDI values the same
-; 'o,15,,20' - convert to note on channel 15, the same MIDI value for note number, velocity 20
+; 'n,15,,20' - convert to note ON channel 15, the same MIDI value for note number, velocity 20
 
 ; Example of rule:
-; f,,,=o,,,0=p; convert all note OFF to note ON with zero velocity. This makes rules more simple
-; o,,,0:5=o,0,0,0=p; all quiet notes silenced  
-; o,,,101:127=o,2,,; all loud notes sent to channel #2 
-; a,,,,,>f,0,0,0=s; catch any event and convert to a zero note off
+; n,,,0:5=n,0,0,0=p; all quiet notes silenced  
+; n,,,101:127=n,2,,; all loud notes sent to channel #2 
+; a,,,,,>n,0,0,0=s; catch any event and convert to a zero note off
 
 
 ; Application creates 2 MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
 ; Example of command line:
 ; mimap -r rules.txt 
 
-
-; Note off simplify
-; f,,,=o,,,0=p; convert all note OFF to note ON with zero velocity
-
 ; CC 12 to note ON/OFF
-c,0,12,50:127=o,,40,77=s; CC big value to note ON   
-c,0,12,0:50=f,,40,0=s; CC small value to note OFF 
+c,0,12,50:127=n,,40,77=s; CC big value to note ON   
+c,0,12,0:50=n,,40,0=s; CC small value to note OFF 
 ; CC 13 to note ON/OFF
-c,0,13,50:127=o,,50,77=s; CC big value to note ON   
-c,0,13,0:50=f,,50,0=s; CC small value to note OFF
+c,0,13,50:127=n,,50,77=s; CC big value to note ON   
+c,0,13,0:50=n,,50,0=s; CC small value to note OFF
 
 ; count notes
 n,0,60,=n,,80,=c; count note 60    

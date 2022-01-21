@@ -8,16 +8,8 @@ const midi_byte_t MIDI_MAX = 127;
 const midi_byte_t MIDI_MAXCH = 15;
 //========== free functions ==================
 bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev) {
-
-	if (ev.evtype == MidiEventType::NOTEOFF) {
-		event->type = SND_SEQ_EVENT_NOTEOFF;
-		event->data.note.channel = ev.ch;
-		event->data.note.note = ev.v1;
-		event->data.note.velocity = ev.v2;
-		return true;
-	}
-
-	if (ev.evtype == MidiEventType::NOTEON) {
+	// note OFF is note ON with zero velocity
+	if (ev.isNote()) {
 		event->type = SND_SEQ_EVENT_NOTEON;
 		event->data.note.channel = ev.ch;
 		event->data.note.note = ev.v1;
@@ -44,14 +36,14 @@ bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev) {
 
 bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 	if (event->type == SND_SEQ_EVENT_NOTEOFF) {
-		ev.evtype = MidiEventType::NOTEOFF;
+		ev.evtype = MidiEventType::NOTE;
 		ev.ch = event->data.note.channel;
 		ev.v1 = event->data.note.note;
-		ev.v2 = event->data.note.velocity;
+		ev.v2 = 0;
 		return true;
 	}
 	if (event->type == SND_SEQ_EVENT_NOTEON) {
-		ev.evtype = MidiEventType::NOTEON;
+		ev.evtype = MidiEventType::NOTE;
 		ev.ch = event->data.note.channel;
 		ev.v1 = event->data.note.note;
 		ev.v2 = event->data.note.velocity;

@@ -76,12 +76,7 @@ using ChannelRange = MidiRange<15>;
 //==================== enums ===================================
 
 enum class MidiEventType : midi_byte_t {
-	ANYTHING = 'a',
-	NOTE = 'n',
-	NOTEON = 'o',
-	NOTEOFF = 'f',
-	CONTROLCHANGE = 'c',
-	PROGCHANGE = 'p'
+	ANYTHING = 'a', NOTE = 'n', CONTROLCHANGE = 'c', PROGCHANGE = 'p'
 };
 
 //=============================================================
@@ -121,14 +116,13 @@ public:
 				&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
 	}
 	inline bool isNote() const {
-		return evtype == MidiEventType::NOTE || evtype == MidiEventType::NOTEON
-				|| evtype == MidiEventType::NOTEOFF;
+		return evtype == MidiEventType::NOTE;
 	}
 	inline bool isNoteOn() const {
-		return evtype == MidiEventType::NOTEON && v2 > 0;
+		return evtype == MidiEventType::NOTE && v2 > 0;
 	}
 	inline bool isNoteOff() const {
-		return evtype == MidiEventType::NOTEOFF || v2 == 0;
+		return evtype == MidiEventType::NOTE && v2 == 0;
 	}
 	inline bool isCc() const {
 		return evtype == MidiEventType::CONTROLCHANGE;
