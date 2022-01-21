@@ -127,7 +127,7 @@ void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
 			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
 			<< ", prev_on: " << cnt_on;
 
-	midi_byte_t v1 = 55 + count_on + (count_on > count_off ? 5 : 0);
+	midi_byte_t v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
 	MidiEvent e(MidiEventType::NOTEON, ev.ch, v1, 100);
 	count_on = count_off = 0;
 	midi_client.send_new(e);
