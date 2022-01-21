@@ -77,8 +77,9 @@ using ChannelRange = MidiRange<15>;
 
 enum class MidiEventType : midi_byte_t {
 	ANYTHING = 'a',
-	NOTEON = 'n',
-	NOTEOFF = 'o',
+	NOTE = 'n',
+	NOTEON = 'o',
+	NOTEOFF = 'f',
 	CONTROLCHANGE = 'c',
 	PROGCHANGE = 'p'
 };
@@ -86,6 +87,7 @@ enum class MidiEventType : midi_byte_t {
 //=============================================================
 
 class MidiEvent {
+	const static std::string all_types;
 public:
 	MidiEvent() :
 			evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
@@ -112,15 +114,14 @@ public:
 		return static_cast<char>(evtype);
 	}
 	inline bool isTypeValid() const {
-		static const std::string s("anocp");
-		return (s.find(typeToChar()) != std::string::npos);
+		return MidiEvent::all_types.find(typeToChar()) != std::string::npos;
 	}
 	inline bool isValid() const {
 		return isTypeValid() && (ch >= 0 && ch <= MIDI_MAXCH)
 				&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
 	}
 	inline bool isNote() const {
-		return evtype == MidiEventType::NOTEON
+		return evtype == MidiEventType::NOTE || evtype == MidiEventType::NOTEON
 				|| evtype == MidiEventType::NOTEOFF;
 	}
 	inline bool isNoteOn() const {
@@ -136,6 +137,7 @@ public:
 		return evtype == MidiEventType::PROGCHANGE;
 	}
 };
+
 //============== free functions ==============================
 bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
 bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);

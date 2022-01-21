@@ -102,6 +102,8 @@ void MidiRange<max>::init(const string &s) {
 
 //======================================
 
+const std::string MidiEvent::all_types("anofcp");
+
 MidiEvent::MidiEvent(const string &s1) {
 	string s(s1);
 	remove_spaces(s);
