@@ -25,7 +25,7 @@ public:
 	size_t getSize() const {
 		return rules.size();
 	}
-	const string toString() const;
+	string toString() const;
 
 private:
 	const MidiClient &midi_client;

@@ -32,12 +32,12 @@
 ; mimap -r rules.txt 
 
 ; CC 12 to note 12 ON/OFF
-c,0,12,50:127=n,,12,77=p; CC big value to note ON   
-c,0,12,0:50=n,,12,0=p; CC small value to note OFF 
+c,0,12,0:70=n,,12,77=p; CC small value to note ON   
+c,0,12,127:127=n,,12,0=p; CC max value to note OFF 
 
 ; CC 13 to note 13 ON/OFF
-c,0,13,50:127=n,,13,77=p; CC big value to note ON   
-c,0,13,0:50=n,,13,0=p; CC small value to note OFF
+c,0,13,0:70=n,,13,77=p   
+c,0,13,127:127=n,,13,0=p
 
 ; count notes
 n,0,12,=n,,40,=c      

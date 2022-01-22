@@ -29,8 +29,9 @@ RuleMapper::RuleMapper(const string &fileName, const MidiClient &mc) :
 	}
 	f.close();
 }
+
 void RuleMapper::parseString(const string &s) {
-	MidiEventRule rule { s };
+	MidiEventRule rule(s);
 	rules.push_back(rule);
 }
 
@@ -126,10 +127,10 @@ void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off) {
 	}
 }
 
-const string RuleMapper::toString() const {
+string RuleMapper::toString() const {
 	ostringstream ss;
 	for (size_t i = 0; i < getSize(); i++) {
-		ss << "#" << i << '\t' << (rules[i]).toString() << endl;
+		ss << "#" << i << '\t' << rules[i].toString() << endl;
 	}
 	return ss.str();
 }

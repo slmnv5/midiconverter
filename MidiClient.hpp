@@ -25,6 +25,9 @@ public:
 	void send_new(const MidiEvent &ev) const;
 	void open_alsa_connection();
 	void process_events(long count);
+	virtual string toString() const {
+		return "";
+	}
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
 	}
 };
@@ -40,8 +43,11 @@ public:
 	}
 	virtual ~MidiConverter() {
 	}
-
+	virtual string toString() const {
+		return rule_mapper.toString();
+	}
 	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev);
+
 };
 
 #endif

@@ -202,12 +202,11 @@ MidiEventRule::MidiEventRule(const string &s) {
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s1, true);
 	}
-	if (rutype == MidiRuleType::COUNT
-			&& outEventRange.evtype != MidiEventType::NOTE) {
-		throw MidiAppError(
-				"Rule type COUNT must transform to event NOTE: " + s1, true);
+	if (rutype == MidiRuleType::COUNT) {
+		outEventRange.evtype = MidiEventType::NOTE;
+		inEventRange.evtype = MidiEventType::NOTE;
+		inEventRange.v2 = ValueRange();
 	}
-
 }
 
 string MidiEventRule::toString() const {
