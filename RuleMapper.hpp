@@ -9,10 +9,6 @@ class MidiClient;
 
 class RuleMapper {
 
-	typedef std::chrono::steady_clock the_clock;
-	typedef the_clock::time_point time_point;
-	typedef std::chrono::milliseconds millis;
-	millis millis_600 { 600 };
 public:
 	RuleMapper(const string &fileName, const MidiClient&);
 

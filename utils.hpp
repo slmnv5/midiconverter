@@ -2,11 +2,6 @@
 #define UTILS_H
 
 #include "pch.hpp"
-#include <alsa/asoundlib.h>
-#include "MidiEvent.hpp"
-#include <chrono>
-
-using namespace std;
 
 //==================== utility functions ===================================
 
