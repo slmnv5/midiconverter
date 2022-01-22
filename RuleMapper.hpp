@@ -38,10 +38,7 @@ private:
 	vector<MidiEventRule> rules;
 
 	void count_event(const MidiEvent &ev);
-
-	bool similar_and_fast(const MidiEvent &ev);
-
-	void send_event_delayed(const MidiEvent &ev, int cnt_on);
+	void send_event_delayed(const MidiEvent &ev, int cnt_on, int cnt_off);
 
 };
 

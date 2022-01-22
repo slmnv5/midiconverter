@@ -86,39 +86,46 @@ const string RuleMapper::toString() const {
 }
 
 void RuleMapper::count_event(const MidiEvent &ev) {
-	if (!similar_and_fast(ev)) {
-		if (ev.isNoteOn()) {
-			LOG(LogLvl::INFO) << "New note, reset count for: "
-					<< ev.toString();
-			prev_ev = ev;
-			count_on = count_off = 0;
-		}
-	}
-
-	if (ev.isNoteOn()) {
-		if (count_off >= count_on) {
-			count_on++;
-			thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
+	bool is_on = ev.isNoteOn();
+	time_point now_moment = the_clock::now();
+	bool is_similar = prev_ev.isEqual(ev);
+	bool is_fast = now_moment - prev_moment < millis_600;
+	prev_ev = ev;
+	prev_moment = now_moment;
+	if (!is_similar || !is_fast) {
+		if (is_on) {
+			LOG(LogLvl::INFO) << "New count start for: " << ev.toString();
+			count_on = 1;
+			count_off = 0;
+			send_event_delayed(ev, count_on, count_off);
 		}
 	} else {
-		if (count_off < count_on) {
+		LOG(LogLvl::INFO) << "Keep count for: " << ev.toString();
+		if (is_on) {
+			count_on++;
+		} else {
 			count_off++;
 		}
+		send_event_delayed(ev, count_on, count_off);
 	}
 }
 
-bool RuleMapper::similar_and_fast(const MidiEvent &ev) {
-	// true if event is similar to latest note and came fast
-	time_point now = the_clock::now();
-	millis delta = std::chrono::duration_cast<millis>(now - prev_moment);
-	prev_moment = now;
-	return prev_ev.isEqual(ev) && delta < millis_600;
-}
-
-void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
+void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on,
+		int cnt_off) {
+	if (ev.isNoteOn()) {
+		if (count_on > count_off) {
+			LOG(LogLvl::DEBUG) << "Ignore ON without OFF";
+			return;
+		}
+	} else {
+		if (count_on <= count_off) {
+			LOG(LogLvl::DEBUG) << "Ignore OFF without ON";
+			return;
+		}
+	}
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on) {
-		// new note came, count on changed, keep waiting
+	if (count_on != cnt_on || count_off != cnt_off) {
+// new note came, count on changed, keep waiting
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: "
 				<< ev.toString() << ", on: " << count_on << ", off:"
 				<< count_off << ", prev_on: " << cnt_on;
