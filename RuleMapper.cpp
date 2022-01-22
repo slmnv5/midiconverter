@@ -15,8 +15,14 @@ RuleMapper::RuleMapper(const string &fileName, const MidiClient &mc) :
 		try {
 			k++;
 			rules.push_back(MidiEventRule(s));
+		} catch (MidiAppError &e) {
+			LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;
+			LOG(level)
+					<< "Line: " + to_string(k) + " in " + fileName + " Error: "
+							+ e.what();
+
 		} catch (exception &e) {
-			LOG(LogLvl::WARN)
+			LOG(LogLvl::ERROR)
 					<< "Line: " + to_string(k) + " in " + fileName + " Error: "
 							+ e.what();
 		}
@@ -64,6 +70,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 		case MidiRuleType::COUNT:
 			ev1 = ev;
 			oneRule.outEventRange.transform(ev1);
+			assert(ev1.isNoteOn());
 			count_event(ev1);
 			stop = true;
 			break;
@@ -93,27 +100,23 @@ void RuleMapper::count_event(const MidiEvent &ev) {
 	prev_ev = ev;
 	prev_moment = now_moment;
 	if (!is_similar || !is_fast) {
-		if (is_on) {
-			LOG(LogLvl::INFO) << "New count start for: " << ev.toString();
-			count_on = 1;
-			count_off = 0;
-			send_event_delayed(ev, count_on, count_off);
-		}
-	} else {
-		LOG(LogLvl::INFO) << "Keep count for: " << ev.toString();
-		if (is_on) {
-			count_on++;
-		} else {
-			count_off++;
-		}
-		send_event_delayed(ev, count_on, count_off);
+		LOG(LogLvl::INFO) << "New count start for: " << ev.toString();
+		count_on = 0;
+		count_off = 0;
 	}
+	if (is_on) {
+		count_on++;
+	} else {
+		count_off++;
+	}
+	send_event_delayed(ev, count_on, count_off);
+
 }
 
 void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on,
 		int cnt_off) {
 	if (ev.isNoteOn()) {
-		if (count_on > count_off) {
+		if (count_on > count_off + 1) {
 			LOG(LogLvl::DEBUG) << "Ignore ON without OFF";
 			return;
 		}
@@ -125,15 +128,15 @@ void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on,
 	}
 	std::this_thread::sleep_for(millis_600);
 	if (count_on != cnt_on || count_off != cnt_off) {
-// new note came, count on changed, keep waiting
+		// new note came, count on changed, return i.e. keep waiting and counting
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: "
-				<< ev.toString() << ", on: " << count_on << ", off:"
-				<< count_off << ", prev_on: " << cnt_on;
+				<< ev.toString() << ", on/off: " << count_on << "/" << count_off
+				<< ", prev on/off: " << cnt_on << "/" << cnt_off;
 		return;
 	}
 	LOG(LogLvl::DEBUG) << "Delayed check, count NOT changed: "
-			<< ev.toString() << ", on: " << count_on << ", off:" << count_off
-			<< ", prev_on: " << cnt_on;
+			<< ev.toString() << ", on/off: " << count_on << "/" << count_off
+			<< ", prev on/off: " << cnt_on << "/" << cnt_off;
 
 	midi_byte_t counted_v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
 	MidiEvent e1 = ev;

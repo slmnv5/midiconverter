@@ -95,6 +95,7 @@ void MidiRange<max>::init(const string &s) {
 //======================================
 
 const std::string MidiEvent::all_types("anofcp");
+const std::string MidiEventRule::all_types("cps");
 
 MidiEvent::MidiEvent(const string &s1) {
 	string s(s1);
@@ -115,10 +116,10 @@ MidiEvent::MidiEvent(const string &s1) {
 		v1 = stoi(parts[2]);
 		v2 = stoi(parts[3]);
 	} catch (exception &e) {
-		throw MidiAppError("Not valid MidiEvent: " + string(e.what()));
+		throw MidiAppError("Not valid MidiEvent: " + string(e.what()), true);
 	}
 	if (!isValid())
-		throw MidiAppError("Not valid MidiEvent: " + toString());
+		throw MidiAppError("Not valid MidiEvent: " + toString(), true);
 }
 
 //========================================================
@@ -138,8 +139,8 @@ MidiEventRange::MidiEventRange(const string &s, bool out) :
 	ch = ChannelRange(parts[1]);
 	v1 = ValueRange(parts[2]);
 	v2 = ValueRange(parts[3]);
-	if (!this->isValid())
-		throw MidiAppError("Not valid MidiEventRange: " + this->toString());
+	if (!isValid())
+		throw MidiAppError("Not valid MidiEventRange: " + toString(), true);
 }
 
 string MidiEventRange::toString() const {
@@ -184,17 +185,24 @@ MidiEventRule::MidiEventRule(const string &s) {
 	string s1(s);
 
 	remove_spaces(s1);
+	if (s1.empty()) {
+		throw MidiAppError("Empty rule was ignored: " + s);
+	}
 	vector<string> parts = split_string(s1, "=");
 	if (parts.size() != 3) {
-		throw MidiAppError("Rule string must have 3 parts: " + s1);
+		throw MidiAppError("Rule string must have 3 parts: " + s1, true);
 	}
 	if (parts[2].size() != 1) {
-		throw MidiAppError("Rule type must be one character: " + s1);
+		throw MidiAppError("Rule type must be one character: " + s1, true);
 	}
 
 	inEventRange = MidiEventRange(parts[0], false);
 	outEventRange = MidiEventRange(parts[1], true);
 	rutype = static_cast<MidiRuleType>(parts[2][0]);
+	if (!isTypeValid()) {
+		throw MidiAppError("Rule type is unknown: " + s1, true);
+	}
+
 }
 
 string MidiEventRule::toString() const {

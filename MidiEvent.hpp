@@ -12,13 +12,16 @@ extern const midi_byte_t MIDI_MAXCH;
 //=============================================================
 class MidiAppError: public std::exception {
 private:
-	string msg;
-
+	const string msg;
+	const bool critical;
 public:
-	MidiAppError(const string &msg) noexcept :
-			msg(msg) {
+	MidiAppError(const string &msg, bool crt = false) noexcept :
+			msg(msg), critical(crt) {
 	}
 
+	bool is_critical() const {
+		return critical;
+	}
 	const char* what() const noexcept {
 		return this->msg.c_str();
 	}
@@ -161,11 +164,17 @@ enum class MidiRuleType : midi_byte_t {
 };
 
 class MidiEventRule {
+	const static std::string all_types;
 public:
 	MidiEventRule(const string &s);
 	string toString() const;
 
-	bool count = false;
+	inline char typeToChar() const {
+		return static_cast<char>(rutype);
+	}
+	inline bool isTypeValid() const {
+		return MidiEventRule::all_types.find(typeToChar()) != std::string::npos;
+	}
 	MidiEventRange inEventRange;
 	MidiEventRange outEventRange;
 	MidiRuleType rutype;
