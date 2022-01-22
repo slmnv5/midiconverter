@@ -10,6 +10,7 @@
 #include <sstream>
 #include <thread>
 #include <stdexcept>
+#include <map>
 
 #endif
 

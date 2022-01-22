@@ -8,6 +8,8 @@ using namespace std;
 class MidiClient;
 
 class RuleMapper {
+private:
+	static const int sleep_ms = 600;
 
 public:
 	RuleMapper(const string &fileName, const MidiClient&);
