@@ -47,7 +47,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 	// returns true if matching rule found
 	bool changed = false;
 	bool stop = false;
-	MidiEvent ev1;
+	MidiEvent count_ev;
 
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule &oneRule = rules[i];
@@ -71,11 +71,11 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			if (prev_orig_ev.isEqual(ev)) {
 				LOG(LogLvl::DEBUG) << "Same orig. event ignored";
 			} else {
-				ev1 = ev;
-				oneRule.outEventRange.transform(ev1);
-				assert(ev1.isNote());
-				update_count(ev1);
-				thread(&RuleMapper::count_and_send, this, ev1, count_on,
+				count_ev = prev_orig_ev = ev;
+				oneRule.outEventRange.transform(count_ev);
+				assert(count_ev.isNote());
+				update_count(count_ev);
+				thread(&RuleMapper::count_and_send, this, count_ev, count_on,
 						count_off).detach();
 			}
 			stop = true;
