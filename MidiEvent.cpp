@@ -1,6 +1,6 @@
+#include "pch.hpp"
 #include "MidiEvent.hpp"
 #include "log.hpp"
-#include "pch.hpp"
 #include "utils.hpp"
 
 using namespace std;
@@ -201,6 +201,11 @@ MidiEventRule::MidiEventRule(const string &s) {
 	rutype = static_cast<MidiRuleType>(parts[2][0]);
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s1, true);
+	}
+	if (rutype == MidiRuleType::COUNT
+			&& outEventRange.evtype != MidiEventType::NOTE) {
+		throw MidiAppError(
+				"Rule type COUNT must transform to event NOTE: " + s1, true);
 	}
 
 }

@@ -70,7 +70,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 		case MidiRuleType::COUNT:
 			ev1 = ev;
 			oneRule.outEventRange.transform(ev1);
-			assert(ev1.isNoteOn());
+			assert(ev1.isNote());
 			count_event(ev1);
 			stop = true;
 			break;
