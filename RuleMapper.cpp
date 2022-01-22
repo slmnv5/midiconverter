@@ -69,7 +69,8 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			break;
 		case MidiRuleType::COUNT:
 			if (prev_orig_ev.isEqual(ev)) {
-				LOG(LogLvl::DEBUG) << "Same orig. event ignored";
+				LOG(LogLvl::DEBUG) << "Same original event ignored";
+				changed = false;
 			} else {
 				count_ev = prev_orig_ev = ev;
 				oneRule.outEventRange.transform(count_ev);
