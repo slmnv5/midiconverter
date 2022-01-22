@@ -30,7 +30,8 @@ public:
 private:
 	const MidiClient &midi_client;
 	//time_point prev_moment = the_clock::now();
-	MidiEvent prev_ev;
+	MidiEvent prev_count_ev;
+	MidiEvent prev_orig_ev;
 	int count_on = 0;
 	int count_off = 0;
 

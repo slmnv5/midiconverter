@@ -68,12 +68,16 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			oneRule.outEventRange.transform(ev);
 			break;
 		case MidiRuleType::COUNT:
-			ev1 = ev;
-			oneRule.outEventRange.transform(ev1);
-			assert(ev1.isNote());
-			update_count(ev1);
-			thread(&RuleMapper::count_and_send, this, ev1, count_on, count_off).detach();
-
+			if (prev_orig_ev.isEqual(ev)) {
+				LOG(LogLvl::DEBUG) << "Same orig. event ignored";
+			} else {
+				ev1 = ev;
+				oneRule.outEventRange.transform(ev1);
+				assert(ev1.isNote());
+				update_count(ev1);
+				thread(&RuleMapper::count_and_send, this, ev1, count_on,
+						count_off).detach();
+			}
 			stop = true;
 			break;
 		default:
@@ -87,10 +91,11 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 }
 void RuleMapper::update_count(const MidiEvent &ev) {
 	// if we got another note number, restart count
-	if (!prev_ev.isSimilar(ev)) {
-		LOG(LogLvl::DEBUG) << "New event, count reset: " << ev.toString();
+	if (!prev_count_ev.isSimilar(ev)) {
+		LOG(LogLvl::DEBUG) << "New count event, count reset: "
+				<< ev.toString();
 		count_on = count_off = 0;
-		prev_ev = ev;
+		prev_count_ev = ev;
 	}
 
 	if (ev.isNoteOn()) {
@@ -102,7 +107,8 @@ void RuleMapper::update_count(const MidiEvent &ev) {
 
 void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off) {
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on || count_off != cnt_off || !prev_ev.isSimilar(ev)) {
+	if (count_on != cnt_on || count_off != cnt_off
+			|| !prev_count_ev.isSimilar(ev)) {
 		// new note came, count changed, keep waiting, counting
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: " << count_on
 				<< "/" << count_off << " vs. " << cnt_on << "/" << cnt_off;
@@ -112,7 +118,7 @@ void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off) {
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
-		LOG(LogLvl::DEBUG)
+		LOG(LogLvl::INFO)
 				<< "Delayed check, count NOT changed, send counted note: "
 				<< e1.toString();
 		midi_client.send_new(e1);
