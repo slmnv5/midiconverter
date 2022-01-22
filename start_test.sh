@@ -2,19 +2,20 @@
 
 # prepare all
 aconnect -x
-killall -9 aseqdump
 killall -9 mimap_d
-killall -9 vmpk
 sleep 2
 
 MIDIKEYS=$(aconnect -l | awk '/BlueBoard/ {print $2;exit}')
 if [ -z "$MIDIKEYS" ]; then 
-	vmpk &
-	sleep 3
 	MIDIKEYS=$(aconnect -l | awk '/VMPK Output/ {print $2;exit}')
 	if [ -z "$MIDIKEYS" ]; then 
-		echo "Could not find or start MIDIKEYS for input"
-		exit 1
+		vmpk &
+		sleep 3
+		MIDIKEYS=$(aconnect -l | awk '/VMPK Output/ {print $2;exit}')
+		if [ -z "$MIDIKEYS" ]; then
+			echo "Could not find or start MIDIKEYS for input"
+			exit 1
+		fi
 	fi
 fi
 

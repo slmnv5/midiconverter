@@ -29,15 +29,15 @@ public:
 
 private:
 	const MidiClient &midi_client;
-	time_point prev_moment = the_clock::now();
+	//time_point prev_moment = the_clock::now();
 	MidiEvent prev_ev;
 	int count_on = 0;
-	bool prev_on = false;
+	int count_off = 0;
 
 	vector<MidiEventRule> rules;
 
-	void count_event(const MidiEvent &ev);
-	void send_event_delayed(const MidiEvent &ev, int cnt_on);
+	void update_count(const MidiEvent &ev);
+	void count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off);
 
 };
 
