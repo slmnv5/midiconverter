@@ -95,52 +95,38 @@ const string RuleMapper::toString() const {
 void RuleMapper::count_event(const MidiEvent &ev) {
 	bool is_on = ev.isNoteOn();
 	time_point now_moment = the_clock::now();
-	bool is_similar = prev_ev.isEqual(ev);
+	bool is_similar = prev_ev.isSimilar(ev);
 	bool is_fast = now_moment - prev_moment < millis_600;
+
 	prev_ev = ev;
 	prev_moment = now_moment;
 	if (!is_similar || !is_fast) {
 		LOG(LogLvl::INFO) << "New count start for: " << ev.toString();
 		count_on = 0;
-		count_off = 0;
+		prev_on = false;
 	}
+	prev_on = is_on;
 	if (is_on) {
 		count_on++;
-	} else {
-		count_off++;
+		thread(&RuleMapper::send_event_delayed, this, ev, count_on).detach();
 	}
-	send_event_delayed(ev, count_on, count_off);
-
 }
 
-void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on,
-		int cnt_off) {
-	if (ev.isNoteOn()) {
-		if (count_on > count_off + 1) {
-			LOG(LogLvl::DEBUG) << "Ignore ON without OFF";
-			return;
-		}
-	} else {
-		if (count_on <= count_off) {
-			LOG(LogLvl::DEBUG) << "Ignore OFF without ON";
-			return;
-		}
-	}
+void RuleMapper::send_event_delayed(const MidiEvent &ev, int cnt_on) {
 	std::this_thread::sleep_for(millis_600);
-	if (count_on != cnt_on || count_off != cnt_off) {
+	if (count_on != cnt_on) {
 		// new note came, count on changed, return i.e. keep waiting and counting
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: "
-				<< ev.toString() << ", on/off: " << count_on << "/" << count_off
-				<< ", prev on/off: " << cnt_on << "/" << cnt_off;
-		return;
-	}
-	LOG(LogLvl::DEBUG) << "Delayed check, count NOT changed: "
-			<< ev.toString() << ", on/off: " << count_on << "/" << count_off
-			<< ", prev on/off: " << cnt_on << "/" << cnt_off;
+				<< ev.toString() << count_on << "/" << cnt_on;
+	} else {
+		LOG(LogLvl::DEBUG) << "Delayed check, count NOT changed: "
+				<< ev.toString() << count_on << "/" << cnt_on;
 
-	midi_byte_t counted_v1 = ev.v1 + count_on + (count_on > count_off ? 5 : 0);
-	MidiEvent e1 = ev;
-	e1.v1 = counted_v1;
-	count_on = count_off = 0;
-	midi_client.send_new(e1);
+		midi_byte_t counted_v1 = ev.v1 + count_on + prev_on ? 5 : 0;
+		MidiEvent e1 = ev;
+		e1.v1 = counted_v1;
+		count_on = 0;
+		prev_on = false;
+		midi_client.send_new(e1);
+	}
 }

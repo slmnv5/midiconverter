@@ -104,9 +104,8 @@ public:
 				<< to_string(v1) << "," << to_string(v2);
 		return ss.str();
 	}
-	inline bool isEqual(const MidiEvent &other) const {
-		return evtype == other.evtype && ch == other.ch && v1 == other.v1
-				&& v2 == other.v2;
+	inline bool isSimilar(const MidiEvent &other) const {
+		return evtype == other.evtype && ch == other.ch && v1 == other.v1;
 	}
 	inline char typeToChar() const {
 		return static_cast<char>(evtype);

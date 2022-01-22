@@ -32,13 +32,12 @@ private:
 	time_point prev_moment = the_clock::now();
 	MidiEvent prev_ev;
 	int count_on = 0;
-	int count_off = 0;
-	bool sent_on = false;
+	bool prev_on = false;
 
 	vector<MidiEventRule> rules;
 
 	void count_event(const MidiEvent &ev);
-	void send_event_delayed(const MidiEvent &ev, int cnt_on, int cnt_off);
+	void send_event_delayed(const MidiEvent &ev, int cnt_on);
 
 };
 
