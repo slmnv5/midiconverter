@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const int RuleMapper::sleep_ms = 600;
+
 RuleMapper::RuleMapper(const string &fileName, const MidiClient &mc) :
 		midi_client(mc) {
 	ifstream f(fileName);
@@ -108,7 +110,8 @@ void RuleMapper::update_count(const MidiEvent &ev) {
 }
 
 void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+	std::this_thread::sleep_for(
+			std::chrono::milliseconds(RuleMapper::sleep_ms));
 	if (count_on != cnt_on || count_off != cnt_off
 			|| !prev_count_ev.isSimilar(ev)) {
 		// new note came, count changed, keep waiting, counting
