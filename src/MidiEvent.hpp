@@ -30,7 +30,7 @@ public:
 template<midi_byte_t max>
 class MidiRange {
 protected:
-	void init(const string &s);
+	void init(const string&);
 
 public:
 	static const midi_byte_t max_value = max;
@@ -147,7 +147,7 @@ public:
 	MidiEventRange() :
 			evtype(MidiEventType::ANYTHING) {
 	}
-	MidiEventRange(const string &s, bool isOutEvent);
+	MidiEventRange(const string&, bool);
 	string toString() const;
 	bool match(const MidiEvent&) const;
 	void transform(MidiEvent &ev) const;
@@ -168,7 +168,7 @@ enum class MidiRuleType : midi_byte_t {
 class MidiEventRule {
 	const static std::string all_types;
 public:
-	MidiEventRule(const string &s);
+	MidiEventRule(const string&);
 	string toString() const;
 
 	inline char typeToChar() const {

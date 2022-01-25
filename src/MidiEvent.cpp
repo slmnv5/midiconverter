@@ -67,28 +67,28 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 
 //========================================
 template<midi_byte_t max>
-void MidiRange<max>::init(const string &s) {
-	string s1(s);
-	remove_spaces(s1);
-	if (s1.empty()) {
+void MidiRange<max>::init(const string &s1) {
+	string s(s1);
+	remove_spaces(s);
+	if (s.empty()) {
 		lower = 0;
 		upper = max_value;
 		return;
 	}
 
-	vector<string> parts = split_string(s1, ":");
+	vector<string> parts = split_string(s, ":");
 	if (parts.size() == 1) {
 		parts.push_back(parts[0]);
 	}
 	if (parts.size() != 2) {
-		throw MidiAppError("ValueRange incorrect format: " + s1);
+		throw MidiAppError("ValueRange incorrect format: " + s);
 	}
 
 	try {
 		lower = stoi(parts[0]);
 		upper = stoi(parts[1]);
 	} catch (exception &e) {
-		throw MidiAppError("ValueRange incorrect values: " + s1);
+		throw MidiAppError("ValueRange incorrect values: " + s);
 	}
 }
 
@@ -124,13 +124,15 @@ MidiEvent::MidiEvent(const string &s1) {
 
 //========================================================
 
-MidiEventRange::MidiEventRange(const string &s, bool out) :
-		isOut(out), evtype(MidiEventType::ANYTHING) {
+MidiEventRange::MidiEventRange(const string &s1, bool out) :
+		isOut(out) {
 
+	string s(s1);
+	remove_spaces(s);
 	vector<string> parts = split_string(s, ",");
 
-	while (parts.size() < 4) {
-		parts.push_back("");
+	while (parts.size() != 4) {
+		throw MidiAppError("MidiEventRange must have 4 parts: " + s, true);
 	}
 
 	if (!parts[0].empty())
@@ -140,7 +142,7 @@ MidiEventRange::MidiEventRange(const string &s, bool out) :
 	v1 = ValueRange(parts[2]);
 	v2 = ValueRange(parts[3]);
 	if (!isValid())
-		throw MidiAppError("Not valid MidiEventRange: " + toString(), true);
+		throw MidiAppError("Not valid MidiEventRange: " + s, true);
 }
 
 string MidiEventRange::toString() const {
@@ -181,38 +183,38 @@ bool MidiEventRange::isValid() const {
 
 //===================================================
 
-MidiEventRule::MidiEventRule(const string &s) {
-	string s1(s);
+MidiEventRule::MidiEventRule(const string &s1) {
+	string s(s1);
 
-	remove_spaces(s1);
-	if (s1.empty()) {
+	remove_spaces(s);
+	if (s.empty()) {
 		throw MidiAppError("Empty rule was ignored: " + s);
 	}
-	vector<string> parts = split_string(s1, "=");
+	vector<string> parts = split_string(s, "=");
 	if (parts.size() != 3) {
-		throw MidiAppError("Rule string must have 3 parts: " + s1, true);
+		throw MidiAppError("Rule string must have 3 parts: " + s, true);
 	}
 	if (parts[2].size() != 1) {
-		throw MidiAppError("Rule type must be one character: " + s1, true);
+		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
 
 	inEventRange = MidiEventRange(parts[0], false);
 	outEventRange = MidiEventRange(parts[1], true);
 	rutype = static_cast<MidiRuleType>(parts[2][0]);
 	if (!isTypeValid()) {
-		throw MidiAppError("Rule type is unknown: " + s1, true);
+		throw MidiAppError("Rule type is unknown: " + s, true);
 	}
 	if (rutype == MidiRuleType::COUNT) {
 		if (outEventRange.evtype != MidiEventType::NOTE)
-			throw MidiAppError("Count rule output must be note message: " + s1,
+			throw MidiAppError("Count rule output must be note message: " + s,
 					true);
 		if (inEventRange.evtype != MidiEventType::NOTE)
-			throw MidiAppError("Count rule input must be note message: " + s1,
+			throw MidiAppError("Count rule input must be note message: " + s,
 					true);
 		if (inEventRange.v2.lower != 0
 				|| inEventRange.v2.upper != ValueRange::max_value)
 			throw MidiAppError(
-					"Count rule input input range must be 0:127: " + s1, true);
+					"Count rule input input range must be 0:127: " + s, true);
 
 	}
 }
