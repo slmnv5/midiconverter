@@ -1,35 +1,37 @@
-; Below are rules for matching incoming MIDI messages and converting them to other messages.
+
 ; Every incoming messages goes trough the list of rules from top to bottom
 ; Semicolon starts a comment that goes to the end of the line
+; Rule has three parts separated by '='
+; If a MIDI message matches first part, it is converted by the second part, the third part specifies rule type
+; Three rule types are 's' - stop rule, 'p' - pass rule, 'c' - count rule.
 
-; If a message matches first part of a rule, it is converted as described by the second part of the rule.
-; Rule parts are separated by '=' or '>'
-; With '>' the rule is terminating, scanning rules stops if match is found
-; With '=' the rule is not terminating, newly converted message goes throgh remaining rules
+; Stop rule and count rule stop scanning rules if match is found
+; For pass rule newly converted message goes throgh remaining rules
 
-; First part of rule matches event by type, channel and  2 MIDI values e.g. 'n,5,10,20'
-; Second part describes converted message e. g. 'n,6,20,30'
-; Message types are few: n-note on/off (on/off depends on velocity), p-program change (PC), c-control change (CC), a-any type
+
+; First part matches event by type, channel and two MIDI values. Example: 'n,,10,20' - Note, any channel, note number 10, velocity 20.
+; Second part describes converted message. Example: 'n, ,20, ' - Note, same channel, note number 20, same velocity
+; Missing values in the first part mean that rule matches any value (e.g. any channel)
+; In the second part it keeps the value without changes (e.g. keep same channel)
+   
+; Four MIDI message types are: n-note on/off (on/off depends on note velocity), p-program change (PC), c-control change (CC), a-any type
 ; MIDI channel is number in the range 0:15. MIDI values are numbers in the range 0:127 
 
 ; Examples of 1st part of a rule:
 ; 'n,2,30:40,1:127' - matches note ON channel 2, note number 30:40, any velocity   
-; 'n,2,30:40,0' - matches note OFF channel 2, note number 30:40   
+; 'n,2,30:40,0' - matches note OFF channel 2, note number 30:40, velocity must be zero fo note OFF   
 ; 'c,,,120:127' - matches CC on any channel (0:15), any control number (0:127), and control value 120:127   
 
 ; Example of 2nd part of rule:
 ; 'c,2, , ,' - convert to CC on channel 2, keep MIDI values the same
 ; 'n,15,,20' - convert to note ON channel 15, the same MIDI value for note number, velocity 20
 
-; Example of rule:
-; n,,,0:5=n,0,0,0=p; all quiet notes silenced  
-; n,,,101:127=n,2,,; all loud notes sent to channel #2 
-; a,,,,,>n,0,0,0=s; catch any event and convert to a zero note off
+; Example of complete rule:
+; n,,,0:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
+; n,,,101:127=n,2,,=s; all loud notes sent to channel #2, stop rule 
+; a,,,,,=n,0,0,0=s; catch any event and convert to a zero note off
 
 
-; Application creates 2 MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
-; Example of command line:
-; mimap -r rules.txt 
 
 ; CC 12 to note 12 ON/OFF
 c,0,12,0:70=n,,12,77=p; CC small value to note ON   

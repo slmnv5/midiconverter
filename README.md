@@ -1,15 +1,21 @@
 
 
-# MIDI message counter and converter
+# MIDI message converter
 
 This application is used for two tasks:
 
-### Count MIDI messages to produce new messages
-Common issue with MIDI controllers is a lack of sufficent number of available messages.
-With MIDI count number of available messages (notes) may be increates many times because double push of a button will generate other note than single push. Long release of a button also affect the process. 
-For details and exammple see [count.txt](count.txt)
-
-### Convert MIDI messages using rules
-Another issue when devices use different notes, CCs or channels may be solved with MIDI convertiing. Application can convert notes to control changes and vise versa. It can transpose notes,  change notes velocity, change MIDI channels and do many other things.
+### Convert MIDI messages using rules from text files
+Notes, control change (CC) or program change (PC) messages may be modified or converted to each other.
 For details and exammple see [rules.txt](rules.txt)
+
+
+### Count MIDI messages to produce new messages
+With MIDI count MIDI notes sent less than 0.6 seconds apart make a single series and generate new MIDI message.
+Along with long hold of the last note in series this technigue allows 6-7 different combinations.
+This is useful for small midi controllers with few buttons as the niumber of possible commands increases many times.
+
+Application creates two MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
+Example of command line:
+
+mimap5 -r rules.txt -v 
 
