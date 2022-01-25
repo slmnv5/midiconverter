@@ -19,7 +19,7 @@ Install dependencies. On RaspberryPi OS Lite was only one missing package that I
 Clone the project
 - cd ~/; git clone https://github.com/slmnv5/mimap5
 Build release version
-- make mimap5
+- cd ~/mimap5; make mimap5
 
 ## Test if not working
 Build and run unit tests
