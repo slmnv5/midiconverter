@@ -50,7 +50,6 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 	// returns true if matching rule found
 	bool changed = false;
 	bool stop = false;
-	MidiEvent count_ev;
 
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule &oneRule = rules[i];
@@ -63,29 +62,39 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 
 		changed = true;
 		switch (oneRule.rutype) {
-		case MidiRuleType::STOP:
+		case MidiRuleType::STOP: {
 			oneRule.outEventRange.transform(ev);
 			stop = true;
 			break;
-		case MidiRuleType::PASS:
+		}
+		case MidiRuleType::PASS: {
 			oneRule.outEventRange.transform(ev);
 			break;
-		case MidiRuleType::COUNT:
-			if (prev_orig_ev.isEqual(ev)) {
+		}
+		case MidiRuleType::COUNT: {
+			bool is_similar = prev_orig_ev.isSimilar(ev);
+			bool off_after_on = prev_orig_ev.isNoteOn() && ev.isNoteOn();
+			prev_orig_ev = ev;
+			if (is_similar && !off_after_on) {
 				LOG(LogLvl::DEBUG) << "Same original event ignored";
 				changed = false;
 			} else {
-				count_ev = prev_orig_ev = ev;
+				bool is_on = ev.isNoteOn();
+				MidiEvent count_ev = ev;
 				oneRule.outEventRange.transform(count_ev);
-				assert(count_ev.isNote());
+				assert(count_ev.isNote() && ev.isNote());
 				update_count(count_ev);
-				thread(&RuleMapper::count_and_send, this, count_ev, count_on,
-						count_off).detach();
+				if (is_on) {
+					thread(&RuleMapper::count_and_send, this, count_ev,
+							count_on).detach();
+				}
 			}
 			stop = true;
 			break;
+		}
 		default:
 			throw MidiAppError("Unknown rule type: " + oneRule.toString());
+
 		}
 
 		if (stop)
@@ -109,14 +118,15 @@ void RuleMapper::update_count(const MidiEvent &ev) {
 	}
 }
 
-void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off) {
+void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on) {
 	std::this_thread::sleep_for(
 			std::chrono::milliseconds(RuleMapper::sleep_ms));
-	if (count_on != cnt_on || count_off != cnt_off
-			|| !prev_count_ev.isSimilar(ev)) {
-		// new note came, count changed, keep waiting, counting
+	if (count_on != cnt_on) {
 		LOG(LogLvl::DEBUG) << "Delayed check, count changed: " << count_on
-				<< "/" << count_off << " vs. " << cnt_on << "/" << cnt_off;
+				<< " vs. " << cnt_on;
+	} else if (!prev_count_ev.isSimilar(ev)) {
+		LOG(LogLvl::DEBUG) << "Delayed check, new note: " << ev.toString()
+				<< " vs. " << prev_count_ev.toString();
 	} else {
 		midi_byte_t counted_v1 = ev.v1 + count_on
 				+ (count_on > count_off ? 5 : 0);

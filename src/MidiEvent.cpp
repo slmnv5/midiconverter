@@ -94,7 +94,7 @@ void MidiRange<max>::init(const string &s) {
 
 //======================================
 
-const std::string MidiEvent::all_types("anofcp");
+const std::string MidiEvent::all_types("ancp");
 const std::string MidiEventRule::all_types("cps");
 
 MidiEvent::MidiEvent(const string &s1) {
@@ -203,13 +203,21 @@ MidiEventRule::MidiEventRule(const string &s) {
 		throw MidiAppError("Rule type is unknown: " + s1, true);
 	}
 	if (rutype == MidiRuleType::COUNT) {
-		outEventRange.evtype = MidiEventType::NOTE;
-		inEventRange.evtype = MidiEventType::NOTE;
-		inEventRange.v2 = ValueRange();
+		if (outEventRange.evtype != MidiEventType::NOTE)
+			throw MidiAppError("Count rule output must be note message: " + s1,
+					true);
+		if (inEventRange.evtype != MidiEventType::NOTE)
+			throw MidiAppError("Count rule input must be note message: " + s1,
+					true);
+		if (inEventRange.v2.lower != 0
+				|| inEventRange.v2.upper != ValueRange::max_value)
+			throw MidiAppError(
+					"Count rule input input range must be 0:127: " + s1, true);
+
 	}
 }
 
-string MidiEventRule::toString() const {
+std::string MidiEventRule::toString() const {
 	ostringstream ss;
 	ss << inEventRange.toString() << "=" << outEventRange.toString() << "="
 			<< static_cast<char>(rutype);

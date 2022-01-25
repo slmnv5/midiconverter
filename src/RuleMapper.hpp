@@ -36,7 +36,7 @@ private:
 	vector<MidiEventRule> rules;
 
 	void update_count(const MidiEvent &ev);
-	void count_and_send(const MidiEvent &ev, int cnt_on, int cnt_off);
+	void count_and_send(const MidiEvent &ev, int cnt_on);
 
 };
 
