@@ -6,20 +6,20 @@
 ; Three rule types are 's' - stop rule, 'p' - pass rule, 'c' - count rule.
 
 ; Stop rule and count rule stop scanning rules if match is found
-; For pass rule newly converted message goes throgh remaining rules
+; For pass rule newly converted message goes through remaining rules
 
 
-; First part matches event by type, channel and two MIDI values. Example: 'n,,10,20' - Note, any channel, note number 10, velocity 20.
-; Second part describes converted message. Example: 'n, ,20, ' - Note, same channel, note number 20, same velocity
-; Missing values in the first part mean that rule matches any value (e.g. any channel)
-; In the second part it keeps the value without changes (e.g. keep same channel)
+; First part matches event by type, channel and two MIDI values. Example: 'n,,10,20' – matches note ON, any channel, note number 10, velocity 20.
+; Second part describes converted message. Example: 'n, ,20, ' - Convert to note, same channel, note number 20, same velocity.
+; Missing value in the first part means that rule matches any value or channel
+; In the second part it means that rule keeps value or channel without changes
    
 ; Four MIDI message types are: n-note on/off (on/off depends on note velocity), p-program change (PC), c-control change (CC), a-any type
 ; MIDI channel is number in the range 0:15. MIDI values are numbers in the range 0:127 
 
 ; Examples of 1st part of a rule:
 ; 'n,2,30:40,1:127' - matches note ON channel 2, note number 30:40, any velocity   
-; 'n,2,30:40,0' - matches note OFF channel 2, note number 30:40, velocity must be zero fo note OFF   
+; 'n,2,30:40,0' - matches note OFF channel 2, note number 30:40, velocity must be zero for note OFF   
 ; 'c,,,120:127' - matches CC on any channel (0:15), any control number (0:127), and control value 120:127   
 
 ; Example of 2nd part of rule:
@@ -31,9 +31,16 @@
 ; n,,,101:127=n,2,,=s; all loud notes sent to channel #2, stop rule 
 ; a,,,,,=n,0,0,0=s; catch any event and convert to a zero note off
 
+; Count rule counts number of notes in series. Series is sequence of the same note arriving less than 0.6 seconds apart.
+; If another note arrives or time interval is more than 0.6 seconds count stops.
+; Converted note number adds number of notes in series and 5 if the last note was released with a delay.
+; Example of count rule:
+; n,0,12,=n,,40,=c; count note 12 and convert to note 40 + number of note ON + 5 if last note was released with delay.
+; In other words double tap on note 12 will make note 42. Double tap and hold will make note 47.
 
 
 ; CC 12 to note 12 ON/OFF
+; A swing of expression pedal down and up makes a single note
 c,0,12,0:70=n,,12,77=p; CC small value to note ON   
 c,0,12,127:127=n,,12,0=p; CC max value to note OFF 
 
@@ -42,14 +49,14 @@ c,0,13,0:70=n,,13,77=p
 c,0,13,127:127=n,,13,0=p
 
 ; count notes
-n,0,12,=n,,40,=c      
+n,0,12,=n,,40,=c; count note 12      
 n,0,13,=n,,60,=c      
 n,0,60,=n,,80,=c; count note 60    
 n,0,62,=n,,90,=c  
 n,0,64,=n,,100,=c  
 n,0,65,=n,,110,=c
 
-; any other pass as is, without this rule it will be blocked
+; any other message pass as is, without this rule it will be blocked
 a,,,,=a,,,=p
 
  

@@ -22,7 +22,7 @@ Build release version
 
 ## Test if not working
 Build and run unit tests
-- make mimap_t 
+- make mimap_t
 Build with debug options
 - make mimap_d 
 
