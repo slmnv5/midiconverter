@@ -7,8 +7,8 @@ This application is used for two tasks:
 Notes, control change (CC) or program change (PC) messages may be modified or converted to each other.
 
 #### Count MIDI messages to produce new messages
-MIDI notes sent less than 0.6 seconds apart belong to a series and generate new MIDI message.
-With long hold of the last note in series this  allows 6-7 different combinations.
+The same MIDI note sent several times, less than 0.6 seconds apart, make a series and generate new MIDI message.
+With long hold of the last note in series this allows at least 7 different combinations.
 This is useful for small midi controllers with few buttons as the number of possible commands increases many times.
 
 For details and example see [rules.txt](rules.txt)
