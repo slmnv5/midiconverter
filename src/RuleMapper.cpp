@@ -71,14 +71,12 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			break;
 		}
 		case MidiRuleType::COUNT: {
-			bool is_similar = prev_orig_ev.isSimilar(ev);
-			prev_orig_ev = ev;
-			bool is_on = ev.isNoteOn();
-			is_changed = is_on && !is_similar; // send one time
 			MidiEvent ev_count = ev;
 			oneRule.outEventRange.transform(ev_count);
 			update_count(ev_count);
-			if (is_on) {
+			is_changed = count_on == 1 && count_off == 0; // send only 1st ON
+			update_count(ev_count);
+			if (ev.isNoteOn()) {
 				thread(&RuleMapper::count_and_send, this, ev_count, count_on).detach();
 			}
 			is_stop = true;
