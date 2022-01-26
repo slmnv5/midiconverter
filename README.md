@@ -14,12 +14,16 @@ This is useful for small midi controllers with few buttons as the number of poss
 For details and example see [rules.txt](rules.txt)
 
 ## Installation
-Install dependencies. On RaspberryPi OS Lite was only one missing package that I installed:
-- sudo apt install libasound2-dev
+Install dependencies. On RaspberryPi OS Lite was missing package that I installed:
+- sudo apt install libasound2-dev libasound2
+
 Clone the project
 - cd ~/; git clone https://github.com/slmnv5/mimap5
-Build release version
-- cd ~/mimap5; make mimap5
+
+For Raspberry Pi ARM32 there is a release version in this repo, but if you need to build it:
+- cd ~/mimap5; make clean mimap5
+
+
 
 ## Test if not working
 Build and run unit tests
@@ -28,8 +32,9 @@ Build and run unit tests
 Build with debug options
 - make mimap_d 
 
-## Test and rules configuration
+## Test your rules
 Application creates two MIDI ports IN and OUT that are used to connect hardware or software MIDI ports.
-For examples of using it check file [start_test.sh](start_test.sh)
+For an examples of using it check file [start_test.sh](start_test.sh)
+It helps to see how your rules are working with verbose logging option
 
 
