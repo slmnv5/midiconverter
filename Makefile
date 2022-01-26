@@ -9,13 +9,12 @@ OBJ_APP := $(SRC_APP:%=%.o)
 OBJ_TST := $(SRC_TST:%=%.o)
 DEPENDS := $(shell find . -name "*.d")
 
-LDFLAGS += -pthread -lasound
+LDFLAGS := -pthread -lasound
 CPPFLAGS := -I$(SRC_DIR) -MMD -MP
-CXXFLAGS += -std=c++11 -g
+CXXFLAGS := -std=c++11 -g
  
 mimap_t: $(OBJ_TST)
 	@echo "build app test and run unit tests"
-	mkdir -p $(dir $@)
 	cd $(PROJECT_ROOT)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
 	./mimap_t
@@ -42,7 +41,7 @@ $(SRC_DIR)/%.cpp.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/pch.hpp.gch
 
 clean:
 	cd $(PROJECT_ROOT)
-	rm -fv  $(OBJ_APP) $(OBJ_TST) ${DEPENDS} mimap_t mimap_d mimap5
+	rm -fv  $(OBJ_APP) $(OBJ_TST) ${DEPENDS} mimap_t mimap_d mimap5 $(SRC_DIR)/pch.hpp.gch 
 
 	
 info:

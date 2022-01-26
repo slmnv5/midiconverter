@@ -1,16 +1,17 @@
-
-; Every incoming messages goes trough the list of rules from top to bottom
 ; Semicolon starts a comment that goes to the end of the line
-; Rule has three parts separated by '='
-; If a MIDI message matches first part, it is converted by the second part, the third part specifies rule type
-; Three rule types are 's' - stop rule, 'p' - pass rule, 'c' - count rule.
+; Every incoming messages goes trough the list of rules from top to bottom
 
-; Stop rule and count rule stop scanning rules if match is found
-; For pass rule newly converted message goes through remaining rules
+; Rule has three parts separated by '='. Example: c,0,12,0:70=n,,12,77=p
+; If a MIDI message matches first part, it is converted by the second part, the third part is rule type
+; Three rule types are: 's' - stop rule, 'p' - pass rule, 'c' - count rule
 
+; Stop rule and Count rules stop scanning if a match for event is found
+; For Pass rule newly converted message goes through the remaining rules
 
-; First part matches event by type, channel and two MIDI values. Example: 'n,,10,20' – matches note ON, any channel, note number 10, velocity 20.
-; Second part describes converted message. Example: 'n, ,20, ' - Convert to note, same channel, note number 20, same velocity.
+; First part matches event using four elemnts: type, channel and two MIDI values. 
+' Example: 'n,,10,20' – matches note ON, any channel (because it is missing), note number 10, velocity 20.
+; Second part describes converted message using same four elements. 
+; Example: 'n, ,20, ' - Convert to note, on same channel (because it is missing), note number 20, same velocity.
 ; Missing value in the first part means that rule matches any value or channel
 ; In the second part it means that rule keeps value or channel without changes
    
@@ -37,7 +38,7 @@
 ; Example of count rule:
 ; n,0,12,=n,,40,=c; count note 12 and convert to note 40 + number of note ON + 5 if last note was released with delay.
 ; In other words double tap on note 12 will make note 42. Double tap and hold will make note 47.
-
+; Count rule does not send note OFF only note ON for original note and for counted note.
 
 ; CC 12 to note 12 ON/OFF
 ; A swing of expression pedal down and up makes a single note

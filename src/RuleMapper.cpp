@@ -75,7 +75,6 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 			oneRule.outEventRange.transform(ev_count);
 			update_count(ev_count);
 			is_changed = count_on == 1 && count_off == 0; // send only 1st ON
-			update_count(ev_count);
 			if (ev.isNoteOn()) {
 				thread(&RuleMapper::count_and_send, this, ev_count, count_on).detach();
 			}
@@ -94,7 +93,7 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 void RuleMapper::update_count(const MidiEvent &ev) {
 // if we got another note number, restart count
 	if (!prev_count_ev.isSimilar(ev)) {
-		LOG(LogLvl::DEBUG) << "New count event, count reset: "
+		LOG(LogLvl::INFO) << "New count event, count reset: "
 				<< ev.toString();
 		count_on = count_off = 0;
 		prev_count_ev = ev;
@@ -125,7 +124,7 @@ void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on) {
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
-		prev_orig_ev = MidiEvent();
+
 		LOG(LogLvl::INFO)
 				<< "Delayed check, count NOT changed, send counted note: "
 				<< e1.toString();
