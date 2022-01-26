@@ -48,8 +48,8 @@ int RuleMapper::findMatchingRule(const MidiEvent &ev, int startPos) const {
 
 bool RuleMapper::applyRules(MidiEvent &ev) {
 	// returns true if matching rule found
-	bool changed = false;
-	bool stop = false;
+	bool is_changed = false;
+	bool is_stop = false;
 
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule &oneRule = rules[i];
@@ -59,12 +59,11 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 
 		LOG(LogLvl::INFO) << "Found match for event: " << ev.toString()
 				<< ", in rule: " << oneRule.toString();
-
-		changed = true;
+		is_changed = true;
 		switch (oneRule.rutype) {
 		case MidiRuleType::STOP: {
 			oneRule.outEventRange.transform(ev);
-			stop = true;
+			is_stop = true;
 			break;
 		}
 		case MidiRuleType::PASS: {
@@ -73,37 +72,29 @@ bool RuleMapper::applyRules(MidiEvent &ev) {
 		}
 		case MidiRuleType::COUNT: {
 			bool is_similar = prev_orig_ev.isSimilar(ev);
-			bool off_after_on = prev_orig_ev.isNoteOn() && ev.isNoteOn();
 			prev_orig_ev = ev;
-			if (is_similar && !off_after_on) {
-				LOG(LogLvl::DEBUG) << "Same original event ignored";
-				changed = false;
-			} else {
-				bool is_on = ev.isNoteOn();
-				MidiEvent count_ev = ev;
-				oneRule.outEventRange.transform(count_ev);
-				assert(count_ev.isNote() && ev.isNote());
-				update_count(count_ev);
-				if (is_on) {
-					thread(&RuleMapper::count_and_send, this, count_ev,
-							count_on).detach();
-				}
+			bool is_on = ev.isNoteOn();
+			is_changed = is_on && !is_similar; // send one time
+			MidiEvent ev_count = ev;
+			oneRule.outEventRange.transform(ev_count);
+			update_count(ev_count);
+			if (is_on) {
+				thread(&RuleMapper::count_and_send, this, ev_count, count_on).detach();
 			}
-			stop = true;
+			is_stop = true;
 			break;
 		}
 		default:
 			throw MidiAppError("Unknown rule type: " + oneRule.toString());
-
 		}
 
-		if (stop)
+		if (is_stop)
 			break;
 	}
-	return changed;
+	return is_changed;
 }
 void RuleMapper::update_count(const MidiEvent &ev) {
-	// if we got another note number, restart count
+// if we got another note number, restart count
 	if (!prev_count_ev.isSimilar(ev)) {
 		LOG(LogLvl::DEBUG) << "New count event, count reset: "
 				<< ev.toString();
@@ -130,9 +121,13 @@ void RuleMapper::count_and_send(const MidiEvent &ev, int cnt_on) {
 	} else {
 		midi_byte_t counted_v1 = ev.v1 + count_on
 				+ (count_on > count_off ? 5 : 0);
+		if (counted_v1 > ValueRange::max_value) {
+			counted_v1 %= ValueRange::max_value;
+		}
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
+		prev_orig_ev = MidiEvent();
 		LOG(LogLvl::INFO)
 				<< "Delayed check, count NOT changed, send counted note: "
 				<< e1.toString();
