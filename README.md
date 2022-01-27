@@ -13,7 +13,7 @@ This is useful for small midi controllers with few buttons as the number of poss
 
 For details and example see [rules.txt](rules.txt)
 
-I use this utility with [Pepelats audio looper on Rapberry Pi](https://github.com/slmnv5/pepelats.git) and the [rules.txt](rules.txt) is written for this.
+I use this utility with [Pepelats audio looper on Raspberry Pi](https://github.com/slmnv5/pepelats.git) and the [rules.txt](rules.txt) is written for this.
 
 ## Installation
 Install dependencies. On RaspberryPi OS Lite was missing package that I installed:
