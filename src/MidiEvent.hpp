@@ -10,13 +10,13 @@ extern const midi_byte_t MIDI_MAX;
 extern const midi_byte_t MIDI_MAXCH;
 
 //=============================================================
-class MidiAppError: public std::exception {
+class MidiAppError : public std::exception {
 private:
 	const string msg;
 	const bool critical;
 public:
-	MidiAppError(const string &msg, bool crt = false) noexcept :
-			msg(msg), critical(crt) {
+	MidiAppError(const string& msg, bool crt = false) noexcept :
+		msg(msg), critical(crt) {
 	}
 
 	bool is_critical() const {
@@ -41,7 +41,7 @@ public:
 		upper = max_value;
 	}
 
-	MidiRange(const string &s) {
+	MidiRange(const string& s) {
 		init(s);
 		if (!isValid()) {
 			throw MidiAppError(err_msg);
@@ -55,22 +55,22 @@ public:
 	}
 	inline bool isValid() const {
 		return (lower >= 0 && lower <= max_value)
-				&& (upper >= 0 && upper <= max_value);
+			&& (upper >= 0 && upper <= max_value);
 	}
 	inline bool isValidToTransform() const {
 		return (lower == 0 && upper == max_value)
-				|| (lower == upper && (lower >= 0 && lower <= max_value));
+			|| (lower == upper && (lower >= 0 && lower <= max_value));
 	}
 	inline bool match(midi_byte_t v) const {
 		return lower <= v && v <= upper;
 	}
-	inline void transform(midi_byte_t &v) const {
+	inline void transform(midi_byte_t& v) const {
 		v = lower == upper ? lower : v;
 	}
 
 private:
 	string err_msg = "Not valid values, must be in range: 0-"
-			+ to_string(max_value);
+		+ to_string(max_value);
 };
 
 using ValueRange = MidiRange<127>;
@@ -88,7 +88,7 @@ class MidiEvent {
 	const static std::string all_types;
 public:
 	MidiEvent() :
-			evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
+		evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
 	}
 
 	MidiEvent(const string&);
@@ -101,13 +101,13 @@ public:
 	string toString() const {
 		std::ostringstream ss;
 		ss << static_cast<char>(evtype) << "," << to_string(ch) << ","
-				<< to_string(v1) << "," << to_string(v2);
+			<< to_string(v1) << "," << to_string(v2);
 		return ss.str();
 	}
-	inline bool isEqual(const MidiEvent &ev) const {
+	inline bool isEqual(const MidiEvent& ev) const {
 		return evtype == ev.evtype && ch == ev.ch && v1 == ev.v1 && v2 == ev.v2;
 	}
-	inline bool isSimilar(const MidiEvent &ev) const {
+	inline bool isSimilar(const MidiEvent& ev) const {
 		return evtype == ev.evtype && ch == ev.ch && v1 == ev.v1;
 	}
 	inline char typeToChar() const {
@@ -118,7 +118,7 @@ public:
 	}
 	inline bool isValid() const {
 		return isTypeValid() && (ch >= 0 && ch <= MIDI_MAXCH)
-				&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
+			&& (v1 >= 0 && v1 <= MIDI_MAX) && (v2 >= 0 && v2 <= MIDI_MAX);
 	}
 	inline bool isNote() const {
 		return evtype == MidiEventType::NOTE;
@@ -138,19 +138,19 @@ public:
 };
 
 //============== free functions ==============================
-bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev);
-bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev);
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
 //=============================================================
 
 class MidiEventRange {
 public:
 	MidiEventRange() :
-			evtype(MidiEventType::ANYTHING) {
+		evtype(MidiEventType::ANYTHING) {
 	}
 	MidiEventRange(const string&, bool);
 	string toString() const;
 	bool match(const MidiEvent&) const;
-	void transform(MidiEvent &ev) const;
+	void transform(MidiEvent& ev) const;
 	bool isValid() const;
 
 	bool isOut = false;
@@ -162,7 +162,7 @@ public:
 
 //=============================================================
 enum class MidiRuleType : midi_byte_t {
-	PASS = 'p', STOP = 's', COUNT = 'c'
+	PASS = 'p', STOP = 's', COUNT = 'c', ONCE = 'o', KILL = 'k'
 };
 
 class MidiEventRule {

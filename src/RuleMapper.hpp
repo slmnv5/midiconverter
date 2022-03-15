@@ -12,11 +12,11 @@ private:
 	static const int sleep_ms;
 
 public:
-	RuleMapper(const string &fileName, const MidiClient&);
+	RuleMapper(const string& fileName, const MidiClient&);
 
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
-	bool applyRules(MidiEvent &ev);
+	bool applyRules(MidiEvent& ev);
 	MidiEventRule& getRule(int i) {
 		return rules[i];
 	}
@@ -26,17 +26,18 @@ public:
 	string toString() const;
 
 private:
-	const MidiClient &midi_client;
+	const MidiClient& midi_client;
 	//time_point prev_moment = the_clock::now();
 	MidiEvent prev_count_ev;
+	MidiEvent prev_ev;
 
 	int count_on = 0;
 	int count_off = 0;
 
 	vector<MidiEventRule> rules;
 
-	void update_count(const MidiEvent &ev);
-	void count_and_send(const MidiEvent &ev, int cnt_on);
+	void update_count(const MidiEvent& ev);
+	void count_and_send(const MidiEvent& ev, int cnt_on);
 
 };
 
