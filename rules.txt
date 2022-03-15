@@ -9,7 +9,7 @@
 ; For Pass rule newly converted message goes through the remaining rules
 
 ; First part matches event using four elemnts: type, channel and two MIDI values. 
-' Example: 'n,,10,20' – matches note ON, any channel (because it is missing), note number 10, velocity 20.
+; Example: 'n,,10,20' – matches note ON, any channel (because it is missing), note number 10, velocity 20.
 ; Second part describes converted message using same four elements. 
 ; Example: 'n, ,20, ' - Convert to note, on same channel (because it is missing), note number 20, same velocity.
 ; Missing value in the first part means that rule matches any value or channel
