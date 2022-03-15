@@ -95,7 +95,7 @@ void MidiRange<max>::init(const string &s1) {
 //======================================
 
 const std::string MidiEvent::all_types("ancp");
-const std::string MidiEventRule::all_types("cps");
+const std::string MidiEventRule::all_types("cpsko");
 
 MidiEvent::MidiEvent(const string &s1) {
 	string s(s1);
