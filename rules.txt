@@ -1,12 +1,12 @@
  
 ; CC 12 to note 12 ON/OFF
 ; A swing of expression pedal down and up makes a single note
-c,0,12,0:70=n,,12,77=o; CC small value to note ON   
-c,0,12,127:127=n,,12,0=o; CC max value to note OFF 
+c,0,12,0:70=n,,12,77=s; CC small value to note ON   
+c,0,12,127:127=n,,12,0=s; CC max value to note OFF 
 
 ; CC 13 to note 13 ON/OFF
-c,0,13,0:70=n,,13,77=o   
-c,0,13,127:127=n,,13,0=o
+c,0,13,0:70=n,,13,77=s  
+c,0,13,127:127=n,,13,0=s
 
 ; count notes
 n,0,12,=n,,40,=c; count note 12      
