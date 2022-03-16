@@ -1,10 +1,12 @@
  
-; CC 12:13 to note  ON/OFF
-; A swing of expression pedal down and up makes a single note
-c,0,12:13,0:70=n,,,77=p  
-c,0,12:13,127:127=n,,,0=p
+; CC 12:13 to note ON/OFF
+; A swing of expression pedal down/up makes a single note ON/OFF
 
-n,0,12:13,=n,,,=o; only once
+c,0,12:13,0:70=n,,,77=p ; convert and pass to other rules
+c,0,12:13,127:127=n,,,0=p ; convert and pass to other rules
+
+; expression pedal rule above sends many notes we need only 1st ON and 1st OFF
+n,0,12:13,=n,,,=o; only once, if same note is repeated convert only first note
 
 ; count notes
 n,0,12,=n,,40,=c; count note 12      

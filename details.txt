@@ -3,32 +3,33 @@ Semicolon starts a comment that goes to the end of the line
 Every incoming messages goes trough the list of rules from top to bottom
 
 Rule has three parts separated by '='. Example: 'c,0,12,0:70=n,,12,77=p'
-If a MIDI message matches first part, it is converted by the second part, the third part is rule type
+If a MIDI event matches first part, it is converted to match second part. 
+The third part is rule type as explained below.
 
 
 There are three rule types are: 's' - stop, 'p' - pass, 'c' - count, 'o' - once, k - kill 
-For rules Pass and Once converted message goes through the remaining rules
-For all other rules processing stops if a match for the event is found
-Kill rule simply removes the matching event
-Once rule makes conversion only if message is different from the previos, thus for few identical messages only fisrst is processed.
+For rules Pass and Once converted event is passed to the remaining rules.
+For all other rules processing stops if a match for the event is found.
+Kill rule simply removes the matching event.
+Once rule makes conversion only if event is different from the previous, thus for few identical events only first is converted others are ignored.
 
 Examples of rule:
 
-n,2,30:40,1:127=c,2, , ,=p 
+n,2,30:40,1:127=c,2,,,=p 
 ;note ON channel 2, note number 30:40, any velocity = convert to CC on channel 2, keep MIDI values the same = pass to next rule
 
 c,,,120:127=n,15,,20,=s 
 ;CC on any channel (0:15), any control number (0:127), value 120:127 = convert to note ON channel 15, 
 ;keep same MIDI value for note number, velocity 20 = stop, do not scan remaining rules
 
-;Less verbose description
-n,,,0:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
+;Less verbose rule description
+n,,,1:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
 n,,,101:127=n,2,,=p; all loud notes sent to channel #2, scan remaining rules using converted note 
 a,,,,,=n,0,0,0=s; catch any event and convert to a zero note off, stop rule
 a,,,,=a,,,=s; any message passed as is, without changes
 n,,,,=n,,,=k; any note is killed
 c,,,,=c,2,,=s; any CC is moved to channel 2
-
+n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channel 0 
 
 Count rule counts number of notes in series. Series is sequence of the same note arriving less than 0.6 seconds apart.
 Converted note number adds number of notes in series and 5 if the last note was released with a delay.
