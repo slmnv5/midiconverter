@@ -1,17 +1,24 @@
 Rules are lines in a text file, extra spaces are removed  
 Semicolon starts a comment that goes to the end of the line
-Every incoming messages goes trough the list of rules from top to bottom
+Every incoming MIDI event goes trough the list of rules from top to bottom
 
 Rule has three parts separated by '='. Example: 'c,0,12,0:70=n,,12,77=p'
 If a MIDI event matches first part, it is converted to match second part. 
 The third part is rule type as explained below.
 
 
-There are three rule types are: 's' - stop, 'p' - pass, 'c' - count, 'o' - once, k - kill 
+The five rule types are: 's' - stop, 'p' - pass, 'c' - count, 'o' - once, 'k' - kill 
 For rules Pass and Once converted event is passed to the remaining rules.
-For all other rules processing stops if a match for the event is found.
+For Count, Stop and Kill rules processing stops if a match for the event is found.
 Kill rule simply removes the matching event.
 Once rule makes conversion only if event is different from the previous, thus for few identical events only first is converted others are ignored.
+
+Count rule counts number of notes in series. Series is sequence of the same note arriving less than 0.6 seconds apart.
+Converted note number adds number of notes in series and 5 if the last note was released with a delay.
+Example of count rule:
+n,0,12,=n,,40,=c; count note 12 and convert to note 40 + number of note ON + 5 if last note was released with delay.
+In other words double tap on note 12 will make note 42. Double tap and hold of note 12 will make note 47.
+Count rule does not send note OFF only note ON
 
 Examples of rule:
 
@@ -31,19 +38,6 @@ n,,,=n,,,=k; any note is killed
 c,,,=c,2,,=s; any CC is moved to channel 2
 n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channel 0 
 
-Count rule counts number of notes in series. Series is sequence of the same note arriving less than 0.6 seconds apart.
-Converted note number adds number of notes in series and 5 if the last note was released with a delay.
-Example of count rule:
-n,0,12,=n,,40,=c; count note 12 and convert to note 40 + number of note ON + 5 if last note was released with delay.
-In other words double tap on note 12 will make note 42. Double tap and hold of note 12 will make note 47.
-Count rule does not send note OFF only note ON
 
-
-
-Count note examples
+;Count note example
 n,0,12,=n,,40,=c; count note 12 and convert it to note 41,42,43,....      
-
-
-
- 
- 
