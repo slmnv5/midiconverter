@@ -25,10 +25,10 @@ c,,,120:127=n,15,,20,=s
 ;Less verbose rule description
 n,,,1:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
 n,,,101:127=n,2,,=p; all loud notes sent to channel #2, scan remaining rules using converted note 
-a,,,,,=n,0,0,0=s; catch any event and convert to a zero note off, stop rule
-a,,,,=a,,,=s; any message passed as is, without changes
-n,,,,=n,,,=k; any note is killed
-c,,,,=c,2,,=s; any CC is moved to channel 2
+a,,,=n,0,0,0=s; catch any event and convert to a zero note off, stop rule
+a,,,=a,,,=s; any message passed as is, without changes
+n,,,=n,,,=k; any note is killed
+c,,,=c,2,,=s; any CC is moved to channel 2
 n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channel 0 
 
 Count rule counts number of notes in series. Series is sequence of the same note arriving less than 0.6 seconds apart.
