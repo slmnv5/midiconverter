@@ -40,4 +40,15 @@ n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channe
 
 
 ;Count note example
-n,0,12,=n,,40,=c; count note 12 and convert it to note 41,42,43,....      
+n,0,12,=n,,40,=c; count note 12 and convert it to note 41,42,43,....     
+
+
+Command line parameters:
+Usage: mimap5 -r <file> [options]
+		-r <file> load file with rules, see rules.txt for details
+		options:
+		  -h displays this info
+		  -n [name] MIDI client name
+		  -v verbose output
+		  -vv more verbose
+		  -vvv even more verbose
