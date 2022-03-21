@@ -1,16 +1,16 @@
 
-# mimap5 - MIDI message converter
+# mimap5 - MIDI converter
 
 This command line utility for linux is used for:
 
-- #### Convert MIDI messages using rules in a text files
+- #### Convert MIDI events using rules in a text files
 As an example notes ON/OFF may be converted to control change (CC).
 
-- #### Count MIDI messages to produce new messages
-The same MIDI note sent several times, less than 0.6 seconds apart, make a series and generate new MIDI message.
-This is useful for small midi controllers with few buttons as the number of possible commands increases many times.
+- #### Count MIDI events to produce new events
+The same MIDI note sent several times, less than 0.6 seconds apart, makes a series and generates new MIDI event.
+This is useful for midi controllers with few buttons as the number of possible MIDI commands increases many times.
 
-For details [details.txt](details.txt) and for example see [rules.txt](rules.txt)
+For details see [details.txt](details.txt) and for example see [rules.txt](rules.txt)
 
 I use this utility with [Pepelats audio looper on Raspberry Pi](https://github.com/slmnv5/pepelats.git) and the [rules.txt](rules.txt) is written for this.
 
@@ -26,7 +26,7 @@ For Raspberry Pi ARM32 there is a release version in this repo, but if you need 
 
 
 
-## Test if not working
+## Tests
 Build and run unit tests
 - make mimap_t
 
