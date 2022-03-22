@@ -1,12 +1,12 @@
 
 # mimap5 - MIDI converter
 
-This command line utility for linux is used for:
+This command line utility for linux is used to:
 
-- #### Convert MIDI events using rules in a text file
+- #### Convert MIDI events using event matching and conversion rules saved in a text file.
 As an example notes ON/OFF may be converted to control change (CC).
 
-- #### Count MIDI events to produce new events
+- #### Count MIDI events to produce new events.
 The same MIDI note sent several times, less than 0.6 seconds apart, makes a series and generates new MIDI event.
 This is useful for midi controllers with few buttons as the number of possible MIDI commands increases many times.
 
