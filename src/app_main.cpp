@@ -17,11 +17,11 @@ int main(int argc, char* argv[]) {
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
+		if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
 			ruleFile = argv[i + 1];
 			LOG(LogLvl::INFO) << "Loaded file: " << ruleFile;
 		}
-		else if (strcmp(argv[i], "-n") == 0) {
+		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
 			clientName = argv[i + 1];
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
