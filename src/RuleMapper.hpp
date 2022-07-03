@@ -13,7 +13,6 @@ private:
 
 public:
 	RuleMapper(const string& fileName, const MidiClient&);
-
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
 	bool applyRules(MidiEvent& ev);
