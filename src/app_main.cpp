@@ -12,17 +12,22 @@ void help();
 int main(int argc, char* argv[]) {
 
 	char* ruleFile = nullptr;
-
 	char* clientName = nullptr;
+	char* kbdFile = nullptr;
+	
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
 			ruleFile = argv[i + 1];
-			LOG(LogLvl::INFO) << "Loaded file: " << ruleFile;
+			LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 		}
 		else if (strcmp(argv[i], "-n") == 0) {
 			clientName = argv[i + 1];
+		}
+		else if (strcmp(argv[i], "-k") == 0) {
+			kbdFile = argv[i + 1];
+			LOG(LogLvl::INFO) << "Keyboard file: " << kbdFile;
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
@@ -48,7 +53,8 @@ int main(int argc, char* argv[]) {
 		string clName = clientName == nullptr ? "mimap" : clientName;
 
 		LOG(LogLvl::INFO) << "Start rule processing";
-		mf = new MidiConverter(clName.substr(0, 15), ruleFile);
+		MidiClient mc = MidiClient(clName.substr(0, 15), kbdFile);
+		mf = new MidiConverter(ruleFile, mc);
 		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
 			<< mf->toString();
 
