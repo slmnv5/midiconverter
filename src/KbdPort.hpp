@@ -2,9 +2,10 @@
 #define MIDICLIENT_H
 
 #include "pch.hpp"
+#include "MidiEvent.hpp"
 
 
-using namespace std;
+ 
 
 class KbdPort {
 
@@ -14,16 +15,17 @@ class KbdPort {
     "REPEATED"
     };
 
-
-    const char* dev = "/dev/input/by-path/platform-i8042-serio-0-event-kbd";
+private:
+    std::map<int, int> m;
+    std::string dev;
     struct input_event ev;
+    int fd;
     
-    int fd = -1;
-
+    
 
 
 public:
-    KbdPort(const string& kbdName) {
+    KbdPort(const std::string& kbdName) {
         fd = open(kbdName.c_str(), O_RDONLY);
         if (fd == -1) {
             throw MidiAppError("Cannot open keyboard device: " + kbdName);

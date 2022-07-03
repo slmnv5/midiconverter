@@ -5,7 +5,7 @@ using namespace std;
 
 //==================== utility functions ===================================
 
-vector<string> split_string(const string &s, const string &delimiter) {
+vector<string> split_string(const string& s, const string& delimiter) {
 	vector<string> tokens;
 	auto start = 0U;
 	auto stop = s.find(delimiter);
@@ -18,7 +18,7 @@ vector<string> split_string(const string &s, const string &delimiter) {
 	return tokens;
 }
 
-int replace_all(string &s, const string &del, const string &repl) {
+int replace_all(string& s, const string& del, const string& repl) {
 	string::size_type delsz = del.size();
 	if (delsz == 0)
 		return 0;
@@ -32,24 +32,25 @@ int replace_all(string &s, const string &del, const string &repl) {
 	return count;
 }
 
-void remove_spaces(string &s) {
+void remove_spaces(string& s) {
 	s = s.substr(0, s.find(";"));
 	replace_all(s, " ", "");
 	replace_all(s, "\n", "");
 	replace_all(s, "\t", "");
 }
 
-string exec_command(const string &cmd) {
+string exec_command(const string& cmd) {
 	char buffer[128];
 	std::string result = "";
-	FILE *pipe = popen(cmd.c_str(), "r");
+	FILE* pipe = popen(cmd.c_str(), "r");
 	if (!pipe)
 		throw std::runtime_error("popen() failed!");
 	try {
 		while (fgets(buffer, sizeof buffer, pipe) != NULL) {
 			result += buffer;
 		}
-	} catch (exception &e) {
+	}
+	catch (exception& e) {
 		pclose(pipe);
 		throw e;
 	}
