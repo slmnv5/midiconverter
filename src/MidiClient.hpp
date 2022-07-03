@@ -3,6 +3,7 @@
 #include "pch.hpp"
 
 #include "RuleMapper.hpp"
+#include "KbdPort.hpp"
 
 using namespace std;
 
@@ -13,23 +14,28 @@ protected:
 	int outport = -1;
 	snd_seq_t* seq_handle = nullptr;
 	const string& clientName;
+	const string& keyboardFile;
+	KbdPort* kbdPort = nullptr;
 
 public:
-	MidiClient(const string& clentName) :
-		clientName(clentName) {
+	MidiClient(const string& clName, const string& kbdFile) :
+		clientName(clName), keyboardFile(kbdFile) {
+			open_alsa_connection();
+
 	}
 	virtual ~MidiClient() {
 	}
 
 	void send_event(snd_seq_event_t* event) const;
 	void send_new(const MidiEvent& ev) const;
-	void open_alsa_connection();
 	void process_events(long count);
 	virtual string toString() const {
 		return "";
 	}
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	}
+private:
+	void open_alsa_connection();
 };
 //=============== class that maps in event to out events ============================
 

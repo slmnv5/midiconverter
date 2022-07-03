@@ -30,6 +30,9 @@ void MidiClient::open_alsa_connection() {
 	if (outport < 0)
 		throw MidiAppError("Error creating seq_handle OUT port");
 
+	if (keyboardFile != nullptr) {
+		kbdPort = new KbdPort(keyboardFile);
+	}
 	cout << "MIDI ports created: IN=" << client << ":" << inport << "   OUT="
 			<< client << ":" << outport << endl;
 }
