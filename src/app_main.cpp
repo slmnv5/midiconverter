@@ -45,10 +45,10 @@ int main(int argc, char* argv[]) {
 
 	try {
 		MidiClient* mf = nullptr;
-		const char* clName = clientName == nullptr ? "mimap" : clientName;
+		string clName = clientName == nullptr ? "mimap" : clientName;
 
 		LOG(LogLvl::INFO) << "Start rule processing";
-		mf = new MidiConverter(clName, ruleFile);
+		mf = new MidiConverter(clName.substr(0, 15), ruleFile);
 		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
 			<< mf->toString();
 
