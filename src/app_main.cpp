@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
 	char* clientName = nullptr;
 	char* kbdFile = nullptr;
 	char* kbdMapFile = nullptr;
-	
-	
+
+
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 		else if (strcmp(argv[i], "-k") == 0) {
 			kbdFile = argv[i + 1];
 			kbdMapFile = argv[i + 2];
-			LOG(LogLvl::INFO) << "Keyboard file: " << kbdFile <<  "Keyboard map file: " << kbdMapFile;
+			LOG(LogLvl::INFO) << "Keyboard file: " << kbdFile << "Keyboard map file: " << kbdMapFile;
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
@@ -52,20 +52,20 @@ int main(int argc, char* argv[]) {
 	}
 
 	try {
-		MidiClient* mf = nullptr;
-		string clName = clientName == nullptr ? "mimap" : clientName;
+
+		if (clientName == nullptr)
+			clientName = "mimap";
 
 		LOG(LogLvl::INFO) << "Start rule processing";
-		MidiClient mc = MidiClient(clName, kbdFile, kbdMapFile);
-		mf = new MidiConverter(ruleFile, mc);
+		MidiClient midiClient = MidiClient(clientName, kbdFile, kbdMapFile);
+		MidiConverter midiConverter = MidiConverter(ruleFile, midiClient);
 		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
-			<< mf->toString();
+			<< midiConverter.toString();
 
-		LOG(LogLvl::INFO)
-			<< "Opening MIDI ports. Use 'aconnect' to see ports and connect to them";
-		mf->open_alsa_connection();
+
+
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
-		mf->process_events(88888888);
+		midiConverter.process_events();
 	}
 	catch (exception& err) {
 		LOG(LogLvl::ERROR) << "! Completed with error !" << err.what();
@@ -76,10 +76,12 @@ void help() {
 	cout << "Usage: mimap5 -r <file> [options] \n"
 		"  -r <file> load file with rules, see rules.txt for details\n"
 		"options:\n"
-		"  -h displays this info\n"
-		"  -n [name] MIDI client name\n"
-		"  -v verbose output\n"
-		"  -vv more verbose\n"
-		"  -vvv even more verbose\n";
+		"  -h -- displays this info\n"
+		"  -n [name] -- MIDI client name\n"
+		"  -v -- verbose output\n"
+		"  -vv -- more verbose\n"
+		"  -vvv -- even more verbose\n"
+		"  -k [kbdFile] [kbdMapFile] -- use typing keyboard for MIDI notes\n";
+
 	exit(0);
 }

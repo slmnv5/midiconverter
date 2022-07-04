@@ -10,16 +10,15 @@ class KbdPort {
 private:
     std::map<int, midi_byte_t> kbdMap;
     std::string dev;
-    MidiClient midi_client;
-    int fd;
+    MidiClient& midi_client;
 
 public:
-    KbdPort(const char* kbdFile, const char* kbdMapFile, const MidiClient& mc);
+    KbdPort(const char* kbdFile, const char* kbdMapFile, MidiClient& mc);
     virtual ~KbdPort() {}
-    virtual void start();
 private:
     void parse_string(const string& s);
     void parse_file(const char* kbdMapFile);
+    void start(int fd);
 
 };
 

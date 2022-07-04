@@ -13,29 +13,25 @@ protected:
 	int inport = -1;
 	int outport = -1;
 	snd_seq_t* seq_handle = nullptr;
-	KbdPort* kbdPort = nullptr;
+	const KbdPort* kbdPort;
 
 public:
 	MidiClient(const char* clientName, const char* kbdFile, const char* kbdMapFile )  {
-		open_alsa_connection(clientName);
-		if (nullptr != kbdFile && nullptr != kbdMapFile)
-			kbdPort = new KbdPort(kbdFile, kbdMapFile, this);
-
-
+		open_alsa_connection(clientName,   kbdFile,   kbdMapFile );
 	}
 	virtual ~MidiClient() {
 	}
 
 	void send_event(snd_seq_event_t* event) const;
 	void send_new(const MidiEvent& ev) const;
-	void process_events(long count);
+	void process_events();
 	virtual string toString() const {
 		return "";
 	}
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
-	}
+	};
 private:
-	void open_alsa_connection(const char* clientName);
+	void open_alsa_connection(const char* clientName,  const char* kbdFile, const char* kbdMapFile);
 };
 //=============== class that maps in event to out events ============================
 

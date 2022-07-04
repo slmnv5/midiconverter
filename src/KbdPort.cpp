@@ -1,14 +1,9 @@
-
-
-
-
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <linux/input.h>
-#include <string.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+//#include <fcntl.h>
+//#include <errno.h>
+//#include <linux/input.h>
+//#include <string.h>
 #include "pch.hpp"
 #include "utils.hpp"
 #include "KbdPort.hpp"
@@ -17,19 +12,19 @@
 #include "MidiClient.hpp"
 
 
-KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, const MidiClient& mc) : midi_client(mc) {
+KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, MidiClient& mc) : midi_client(mc) {
 
-    fd = open(kbdFile, O_RDONLY);
+    int fd = open(kbdFile, O_RDONLY);
     if (fd == -1) {
-        throw MidiAppError("Cannot open keyboard device: " + string(kbdName), true);
+        throw MidiAppError("Cannot open keyboard device: " + string(kbdFile), true);
     }
     parse_file(kbdMapFile);
-
+    thread(&KbdPort::start, this, fd).detach();
 }
 
 
 
-void KbdPort::start() {
+void KbdPort::start(int fd) {
     ssize_t n;
     struct input_event kbd_ev;
     while (true) {
@@ -45,9 +40,6 @@ void KbdPort::start() {
         }
         if (kbd_ev.type != EV_KEY || kbd_ev.value != 0 || kbd_ev.value != 1)
             continue;
-
-
-
         std::map<int, midi_byte_t>::iterator it = kbdMap.find((int)kbd_ev.code);
         if (it == kbdMap.end())
             continue;
@@ -85,8 +77,8 @@ void KbdPort::parse_string(const string& s1) {
     }
 }
 
-void KbdPort::parse_file(const string& fileName) {
-    ifstream f(fileName);
+void KbdPort::parse_file(const char* kbdMapFile) {
+    ifstream f(kbdMapFile);
     string s;
     int k = 0;
     while (getline(f, s)) {
@@ -97,7 +89,7 @@ void KbdPort::parse_file(const string& fileName) {
         catch (MidiAppError& e) {
             LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;
             LOG(level)
-                << "Line: " + to_string(k) + " in " + fileName + " Error: "
+                << "Line: " + to_string(k) + " in " + kbdMapFile + " Error: "
                 + e.what();
         }
     }
