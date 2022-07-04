@@ -13,14 +13,14 @@ protected:
 	int inport = -1;
 	int outport = -1;
 	snd_seq_t* seq_handle = nullptr;
-	const string& clientName;
-	const string& keyboardFile;
+	const char* clientName;
+	const char* keyboardFile;
 	KbdPort* kbdPort = nullptr;
 
 public:
-	MidiClient(const string& clName, const string& kbdFile) :
+	MidiClient(const char* clName, const char* kbdFile) :
 		clientName(clName), keyboardFile(kbdFile) {
-			open_alsa_connection();
+		open_alsa_connection();
 
 	}
 	virtual ~MidiClient() {
