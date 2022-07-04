@@ -14,7 +14,7 @@ private:
     int fd;
 
 public:
-    KbdPort(const std::string& kbdName, const std::string& fileName, const MidiClient& mc);
+    KbdPort(const char* kbdName, const std::string& fileName, const MidiClient& mc);
     virtual ~KbdPort() {}
     virtual void start();
 private:

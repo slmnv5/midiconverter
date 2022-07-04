@@ -18,9 +18,12 @@ protected:
 	KbdPort* kbdPort = nullptr;
 
 public:
-	MidiClient(const char* clName, const char* kbdFile) :
+	MidiClient(const char* clName, const char* kbdFile, const char* kbdMapFile ) :
 		clientName(clName), keyboardFile(kbdFile) {
 		open_alsa_connection();
+		if (nullptr != kbdFile)
+			kbdPort = new KbdPort(kbdFile);
+
 
 	}
 	virtual ~MidiClient() {

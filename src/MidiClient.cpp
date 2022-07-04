@@ -9,8 +9,7 @@
 using namespace std;
 
 void MidiClient::open_alsa_connection() {
-	string clName = clientName;
-	clName = clName.substr(0, 15);
+	const string clName = string(clName).substr(0, 15);
 	const string inPortName = clName + "_in";
 	const string outPortName = clName + "_out";
 
