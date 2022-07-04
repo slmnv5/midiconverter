@@ -1,9 +1,3 @@
-//#include <stdlib.h>
-//#include <unistd.h>
-//#include <fcntl.h>
-//#include <errno.h>
-//#include <linux/input.h>
-//#include <string.h>
 #include "pch.hpp"
 #include "utils.hpp"
 #include "KbdPort.hpp"

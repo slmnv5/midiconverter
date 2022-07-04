@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void MidiClient::open_alsa_connection(const char* clientName, const char* kbdFile, const char* kbdMapFile ) {
+void MidiClient::open_alsa_connection(const char* clientName, const char* kbdFile, const char* kbdMapFile) {
 	const string clName = string(clientName).substr(0, 15);
 	const string inPortName = clName + "_in";
 	const string outPortName = clName + "_out";
@@ -19,8 +19,6 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* kbdFil
 	snd_seq_set_client_name(seq_handle, clName.c_str());
 	client = snd_seq_client_id(seq_handle);
 
-	
-
 	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
 		SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
 		SND_SEQ_PORT_TYPE_APPLICATION);
@@ -29,10 +27,11 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* kbdFil
 
 	if (kbdFile != nullptr && kbdMapFile != nullptr) {
 		kbdPort = new KbdPort(kbdFile, kbdMapFile, *this);
-	} else {
+	}
+	else {
 		inport = snd_seq_create_simple_port(seq_handle, inPortName.c_str(),
-		SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
-		SND_SEQ_PORT_TYPE_APPLICATION);
+			SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
+			SND_SEQ_PORT_TYPE_APPLICATION);
 		if (inport < 0)
 			throw MidiAppError("Error creating seq_handle IN port");
 	}
