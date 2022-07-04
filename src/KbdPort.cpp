@@ -19,11 +19,11 @@
 
 KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, const MidiClient& mc) : midi_client(mc) {
 
-    fd = open(kbdName, O_RDONLY);
+    fd = open(kbdFile, O_RDONLY);
     if (fd == -1) {
         throw MidiAppError("Cannot open keyboard device: " + string(kbdName), true);
     }
-    parse_file(fileName);
+    parse_file(kbdMapFile);
 
 }
 
