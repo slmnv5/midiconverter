@@ -13,16 +13,13 @@ protected:
 	int inport = -1;
 	int outport = -1;
 	snd_seq_t* seq_handle = nullptr;
-	const char* clientName;
-	const char* keyboardFile;
 	KbdPort* kbdPort = nullptr;
 
 public:
-	MidiClient(const char* clName, const char* kbdFile, const char* kbdMapFile ) :
-		clientName(clName), keyboardFile(kbdFile) {
-		open_alsa_connection();
-		if (nullptr != kbdFile)
-			kbdPort = new KbdPort(kbdFile);
+	MidiClient(const char* clientName, const char* kbdFile, const char* kbdMapFile )  {
+		open_alsa_connection(clientName);
+		if (nullptr != kbdFile && nullptr != kbdMapFile)
+			kbdPort = new KbdPort(kbdFile, kbdMapFile, this);
 
 
 	}
@@ -38,7 +35,7 @@ public:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	}
 private:
-	void open_alsa_connection();
+	void open_alsa_connection(const char* clientName);
 };
 //=============== class that maps in event to out events ============================
 

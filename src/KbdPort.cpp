@@ -17,7 +17,7 @@
 #include "MidiClient.hpp"
 
 
-KbdPort::KbdPort(const char* kbdName, const std::string& fileName, const MidiClient& mc) : midi_client(mc) {
+KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, const MidiClient& mc) : midi_client(mc) {
 
     fd = open(kbdName, O_RDONLY);
     if (fd == -1) {

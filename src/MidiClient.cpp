@@ -8,8 +8,8 @@
 
 using namespace std;
 
-void MidiClient::open_alsa_connection() {
-	const string clName = string(clName).substr(0, 15);
+void MidiClient::open_alsa_connection(const char* clientName) {
+	const string clName = string(clientName).substr(0, 15);
 	const string inPortName = clName + "_in";
 	const string outPortName = clName + "_out";
 

@@ -14,12 +14,12 @@ private:
     int fd;
 
 public:
-    KbdPort(const char* kbdName, const std::string& fileName, const MidiClient& mc);
+    KbdPort(const char* kbdFile, const char* kbdMapFile, const MidiClient& mc);
     virtual ~KbdPort() {}
     virtual void start();
 private:
     void parse_string(const string& s);
-    void parse_file(const string& fileName);
+    void parse_file(const char* kbdMapFile);
 
 };
 
