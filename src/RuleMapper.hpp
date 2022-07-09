@@ -16,7 +16,7 @@ public:
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
 	bool applyRules(MidiEvent& ev);
-	const MidiEventRule& getRule(int i) const {
+	MidiEventRule& getRule(int i) {
 		return rules[i];
 	}
 	size_t getSize() const {
@@ -33,7 +33,7 @@ private:
 	int count_on = 0;
 	int count_off = 0;
 
-	vector<const MidiEventRule&> rules;
+	vector<MidiEventRule> rules;
 
 	void update_count(const MidiEvent& ev);
 	void count_and_send(const MidiEvent& ev, int cnt_on);

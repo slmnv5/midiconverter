@@ -12,13 +12,13 @@
 #include <stdexcept>
 #include <map>
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <linux/input.h>
-#include <string.h>
-#include <stdio.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+//#include <fcntl.h>
+//#include <errno.h>
+//#include <linux/input.h>
+//#include <string.h>
+//#include <stdio.h>
 
 #endif
 
