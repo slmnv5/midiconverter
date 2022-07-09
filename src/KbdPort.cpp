@@ -1,4 +1,24 @@
 #include "pch.hpp"
+
+#include <fcntl.h>
+#include <linux/input.h>
+
+
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <unistd.h>
+//#include <errno.h>
+
+//#include <dirent.h>
+//#include <sys/types.h>
+//#include <sys/stat.h>
+//#include <sys/select.h>
+//#include <sys/time.h>
+//#include <termios.h>
+//#include <signal.h>
+
+
 #include "utils.hpp"
 #include "KbdPort.hpp"
 #include "log.hpp"
@@ -6,7 +26,7 @@
 #include "MidiClient.hpp"
 
 
-KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, MidiClient& mc) : midi_client(mc) {
+KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile) {
 
     int fd = open(kbdFile, O_RDONLY);
     if (fd == -1) {
@@ -18,8 +38,9 @@ KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile, MidiClient& mc) : 
 
 
 
-void KbdPort::start(int fd) {
+void KbdPort::start(int fd, MidiClient& midi_client) {
     ssize_t n;
+
     struct input_event kbd_ev;
     while (true) {
         n = read(fd, &kbd_ev, sizeof kbd_ev);
@@ -32,8 +53,9 @@ void KbdPort::start(int fd) {
         else if (n != sizeof kbd_ev) {
             continue;
         }
-        if (kbd_ev.type != EV_KEY || kbd_ev.value != 0 || kbd_ev.value != 1)
+        if (kbd_ev.type != EV_KEY || kbd_ev.value != 0 || kbd_ev.value != 1) {
             continue;
+        }
         std::map<int, midi_byte_t>::iterator it = kbdMap.find((int)kbd_ev.code);
         if (it == kbdMap.end())
             continue;

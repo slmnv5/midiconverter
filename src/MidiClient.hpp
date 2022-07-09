@@ -7,20 +7,22 @@
 
 using namespace std;
 
+
+
 class MidiClient {
 protected:
 	int client = -1;
 	int inport = -1;
 	int outport = -1;
 	snd_seq_t* seq_handle = nullptr;
-	const KbdPort* kbdPort;
+
 
 public:
 	MidiClient(const char* clientName) {
 		open_alsa_connection(clientName, nullptr, nullptr);
 	}
-	MidiClient(const char* clientName, const char* kbdFile, const char* kbdMapFile) {
-		open_alsa_connection(clientName, kbdFile, kbdMapFile);
+	MidiClient(const char* clientName) {
+		open_alsa_connection(clientName);
 	}
 	virtual ~MidiClient() {
 	}
@@ -28,9 +30,6 @@ public:
 	void send_event(snd_seq_event_t* event) const;
 	void send_new(const MidiEvent& ev) const;
 	void process_events();
-	virtual string toString() const {
-		return "";
-	}
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	};
 private:
@@ -41,7 +40,6 @@ private:
 class MidiConverter : public MidiClient {
 private:
 	RuleMapper rule_mapper;
-
 public:
 	MidiConverter(const string& ruleFile, MidiClient& mc) :
 		MidiClient(mc), rule_mapper(ruleFile, *this) {

@@ -57,12 +57,15 @@ int main(int argc, char* argv[]) {
 			clientName = "mimap";
 
 		LOG(LogLvl::INFO) << "Start rule processing";
-		MidiClient midiClient = MidiClient(clientName, kbdFile, kbdMapFile);
+		MidiClient midiClient = MidiClient(clientName);
 		MidiConverter midiConverter = MidiConverter(ruleFile, midiClient);
 		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
 			<< midiConverter.toString();
 
-
+		if (kbdFile != nullptr && kbdMapFile != nullptr) {
+			kbdPort = new KbdPort(kbdFile, kbdMapFile, midiClient);
+			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input" << kbdPort->toString();
+		}
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();

@@ -2,7 +2,7 @@
 #define KBDPORT_H
 
 #include "pch.hpp"
-#include "MidiEvent.hpp"
+//#include "MidiEvent.hpp"
 #include "MidiClient.hpp"
 
 class KbdPort {
@@ -10,15 +10,15 @@ class KbdPort {
 private:
     std::map<int, midi_byte_t> kbdMap;
     std::string dev;
-    MidiClient& midi_client;
+
 
 public:
-    KbdPort(const char* kbdFile, const char* kbdMapFile, MidiClient& mc);
+    KbdPort(const char* kbdFile, const char* kbdMapFile);
     virtual ~KbdPort() {}
 private:
     void parse_string(const string& s);
     void parse_file(const char* kbdMapFile);
-    void start(int fd);
+    void start(int fd, MidiClient& mc);
 
 };
 
