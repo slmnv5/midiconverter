@@ -11,12 +11,10 @@ void help();
 
 int main(int argc, char* argv[]) {
 
-	char* ruleFile = nullptr;
-	char* clientName = nullptr;
-	char* kbdFile = nullptr;
-	char* kbdMapFile = nullptr;
-
-
+	char const* ruleFile = nullptr;
+	char const* clientName = nullptr;
+	char const* kbdFile = nullptr;
+	char const* kbdMapFile = nullptr;
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
@@ -63,8 +61,9 @@ int main(int argc, char* argv[]) {
 			<< midiConverter.toString();
 
 		if (kbdFile != nullptr && kbdMapFile != nullptr) {
-			kbdPort = new KbdPort(kbdFile, kbdMapFile, midiClient);
-			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input" << kbdPort->toString();
+			KbdPort kbdPort = KbdPort(kbdFile, kbdMapFile);
+			kbdPort.start(&midiConverter);
+			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input";
 		}
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
