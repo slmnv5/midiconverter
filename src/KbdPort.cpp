@@ -28,17 +28,20 @@
 
 KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile) {
 
-    int fd = open(kbdFile, O_RDONLY);
+    fd = open(kbdFile, O_RDONLY);
     if (fd == -1) {
         throw MidiAppError("Cannot open keyboard device: " + string(kbdFile), true);
     }
     parse_file(kbdMapFile);
-    thread(&KbdPort::start, this, fd).detach();
 }
 
 
+void KbdPort::start(MidiClient* mc) {
+    midi_client = mc;
+    thread(&KbdPort::readKbd, this).detach();
+}
 
-void KbdPort::start(int fd, MidiClient& midi_client) {
+void KbdPort::readKbd() {
     ssize_t n;
 
     struct input_event kbd_ev;
@@ -65,10 +68,10 @@ void KbdPort::start(int fd, MidiClient& midi_client) {
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
 
-        midi_client.send_new(ev);
+        midi_client->send_new(ev);
     }
+}
 
-};
 
 
 void KbdPort::parse_string(const string& s1) {

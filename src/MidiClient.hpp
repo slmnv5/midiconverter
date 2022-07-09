@@ -19,9 +19,6 @@ protected:
 
 public:
 	MidiClient(const char* clientName) {
-		open_alsa_connection(clientName, nullptr, nullptr);
-	}
-	MidiClient(const char* clientName) {
 		open_alsa_connection(clientName);
 	}
 	virtual ~MidiClient() {
@@ -33,7 +30,7 @@ public:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	};
 private:
-	void open_alsa_connection(const char* clientName, const char* kbdFile, const char* kbdMapFile);
+	void open_alsa_connection(const char* clientName);
 };
 //=============== class that maps in event to out events ============================
 
