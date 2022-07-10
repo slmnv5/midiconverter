@@ -13,12 +13,11 @@ int main(int argc, char* argv[]) {
 
 	char const* ruleFile = nullptr;
 	char const* clientName = nullptr;
-	char const* kbdFile = nullptr;
 	char const* kbdMapFile = nullptr;
 
 	LOG::ReportingLevel() = LogLvl::ERROR;
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-r") == 0 && i + 1 <= argc) {
+		if (strcmp(argv[i], "-r") == 0) {
 			ruleFile = argv[i + 1];
 			LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 		}
@@ -26,9 +25,8 @@ int main(int argc, char* argv[]) {
 			clientName = argv[i + 1];
 		}
 		else if (strcmp(argv[i], "-k") == 0) {
-			kbdFile = argv[i + 1];
-			kbdMapFile = argv[i + 2];
-			LOG(LogLvl::INFO) << "Keyboard file: " << kbdFile << "Keyboard map file: " << kbdMapFile;
+			kbdMapFile = argv[i + 1];
+			LOG(LogLvl::INFO) << "Keyboard map file: " << kbdMapFile;
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
@@ -60,10 +58,10 @@ int main(int argc, char* argv[]) {
 		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
 			<< midiConverter.toString();
 
-		if (kbdFile != nullptr && kbdMapFile != nullptr) {
-			KbdPort kbdPort = KbdPort(kbdFile, kbdMapFile);
+		if (kbdMapFile != nullptr) {
+			KbdPort kbdPort = KbdPort(kbdMapFile);
 			kbdPort.start(&midiConverter);
-			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input";
+			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
 		}
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
@@ -78,12 +76,12 @@ void help() {
 	cout << "Usage: mimap5 -r <file> [options] \n"
 		"  -r <file> load file with rules, see rules.txt for details\n"
 		"options:\n"
-		"  -h -- displays this info\n"
-		"  -n [name] -- MIDI client name\n"
+		"  -k <kbdMapFile> -- use typing keyboard for MIDI notes\n"
+		"  -n [name] -- MIDI port name (mimap if missing)\n"
 		"  -v -- verbose output\n"
 		"  -vv -- more verbose\n"
 		"  -vvv -- even more verbose\n"
-		"  -k [kbdFile] [kbdMapFile] -- use typing keyboard for MIDI notes\n";
+		"  -h -- displays this info\n";
 
 	exit(0);
 }

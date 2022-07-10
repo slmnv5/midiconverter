@@ -26,8 +26,8 @@
 #include "MidiClient.hpp"
 
 
-KbdPort::KbdPort(const char* kbdFile, const char* kbdMapFile) {
-
+KbdPort::KbdPort(const char* kbdMapFile) {
+    const char* kbdFile = getInputDevicePath().c_str();
     fd = open(kbdFile, O_RDONLY);
     if (fd == -1) {
         throw MidiAppError("Cannot open keyboard device: " + string(kbdFile), true);
