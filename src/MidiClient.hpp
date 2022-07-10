@@ -32,9 +32,9 @@ public:
 	}
 protected:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
-	void send_event(snd_seq_event_t* event, int port) const;
-private:
+	void send_old_event(snd_seq_event_t* event, int port) const;
 	void send_new_event(const MidiEvent& ev, int port) const;
+private:
 	void open_alsa_connection(const char* clientName);
 };
 //=============== class that maps in event to out events ============================

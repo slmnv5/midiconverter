@@ -66,11 +66,12 @@ void KbdPort::readKbd() {
         if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
             continue;
 
+        LOG(LogLvl::DEBUG) << "Typing keyboard code: " << kbd_ev.code;
         MidiEvent ev = MidiEvent();
         ev.evtype = MidiEventType::NOTE;
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
-
+        LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
         midi_client->take_in(ev);
     }
 }
@@ -84,7 +85,6 @@ void KbdPort::parse_string(const string& s1) {
         LOG(LogLvl::DEBUG) << "Line was ignored: " << s1;
         return;
     }
-    LOG(LogLvl::DEBUG) << "Parsing string: " << s;
     vector<string> parts = split_string(s, "=");
     if (parts.size() != 2) {
         throw MidiAppError("Keyboard mapping must have 2 parts: " + s, true);
