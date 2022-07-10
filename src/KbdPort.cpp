@@ -42,39 +42,36 @@ KbdPort::KbdPort(const char* kbdMapFile) {
 
 void KbdPort::start(MidiClient* mc) {
     midi_client = mc;
-    LOG(LogLvl::DEBUG) << "Starting thread reading typing keyboard";
     thread(&KbdPort::readKbd, this).detach();
 }
 
 void KbdPort::readKbd() {
     ssize_t n;
     struct input_event kbd_ev;
+    LOG(LogLvl::DEBUG) << "Started thread reading typing keyboard";
     while (true) {
         n = read(fd, &kbd_ev, sizeof kbd_ev);
-        LOG(LogLvl::DEBUG) << "Got kbd!!!!";
         if (n == (ssize_t)-1) {
             if (errno == EINTR)
                 continue;
             else
                 break;
         }
-        else if (n != sizeof kbd_ev) {
+        if (n != sizeof kbd_ev)
             continue;
-        }
-        if (kbd_ev.type != EV_KEY || kbd_ev.value != 0 || kbd_ev.value != 1) {
+        if (kbd_ev.type != EV_KEY)
             continue;
-        }
-        std::map<int, midi_byte_t>::iterator it = kbdMap.find((int)kbd_ev.code);
-        if (it == kbdMap.end())
+        if (kbd_ev.value < 0 || kbd_ev.value > 1)
+            continue;
+        if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
             continue;
 
         MidiEvent ev = MidiEvent();
         ev.evtype = MidiEventType::NOTE;
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
-        LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
 
-        midi_client->send_new(ev);
+        midi_client->take_new(ev);
     }
 }
 
@@ -82,10 +79,10 @@ void KbdPort::readKbd() {
 
 void KbdPort::parse_string(const string& s1) {
     string s(s1);
-
     remove_spaces(s);
     if (s.empty()) {
-        throw MidiAppError("Keyboard mapping was ignored: " + s);
+        LOG(LogLvl::DEBUG) << "Line was ignored: " << s1;
+        return;
     }
     LOG(LogLvl::DEBUG) << "Parsing string: " << s;
     vector<string> parts = split_string(s, "=");
