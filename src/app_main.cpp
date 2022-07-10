@@ -19,15 +19,12 @@ int main(int argc, char* argv[]) {
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
 			ruleFile = argv[i + 1];
-			LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 		}
 		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
 			clientName = argv[i + 1];
-			LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 		}
 		else if (strcmp(argv[i], "-k") == 0 && i + 1 < argc) {
 			kbdMapFile = argv[i + 1];
-			LOG(LogLvl::INFO) << "Keyboard map file: " << kbdMapFile;
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
@@ -49,6 +46,9 @@ int main(int argc, char* argv[]) {
 	}
 	if (clientName == nullptr)
 		clientName = "mimap";
+
+	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
+	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 
 	try {
 		MidiClient midiClient = MidiClient(clientName);

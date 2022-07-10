@@ -64,25 +64,21 @@ void MidiClient::send_event(snd_seq_event_t* event) const {
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-snd_seq_event_t* MidiClient::make_event(const MidiEvent& ev) const {
-	snd_seq_event_t* event = new snd_seq_event_t();
-	snd_seq_ev_clear(event);
+void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) const {
+	if (nullptr == event) {
+		event = new snd_seq_event_t();
+		snd_seq_ev_clear(event);
+	}
 	if (!writeMidiEvent(event, ev)) {
-		snd_seq_free_event(event);
 		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
 	};
-	return event;
+	send_event(event);
 }
 //===============================================================
 void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
-	if (nullptr == event) {
-		snd_seq_event_t* event = new snd_seq_event_t();
-		snd_seq_ev_clear(event);
-	}
 	if (rule_mapper.applyRules(ev)) {
-		LOG(LogLvl::INFO) << "Send transformed event: " << ev.toString();
-		writeMidiEvent(event, ev);
-		send_event(event);
+		LOG(LogLvl::INFO) << "Send processed event: " << ev.toString();
+		make_and_send(event, ev);
 	}
 }
 
