@@ -148,11 +148,10 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
-
 		LOG(LogLvl::INFO)
 			<< "Delayed check, count NOT changed, send counted note: "
 			<< e1.toString();
-		midi_client.send_out(e1);
+		midi_client.send_new_event(e1);
 	}
 }
 
