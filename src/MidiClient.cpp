@@ -43,11 +43,11 @@ void MidiClient::process_events() {
 	while (true) {
 		int result = snd_seq_event_input(seq_handle, &event);
 		if (result < 0) {
-			LOG(LogLvl::WARN) << "Possible loss of MIDI events! " << result;
+			LOG(LogLvl::WARN) << "Possible loss of MIDI event" << result;
 			continue;
 		}
 		if (!readMidiEvent(event, ev)) {
-			LOG(LogLvl::DEBUG) << "Unknown MIDI message sent as is, type: "
+			LOG(LogLvl::DEBUG) << "Unknown MIDI event send as is, type: "
 				<< to_string(event->type);
 			send_event(event);\
 				continue;
@@ -77,7 +77,7 @@ void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) cons
 //===============================================================
 void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	if (rule_mapper.applyRules(ev)) {
-		LOG(LogLvl::INFO) << "Send processed event: " << ev.toString();
+		LOG(LogLvl::INFO) << "Send mapped event: " << ev.toString();
 		make_and_send(event, ev);
 	}
 }
