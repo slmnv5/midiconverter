@@ -188,10 +188,9 @@ bool MidiEventRange::isValid() const {
 
 MidiEventRule::MidiEventRule(const string& s1) {
 	string s(s1);
-
 	remove_spaces(s);
 	if (s.empty()) {
-		throw MidiAppError("Empty rule was ignored: " + s);
+		LOG(LogLvl::DEBUG) << "Line was ignored: " << s1;
 	}
 	vector<string> parts = split_string(s, "=");
 	if (parts.size() != 3) {

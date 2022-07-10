@@ -66,7 +66,7 @@ void MidiClient::send_event(snd_seq_event_t* event, int port) const {
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiClient::send_new(const MidiEvent& ev, int port) const {
+void MidiClient::send_new_event(const MidiEvent& ev, int port) const {
 	snd_seq_event_t* event = new snd_seq_event_t();
 	snd_seq_ev_clear(event);
 	if (!writeMidiEvent(event, ev)) {

@@ -71,7 +71,7 @@ void KbdPort::readKbd() {
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
 
-        midi_client->take_new(ev);
+        midi_client->take_in(ev);
     }
 }
 
