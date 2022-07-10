@@ -7,7 +7,7 @@ using namespace std;
 const midi_byte_t MIDI_MAX = 127;
 const midi_byte_t MIDI_MAXCH = 15;
 //========== free functions ==================
-bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev) {
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev) {
 	// note OFF is note ON with zero velocity
 	if (ev.isNote()) {
 		event->type = SND_SEQ_EVENT_NOTEON;
@@ -34,7 +34,7 @@ bool writeMidiEvent(snd_seq_event_t *event, const MidiEvent &ev) {
 	return false;
 }
 
-bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev) {
 	if (event->type == SND_SEQ_EVENT_NOTEOFF) {
 		ev.evtype = MidiEventType::NOTE;
 		ev.ch = event->data.note.channel;
@@ -67,7 +67,7 @@ bool readMidiEvent(const snd_seq_event_t *event, MidiEvent &ev) {
 
 //========================================
 template<midi_byte_t max>
-void MidiRange<max>::init(const string &s1) {
+void MidiRange<max>::init(const string& s1) {
 	string s(s1);
 	remove_spaces(s);
 	if (s.empty()) {
@@ -87,7 +87,8 @@ void MidiRange<max>::init(const string &s1) {
 	try {
 		lower = stoi(parts[0]);
 		upper = stoi(parts[1]);
-	} catch (exception &e) {
+	}
+	catch (exception& e) {
 		throw MidiAppError("ValueRange incorrect values: " + s);
 	}
 }
@@ -97,7 +98,7 @@ void MidiRange<max>::init(const string &s1) {
 const std::string MidiEvent::all_types("ancp");
 const std::string MidiEventRule::all_types("cpsko");
 
-MidiEvent::MidiEvent(const string &s1) {
+MidiEvent::MidiEvent(const string& s1) {
 	string s(s1);
 	remove_spaces(s);
 	vector<string> parts = split_string(s, ",");
@@ -115,7 +116,8 @@ MidiEvent::MidiEvent(const string &s1) {
 		ch = stoi(parts[1]);
 		v1 = stoi(parts[2]);
 		v2 = stoi(parts[3]);
-	} catch (exception &e) {
+	}
+	catch (exception& e) {
 		throw MidiAppError("Not valid MidiEvent: " + string(e.what()), true);
 	}
 	if (!isValid())
@@ -124,8 +126,8 @@ MidiEvent::MidiEvent(const string &s1) {
 
 //========================================================
 
-MidiEventRange::MidiEventRange(const string &s1, bool out) :
-		isOut(out) {
+MidiEventRange::MidiEventRange(const string& s1, bool out) :
+	isOut(out) {
 
 	string s(s1);
 	remove_spaces(s);
@@ -148,19 +150,19 @@ MidiEventRange::MidiEventRange(const string &s1, bool out) :
 string MidiEventRange::toString() const {
 	ostringstream ss;
 	ss << static_cast<char>(evtype) << "," << ch.toString() << ","
-			<< v1.toString() << "," << v2.toString();
+		<< v1.toString() << "," << v2.toString();
 	return ss.str();
 }
 
-bool MidiEventRange::match(const MidiEvent &ev) const {
+bool MidiEventRange::match(const MidiEvent& ev) const {
 	if (isOut)
 		throw MidiAppError("Match used for OUT range");
 
 	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING)
-			&& ch.match(ev.ch) && v1.match(ev.v1) && v2.match(ev.v2);
+		&& ch.match(ev.ch) && v1.match(ev.v1) && v2.match(ev.v2);
 }
 
-void MidiEventRange::transform(MidiEvent &ev) const {
+void MidiEventRange::transform(MidiEvent& ev) const {
 	if (!isOut)
 		throw MidiAppError("Transform used for IN range");
 	if (evtype != MidiEventType::ANYTHING)
@@ -175,15 +177,16 @@ bool MidiEventRange::isValid() const {
 
 	{
 		return ch.isValid() && v1.isValid() && v2.isValid();
-	} else {
+	}
+	else {
 		return ch.isValidToTransform() && v1.isValidToTransform()
-				&& v2.isValidToTransform();
+			&& v2.isValidToTransform();
 	}
 }
 
 //===================================================
 
-MidiEventRule::MidiEventRule(const string &s1) {
+MidiEventRule::MidiEventRule(const string& s1) {
 	string s(s1);
 
 	remove_spaces(s);
@@ -207,14 +210,14 @@ MidiEventRule::MidiEventRule(const string &s1) {
 	if (rutype == MidiRuleType::COUNT) {
 		if (outEventRange.evtype != MidiEventType::NOTE)
 			throw MidiAppError("Count rule output must be note message: " + s,
-					true);
+				true);
 		if (inEventRange.evtype != MidiEventType::NOTE)
 			throw MidiAppError("Count rule input must be note message: " + s,
-					true);
+				true);
 		if (inEventRange.v2.lower != 0
-				|| inEventRange.v2.upper != ValueRange::max_value)
+			|| inEventRange.v2.upper != ValueRange::max_value)
 			throw MidiAppError(
-					"Count rule input input range must be 0:127: " + s, true);
+				"Count rule input input range must be 0:127: " + s, true);
 
 	}
 }
@@ -222,6 +225,6 @@ MidiEventRule::MidiEventRule(const string &s1) {
 std::string MidiEventRule::toString() const {
 	ostringstream ss;
 	ss << inEventRange.toString() << "=" << outEventRange.toString() << "="
-			<< static_cast<char>(rutype);
+		<< static_cast<char>(rutype);
 	return ss.str();
 }

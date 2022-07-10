@@ -3,22 +3,6 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <unistd.h>
-//#include <errno.h>
-
-//#include <dirent.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <sys/select.h>
-//#include <sys/time.h>
-//#include <termios.h>
-//#include <signal.h>
-
-
 #include "utils.hpp"
 #include "KbdPort.hpp"
 #include "log.hpp"
@@ -41,14 +25,16 @@ std::string findKbdEvent() {
 }
 
 std::string getInputDevicePath() {
-    return "/dev/input/event" + findKbdEvent();
+    string tmp = "/dev/input/event" + findKbdEvent();
+    LOG(LogLvl::DEBUG) << "Typing keyboard file found: " << tmp;
+    return tmp;
 }
 
 KbdPort::KbdPort(const char* kbdMapFile) {
-    const char* kbdFile = getInputDevicePath().c_str();
-    fd = open(kbdFile, O_RDONLY);
+    string tmp = getInputDevicePath();
+    fd = open(tmp.c_str(), O_RDONLY);
     if (fd == -1) {
-        throw MidiAppError("Cannot open keyboard device: " + string(kbdFile), true);
+        throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
     }
     parse_file(kbdMapFile);
 }
@@ -56,15 +42,16 @@ KbdPort::KbdPort(const char* kbdMapFile) {
 
 void KbdPort::start(MidiClient* mc) {
     midi_client = mc;
+    LOG(LogLvl::DEBUG) << "Starting thread reading typing keyboard";
     thread(&KbdPort::readKbd, this).detach();
 }
 
 void KbdPort::readKbd() {
     ssize_t n;
-
     struct input_event kbd_ev;
     while (true) {
         n = read(fd, &kbd_ev, sizeof kbd_ev);
+        LOG(LogLvl::DEBUG) << "Got kbd!!!!";
         if (n == (ssize_t)-1) {
             if (errno == EINTR)
                 continue;
@@ -100,14 +87,16 @@ void KbdPort::parse_string(const string& s1) {
     if (s.empty()) {
         throw MidiAppError("Keyboard mapping was ignored: " + s);
     }
+    LOG(LogLvl::DEBUG) << "Parsing string: " << s;
     vector<string> parts = split_string(s, "=");
     if (parts.size() != 2) {
         throw MidiAppError("Keyboard mapping must have 2 parts: " + s, true);
     }
 
     try {
-        int n1 = stoi(parts[1]);
-        int n2 = stoi(parts[2]);
+        int n1 = std::stoi(parts[0]);
+        int n2 = std::stoi(parts[1]);
+        LOG(LogLvl::DEBUG) << "Mapping typing key code to note: " << n1 << "=" << n2;
         kbdMap[n1] = n2;
     }
     catch (exception& e) {
