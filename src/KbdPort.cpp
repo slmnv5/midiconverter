@@ -52,10 +52,13 @@ void KbdPort::readKbd() {
     while (true) {
         n = read(fd, &kbd_ev, sizeof kbd_ev);
         if (n == (ssize_t)-1) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
-            else
+            }
+            else {
+                LOG(LogLvl::ERROR) << "Error reading typing keyboard. Exiting";
                 break;
+            }
         }
         if (n != sizeof kbd_ev)
             continue;

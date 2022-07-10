@@ -114,7 +114,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 void RuleMapper::update_count(const MidiEvent& ev) {
 	// if we got another note number, restart count
 	if (!prev_count_ev.isSimilar(ev)) {
-		LOG(LogLvl::INFO) << "New count event, count reset: "
+		LOG(LogLvl::DEBUG) << "New count event, count reset: "
 			<< ev.toString();
 		count_on = count_off = 0;
 		prev_count_ev = ev;
