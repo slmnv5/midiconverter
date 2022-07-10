@@ -3,50 +3,49 @@
 #include "pch.hpp"
 
 #include "RuleMapper.hpp"
+#include "KbdPort.hpp"
 
 using namespace std;
+
+
 
 class MidiClient {
 protected:
 	int client = -1;
 	int inport = -1;
 	int outport = -1;
-	snd_seq_t *seq_handle = nullptr;
-	const string &clientName;
+	snd_seq_t* seq_handle = nullptr;
+
 
 public:
-	MidiClient(const string &clentName) :
-			clientName(clentName) {
+	MidiClient(const char* clientName) {
+		open_alsa_connection(clientName);
 	}
 	virtual ~MidiClient() {
 	}
-
-	void send_event(snd_seq_event_t *event) const;
-	void send_new(const MidiEvent &ev) const;
-	void open_alsa_connection();
-	void process_events(long count);
-	virtual string toString() const {
-		return "";
-	}
-	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev) {
-	}
+	void process_events();
+	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
+	void send_new_event(const MidiEvent& ev) const;
+protected:
+	void send_old_event(snd_seq_event_t* event) const;
+private:
+	void open_alsa_connection(const char* clientName);
 };
 //=============== class that maps in event to out events ============================
 
-class MidiConverter: public MidiClient {
+class MidiConverter : public MidiClient {
 private:
 	RuleMapper rule_mapper;
-
 public:
-	MidiConverter(const string &clientName, const string &ruleFile) :
-			MidiClient(clientName), rule_mapper(ruleFile, *this) {
+	MidiConverter(const string& ruleFile, MidiClient& mc) :
+		MidiClient(mc), rule_mapper(ruleFile, *this) {
 	}
 	virtual ~MidiConverter() {
 	}
 	virtual string toString() const {
 		return rule_mapper.toString();
 	}
-	virtual void process_one_event(snd_seq_event_t *event, MidiEvent &ev);
+	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev);
 
 };
 

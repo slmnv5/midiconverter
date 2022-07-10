@@ -2,6 +2,7 @@
 #include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
+#include "utils.hpp"
 #include "log.hpp"
 
 using namespace std;
@@ -34,9 +35,11 @@ RuleMapper::RuleMapper(const string& fileName, const MidiClient& mc) :
 	f.close();
 }
 
-void RuleMapper::parseString(const string& s) {
-	MidiEventRule rule(s);
-	rules.push_back(rule);
+void RuleMapper::parseString(const string& s1) {
+	string s(s1);
+	remove_spaces(s);
+	if (!s.empty())
+		rules.push_back(MidiEventRule(s));
 }
 
 int RuleMapper::findMatchingRule(const MidiEvent& ev, int startPos) const {
@@ -145,11 +148,10 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
-
 		LOG(LogLvl::INFO)
 			<< "Delayed check, count NOT changed, send counted note: "
 			<< e1.toString();
-		midi_client.send_new(e1);
+		midi_client.send_new_event(e1);
 	}
 }
 
