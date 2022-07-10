@@ -62,7 +62,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 		if (!inEvent.match(ev))
 			continue;
 
-		LOG(LogLvl::INFO) << "Found match for event: " << ev.toString()
+		LOG(LogLvl::DEBUG) << "Found match for event: " << ev.toString()
 			<< ", in rule: " << oneRule.toString();
 		is_changed = true;
 		switch (oneRule.rutype) {
@@ -150,7 +150,7 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		count_on = count_off = 0;
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< e1.toString();
-		midi_client.send_event(midi_client.make_event(e1));
+		midi_client.make_and_send(nullptr, e1);
 	}
 }
 
