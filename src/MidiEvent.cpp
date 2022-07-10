@@ -190,7 +190,7 @@ MidiEventRule::MidiEventRule(const string& s1) {
 	string s(s1);
 	remove_spaces(s);
 	if (s.empty()) {
-		throw MidiAppError("Line was ignored: " + s1);
+		throw MidiAppError("Line is empty or commented out: " + s1);
 	}
 	vector<string> parts = split_string(s, "=");
 	if (parts.size() != 3) {

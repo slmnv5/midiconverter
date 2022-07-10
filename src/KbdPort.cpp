@@ -82,10 +82,9 @@ void KbdPort::readKbd() {
 void KbdPort::parse_string(const string& s1) {
     string s(s1);
     remove_spaces(s);
-    if (s.empty()) {
-        LOG(LogLvl::DEBUG) << "Line was ignored: " << s1;
+    if (s.empty())
         return;
-    }
+
     vector<string> parts = split_string(s, "=");
     if (parts.size() != 2) {
         throw MidiAppError("Keyboard mapping must have 2 parts: " + s, true);

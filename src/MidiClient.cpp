@@ -81,11 +81,6 @@ void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 		writeMidiEvent(event, ev);
 		send_old_event(event);
 	}
-	else {
-		snd_seq_ev_clear(event);
-		LOG(LogLvl::DEBUG) << "Cleared non matching event: "
-			<< ev.toString();
-	}
 }
 
 //===============================================================
