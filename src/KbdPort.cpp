@@ -26,6 +26,24 @@
 #include "MidiClient.hpp"
 
 
+std::string findKbdEvent() {
+    const char* cmd = "grep -E 'Handlers|EV=' /proc/bus/input/devices | "
+        "grep -B1 'EV=120013' | grep -Eo 'event[0-9]+' | grep -Eo '[0-9]+' | tr -d '\n'";
+
+    FILE* pipe = popen(cmd, "r");
+    char buffer[128];
+    std::string result = "";
+    while (!feof(pipe))
+        if (fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    pclose(pipe);
+    return result;
+}
+
+std::string getInputDevicePath() {
+    return "/dev/input/event" + findKbdEvent();
+}
+
 KbdPort::KbdPort(const char* kbdMapFile) {
     const char* kbdFile = getInputDevicePath().c_str();
     fd = open(kbdFile, O_RDONLY);
@@ -67,6 +85,7 @@ void KbdPort::readKbd() {
         ev.evtype = MidiEventType::NOTE;
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
+        LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
 
         midi_client->send_new(ev);
     }
