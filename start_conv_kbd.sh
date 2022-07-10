@@ -11,12 +11,11 @@ cd_to_script_dir() {
 
 cd_to_script_dir
 sudo killall mimap5
-sudo killall mimap_d
 
 wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
 # Start converter and create in and out virtual MIDI ports using typing keyboard only
-sudo ./mimap_d -r rules.txt -k kbdmap.txt "$@" &
+sudo ./mimap5 -r rules.txt -k kbdmap.txt "$@" &
 
 
