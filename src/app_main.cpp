@@ -37,12 +37,12 @@ int main(int argc, char* argv[]) {
 		}
 		else if (strcmp(argv[i], "-h") == 0) {
 			help();
-			exit(0);
+			return 0;
 		}
 	}
 	if (ruleFile == nullptr) {
 		help();
-		exit(1);
+		return 2;
 	}
 	if (clientName == nullptr)
 		clientName = "mimap";
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
 	}
 	catch (exception& e) {
 		LOG(LogLvl::ERROR) << "Completed with error: " << e.what();
+		return 1;
 	}
 }
 
@@ -80,6 +81,4 @@ void help() {
 		"  -vv -- more verbose\n"
 		"  -vvv -- even more verbose\n"
 		"  -h -- displays this info\n";
-
-	exit(0);
 }

@@ -11,24 +11,18 @@ cd_to_script_dir() {
   cd "$THIS_DIR" || exit 1
 }
 
-check_if_running() {
-  found=$(ps -ef | grep -v grep | grep mimap5)
-  if [ -n "$found" ]; then
-    echo "Exiting, this script is already running"
-    exit 1
-  fi
-}
-
 cd_to_script_dir
 sudo killall mimap5
+sudo killall mimap_d
 
 wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
-# Start converter and create in and out virtual MIDI ports
-sudo ./mimap5 -r rules.txt   -k kbdmap.txt  -n "$EXT_CONV" "$@"  &
-time sleep 2
+# Start converter and create in and out virtual MIDI ports using typing keyboard only
+sudo ./mimap_d -r rules.txt   -k kbdmap.txt  -n "$EXT_CONV" "$@" || exit 1;
 
+
+# Not connected to keyboard look for MIDI hardware MIDI port
 HARDWARE_OUT=""
 for k in {1..10}; do
   echo "Waiting for MIDI port $HARDWARE_NAME"

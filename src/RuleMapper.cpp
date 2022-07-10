@@ -71,7 +71,8 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 			is_stop = true;
 			is_changed = false;
 			break;
-		}case MidiRuleType::ONCE: {
+		}
+		case MidiRuleType::ONCE: {
 			if (ev.isEqual(prev_ev)) {
 				LOG(LogLvl::DEBUG) << "Rule type ONCE ignores the same event: " << ev.toString();
 				is_stop = true;
@@ -106,8 +107,6 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 		default:
 			throw MidiAppError("Unknown rule type: " + oneRule.toString());
 		}
-
-
 	}
 	return is_changed;
 }
