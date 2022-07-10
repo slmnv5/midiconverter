@@ -24,16 +24,10 @@ public:
 	virtual ~MidiClient() {
 	}
 	void process_events();
-	void take_in(const MidiEvent& ev) const {
-		send_new_event(ev, inport);
-	}
-	void send_out(const MidiEvent& ev) const {
-		send_new_event(ev, outport);
-	}
-protected:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
-	void send_old_event(snd_seq_event_t* event, int port) const;
-	void send_new_event(const MidiEvent& ev, int port) const;
+protected:
+	void send_old_event(snd_seq_event_t* event) const;
+	void send_new_event(const MidiEvent& ev) const;
 private:
 	void open_alsa_connection(const char* clientName);
 };

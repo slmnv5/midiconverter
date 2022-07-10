@@ -66,13 +66,14 @@ void KbdPort::readKbd() {
         if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
             continue;
 
-        LOG(LogLvl::DEBUG) << "Typing keyboard code: " << kbd_ev.code;
         MidiEvent ev = MidiEvent();
         ev.evtype = MidiEventType::NOTE;
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
         LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-        midi_client->take_in(ev);
+        snd_seq_event_t* event = new snd_seq_event_t();
+        snd_seq_ev_clear(event);
+        midi_client->process_one_event(event, ev);
     }
 }
 
