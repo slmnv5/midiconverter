@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script starts MIDI converter mimap5 (github link below)
 
-# Part of MIDI port name - source of messages
+# Part of hardware MIDI port name - source of messages
 HARDWARE_NAME="BlueBoard"
 # MIDI port name that is source of converted messages
 EXT_CONV="PedalCommands"
@@ -18,13 +18,13 @@ sudo killall mimap_d
 wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
-# Start converter and create in and out virtual MIDI ports using typing keyboard only
-sudo ./mimap_d -r rules.txt   -k kbdmap.txt  -n "$EXT_CONV" "$@" || exit 1;
 
+# Failed with typing keyboard. Start with hardware MIDI port
+./mimap_d -r rules.txt  -n "$EXT_CONV" "$@" &
 
-# Not connected to keyboard look for MIDI hardware MIDI port
+# Wait for hardware to appear
 HARDWARE_OUT=""
-for k in {1..10}; do
+for k in {1..50}; do
   echo "Waiting for MIDI port $HARDWARE_NAME"
   HARDWARE_OUT=$(aconnect -l | awk -v nm="$HARDWARE_NAME" '$0 ~ nm {print $2;exit}')
   if [ -z "$HARDWARE_OUT" ]; then
@@ -34,6 +34,7 @@ for k in {1..10}; do
   fi
 done
 
+# connect using linux alsa command
 CLIENT_IN=$(aconnect -l | awk -v nm="$EXT_CONV" '$0 ~ nm {print $2;exit}')
 if aconnect -e "${HARDWARE_OUT}0" "${CLIENT_IN}1"; then
   echo "Connected MIDI ${HARDWARE_OUT}0 to ${EXT_CONV}1"
