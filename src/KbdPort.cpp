@@ -71,9 +71,7 @@ void KbdPort::readKbd() {
         ev.v1 = kbdMap.at((int)kbd_ev.code);
         ev.v2 = kbd_ev.value == 0 ? 0 : 100;
         LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-        snd_seq_event_t* event = new snd_seq_event_t();
-        snd_seq_ev_clear(event);
-        midi_client->process_one_event(event, ev);
+        midi_client->process_one_event(nullptr, ev);
     }
 }
 
@@ -112,9 +110,8 @@ void KbdPort::parse_file(const char* kbdMapFile) {
         }
         catch (MidiAppError& e) {
             LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;
-            LOG(level)
-                << "Line: " + to_string(k) + " in " + kbdMapFile + " Error: "
-                + e.what();
+            LOG(level) << "Line: " << k << " in " << kbdMapFile << " Error: "
+                << e.what();
         }
     }
 }

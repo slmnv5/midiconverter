@@ -49,37 +49,40 @@ void MidiClient::process_events() {
 		if (!readMidiEvent(event, ev)) {
 			LOG(LogLvl::DEBUG) << "Unknown MIDI message sent as is, type: "
 				<< to_string(event->type);
-			send_old_event(event);\
+			send_event(event);\
 				continue;
 		}
 		process_one_event(event, ev);
 	}
 }
 
-void MidiClient::send_old_event(snd_seq_event_t* event) const {
-	//snd_seq_ev_set_direct(event);
+void MidiClient::send_event(snd_seq_event_t* event) const {
+	snd_seq_ev_set_direct(event);
 	// snd_seq_ev_set_dest(event, 64, 0) or send to subscribers of source port
 	snd_seq_ev_set_subs(event);
 	snd_seq_ev_set_source(event, outport);
-	snd_seq_event_output(seq_handle, event);
+	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiClient::send_new_event(const MidiEvent& ev) const {
+snd_seq_event_t* MidiClient::make_event(const MidiEvent& ev) const {
 	snd_seq_event_t* event = new snd_seq_event_t();
 	snd_seq_ev_clear(event);
 	if (!writeMidiEvent(event, ev)) {
 		snd_seq_free_event(event);
 		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
-		return;
 	};
-	send_old_event(event);
+	return event;
 }
 //===============================================================
 void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
+	if (nullptr == event) {
+		snd_seq_event_t* event = new snd_seq_event_t();
+		snd_seq_ev_clear(event);
+	}
 	if (rule_mapper.applyRules(ev)) {
 		LOG(LogLvl::INFO) << "Send transformed event: " << ev.toString();
 		writeMidiEvent(event, ev);
-		send_old_event(event);
+		send_event(event);
 	}
 }
 

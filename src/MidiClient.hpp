@@ -25,9 +25,8 @@ public:
 	}
 	void process_events();
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
-	void send_new_event(const MidiEvent& ev) const;
-protected:
-	void send_old_event(snd_seq_event_t* event) const;
+	snd_seq_event_t* make_event(const MidiEvent& ev) const;
+	void send_event(snd_seq_event_t* event) const;
 private:
 	void open_alsa_connection(const char* clientName);
 };

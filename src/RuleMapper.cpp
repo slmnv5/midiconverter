@@ -22,14 +22,14 @@ RuleMapper::RuleMapper(const string& fileName, const MidiClient& mc) :
 		catch (MidiAppError& e) {
 			LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;
 			LOG(level)
-				<< "Line: " + to_string(k) + " in " + fileName + " Error: "
-				+ e.what();
+				<< "Line: " << k << " in " << fileName << " Error: "
+				<< e.what();
 
 		}
 		catch (exception& e) {
 			LOG(LogLvl::ERROR)
-				<< "Line: " + to_string(k) + " in " + fileName + " Error: "
-				+ e.what();
+				<< "Line: " << k << " in " << fileName << " Error: "
+				<< e.what();
 		}
 	}
 	f.close();
@@ -148,10 +148,9 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		MidiEvent e1 = ev;
 		e1.v1 = counted_v1;
 		count_on = count_off = 0;
-		LOG(LogLvl::INFO)
-			<< "Delayed check, count NOT changed, send counted note: "
+		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< e1.toString();
-		midi_client.send_new_event(e1);
+		midi_client.send_event(midi_client.make_event(e1));
 	}
 }
 

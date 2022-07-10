@@ -14,17 +14,18 @@ int main(int argc, char* argv[]) {
 	char const* ruleFile = nullptr;
 	char const* clientName = nullptr;
 	char const* kbdMapFile = nullptr;
-
 	LOG::ReportingLevel() = LogLvl::ERROR;
+
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-r") == 0) {
+		if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
 			ruleFile = argv[i + 1];
 			LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 		}
 		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
 			clientName = argv[i + 1];
+			LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 		}
-		else if (strcmp(argv[i], "-k") == 0) {
+		else if (strcmp(argv[i], "-k") == 0 && i + 1 < argc) {
 			kbdMapFile = argv[i + 1];
 			LOG(LogLvl::INFO) << "Keyboard map file: " << kbdMapFile;
 		}
@@ -46,16 +47,13 @@ int main(int argc, char* argv[]) {
 		help();
 		exit(1);
 	}
+	if (clientName == nullptr)
+		clientName = "mimap";
 
 	try {
-
-		if (clientName == nullptr)
-			clientName = "mimap";
-
-		LOG(LogLvl::INFO) << "Start rule processing";
 		MidiClient midiClient = MidiClient(clientName);
 		MidiConverter midiConverter = MidiConverter(ruleFile, midiClient);
-		LOG(LogLvl::WARN) << endl << "Loaded rules:" << endl
+		LOG(LogLvl::INFO) << endl << "Loaded rules: " << endl
 			<< midiConverter.toString();
 
 		if (kbdMapFile != nullptr) {
@@ -67,8 +65,8 @@ int main(int argc, char* argv[]) {
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();
 	}
-	catch (exception& err) {
-		LOG(LogLvl::ERROR) << "! Completed with error !" << err.what();
+	catch (exception& e) {
+		LOG(LogLvl::ERROR) << "Completed with error: " << e.what();
 	}
 }
 
