@@ -18,8 +18,6 @@ sudo killall mimap_d
 wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
-
-# Failed with typing keyboard. Start with hardware MIDI port
 ./mimap_d -r rules.txt  -n "$EXT_CONV" "$@" &
 
 # Wait for hardware to appear
