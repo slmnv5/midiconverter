@@ -41,11 +41,10 @@ KbdPort::KbdPort(const char* kbdMapFile) {
 
 
 void KbdPort::start(MidiClient* mc) {
-    midi_client = mc;
-    thread(&KbdPort::readKbd, this).detach();
+    thread(&KbdPort::readKbd, this, mc).detach();
 }
 
-void KbdPort::readKbd() {
+void KbdPort::readKbd(MidiClient* mc) {
     ssize_t n;
     struct input_event kbd_ev;
     LOG(LogLvl::DEBUG) << "Started thread reading typing keyboard";
@@ -72,7 +71,7 @@ void KbdPort::readKbd() {
             ev.v1 = kbdMap.at((int)kbd_ev.code);
             ev.v2 = kbd_ev.value == 0 ? 0 : 100;
             LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-            midi_client->process_one_event(nullptr, ev);
+            mc->process_one_event(nullptr, ev);
         }
     }
     catch (exception& e) {
