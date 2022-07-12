@@ -56,10 +56,7 @@ void KbdPort::readKbd() {
                 if (errno == EINTR) {
                     continue;
                 }
-                else {
-                    LOG(LogLvl::ERROR) << "Error reading typing keyboard. Exiting";
-                    break;
-                }
+                throw MidiAppError("Error reading typing keyboard.", true);
             }
             if (n != sizeof kbd_ev)
                 continue;
