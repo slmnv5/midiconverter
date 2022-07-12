@@ -66,7 +66,8 @@ void MidiClient::send_event(snd_seq_event_t* event) const {
 
 void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) const {
 	if (nullptr == event) {
-		event = new snd_seq_event_t();
+		snd_seq_event_t e1;
+		event = &e1;
 		snd_seq_ev_clear(event);
 	}
 	if (!writeMidiEvent(event, ev)) {

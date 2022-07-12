@@ -49,32 +49,38 @@ void KbdPort::readKbd() {
     ssize_t n;
     struct input_event kbd_ev;
     LOG(LogLvl::DEBUG) << "Started thread reading typing keyboard";
-    while (true) {
-        n = read(fd, &kbd_ev, sizeof kbd_ev);
-        if (n == (ssize_t)-1) {
-            if (errno == EINTR) {
+    try {
+        while (true) {
+            n = read(fd, &kbd_ev, sizeof kbd_ev);
+            if (n == (ssize_t)-1) {
+                if (errno == EINTR) {
+                    continue;
+                }
+                else {
+                    LOG(LogLvl::ERROR) << "Error reading typing keyboard. Exiting";
+                    break;
+                }
+            }
+            if (n != sizeof kbd_ev)
                 continue;
-            }
-            else {
-                LOG(LogLvl::ERROR) << "Error reading typing keyboard. Exiting";
-                break;
-            }
-        }
-        if (n != sizeof kbd_ev)
-            continue;
-        if (kbd_ev.type != EV_KEY)
-            continue;
-        if (kbd_ev.value < 0 || kbd_ev.value > 1)
-            continue;
-        if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
-            continue;
+            if (kbd_ev.type != EV_KEY)
+                continue;
+            if (kbd_ev.value < 0 || kbd_ev.value > 1)
+                continue;
+            if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
+                continue;
 
-        MidiEvent ev = MidiEvent();
-        ev.evtype = MidiEventType::NOTE;
-        ev.v1 = kbdMap.at((int)kbd_ev.code);
-        ev.v2 = kbd_ev.value == 0 ? 0 : 100;
-        LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-        midi_client->process_one_event(nullptr, ev);
+            MidiEvent ev = MidiEvent();
+            ev.evtype = MidiEventType::NOTE;
+            ev.v1 = kbdMap.at((int)kbd_ev.code);
+            ev.v2 = kbd_ev.value == 0 ? 0 : 100;
+            LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
+            midi_client->process_one_event(nullptr, ev);
+        }
+    }
+    catch (exception& e) {
+        LOG(LogLvl::ERROR) << "Thread to read typing keyboard has error: " << e.what();
+
     }
 }
 

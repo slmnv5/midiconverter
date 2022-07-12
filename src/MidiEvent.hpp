@@ -172,14 +172,14 @@ public:
 	string toString() const;
 
 	inline char typeToChar() const {
-		return static_cast<char>(rutype);
+		return static_cast<char>(ruleType);
 	}
 	inline bool isTypeValid() const {
 		return MidiEventRule::all_types.find(typeToChar()) != std::string::npos;
 	}
 	MidiEventRange inEventRange;
 	MidiEventRange outEventRange;
-	MidiRuleType rutype;
+	MidiRuleType ruleType;
 };
 
 #endif

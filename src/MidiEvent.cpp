@@ -202,11 +202,11 @@ MidiEventRule::MidiEventRule(const string& s1) {
 
 	inEventRange = MidiEventRange(parts[0], false);
 	outEventRange = MidiEventRange(parts[1], true);
-	rutype = static_cast<MidiRuleType>(parts[2][0]);
+	ruleType = static_cast<MidiRuleType>(parts[2][0]);
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s, true);
 	}
-	if (rutype == MidiRuleType::COUNT) {
+	if (ruleType == MidiRuleType::COUNT) {
 		if (outEventRange.evtype != MidiEventType::NOTE)
 			throw MidiAppError("Count rule output must be note message: " + s,
 				true);
@@ -224,6 +224,6 @@ MidiEventRule::MidiEventRule(const string& s1) {
 std::string MidiEventRule::toString() const {
 	ostringstream ss;
 	ss << inEventRange.toString() << "=" << outEventRange.toString() << "="
-		<< static_cast<char>(rutype);
+		<< static_cast<char>(ruleType);
 	return ss.str();
 }

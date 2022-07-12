@@ -53,62 +53,60 @@ int RuleMapper::findMatchingRule(const MidiEvent& ev, int startPos) const {
 
 bool RuleMapper::applyRules(MidiEvent& ev) {
 	// returns true if matching rule found
-	bool is_changed = false;
-	bool is_stop = false;
-
-	for (size_t i = 0; i < getSize() && !is_stop; i++) {
+	bool is_found;
+	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule& oneRule = rules[i];
 		const MidiEventRange& inEvent = oneRule.inEventRange;
-		if (!inEvent.match(ev))
+		is_found = inEvent.match(ev);
+		if (!is_found)
 			continue;
 
 		LOG(LogLvl::DEBUG) << "Found match for event: " << ev.toString()
 			<< ", in rule: " << oneRule.toString();
-		is_changed = true;
-		switch (oneRule.rutype) {
-		case MidiRuleType::KILL: {
+		if (oneRule.ruleType == MidiRuleType::KILL) {
 			LOG(LogLvl::DEBUG) << "Rule type KILL got event: " << ev.toString();
-			is_stop = true;
-			is_changed = false;
-			break;
+			prev_ev = ev;
+			return  false;
 		}
-		case MidiRuleType::ONCE: {
+		else if (oneRule.ruleType == MidiRuleType::ONCE) {
 			if (ev.isEqual(prev_ev)) {
 				LOG(LogLvl::DEBUG) << "Rule type ONCE ignores the same event: " << ev.toString();
-				is_stop = true;
-				is_changed = false;
+				return  false;
 			}
-			else {
-				prev_ev = ev;
-				oneRule.outEventRange.transform(ev);
-			}
-			break;
-		}
-		case MidiRuleType::STOP: {
+			LOG(LogLvl::DEBUG) << "Rule type ONCE executed for event: " << ev.toString();
+			prev_ev = ev;
 			oneRule.outEventRange.transform(ev);
-			is_stop = true;
-			break;
+			continue;
 		}
-		case MidiRuleType::PASS: {
+		else if (oneRule.ruleType == MidiRuleType::STOP) {
+			LOG(LogLvl::DEBUG) << "Rule STOP executed for event: " << ev.toString();
+			prev_ev = ev;
 			oneRule.outEventRange.transform(ev);
-			break;
+			return true;
 		}
-		case MidiRuleType::COUNT: {
+		else if (oneRule.ruleType == MidiRuleType::PASS) {
+			LOG(LogLvl::DEBUG) << "Rule PASS executed for event: " << ev.toString();
+			prev_ev = ev;
+			oneRule.outEventRange.transform(ev);
+			continue;
+		}
+		else if (oneRule.ruleType == MidiRuleType::COUNT) {
+			LOG(LogLvl::DEBUG) << "Rule COUNT executed for event: " << ev.toString();
+			prev_ev = ev;
 			MidiEvent ev_count = ev;
 			oneRule.outEventRange.transform(ev_count);
 			update_count(ev_count);
-			is_changed = count_on == 1 && count_off == 0; // send only 1-st ON for original ev
+			bool send_it = count_on == 1 && count_off == 0; // send only 1-st ON for original ev
 			if (ev.isNoteOn()) {
 				thread(&RuleMapper::count_and_send, this, ev_count, count_on).detach();
 			}
-			is_stop = true;
-			break;
+			return send_it;
 		}
-		default:
+		else {
 			throw MidiAppError("Unknown rule type: " + oneRule.toString());
 		}
 	}
-	return is_changed;
+	return is_found;
 }
 void RuleMapper::update_count(const MidiEvent& ev) {
 	// if we got another note number, restart count
@@ -149,7 +147,12 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		count_on = count_off = 0;
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< e1.toString();
-		midi_client.make_and_send(nullptr, e1);
+		try {
+			midi_client.make_and_send(nullptr, e1);
+		}
+		catch (exception& e) {
+			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();
+		}
 	}
 }
 
