@@ -53,7 +53,7 @@ int RuleMapper::findMatchingRule(const MidiEvent& ev, int startPos) const {
 
 bool RuleMapper::applyRules(MidiEvent& ev) {
 	// returns true if matching rule found
-	bool is_found;
+	bool is_found = false;
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule& oneRule = rules[i];
 		const MidiEventRange& inEvent = oneRule.inEventRange;

@@ -27,6 +27,9 @@ public:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
 	void make_and_send(snd_seq_event_t*, const MidiEvent& ev) const;
 	void send_event(snd_seq_event_t* event) const;
+	void new_event_input( const MidiEvent& ev);
+	
+}
 private:
 	void open_alsa_connection(const char* clientName);
 };

@@ -39,7 +39,6 @@ void MidiClient::open_alsa_connection(const char* clientName) {
 void MidiClient::process_events() {
 	snd_seq_event_t* event = nullptr;
 	MidiEvent ev;
-	long k = 0;
 	while (true) {
 		int result = snd_seq_event_input(seq_handle, &event);
 		if (result < 0) {
@@ -58,7 +57,6 @@ void MidiClient::process_events() {
 
 void MidiClient::send_event(snd_seq_event_t* event) const {
 	snd_seq_ev_set_direct(event);
-	// snd_seq_ev_set_dest(event, 64, 0) or send to subscribers of source port
 	snd_seq_ev_set_subs(event);
 	snd_seq_ev_set_source(event, outport);
 	snd_seq_event_output_direct(seq_handle, event);
@@ -75,6 +73,19 @@ void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) cons
 	};
 	send_event(event);
 }
+
+
+ void MidiClient::new_event_input( const MidiEvent& ev) const {
+		snd_seq_event_t event;
+		snd_seq_ev_clear(&event);
+		if (!writeMidiEvent(&event, ev)) {
+			LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
+		};
+		snd_seq_ev_set_direct(event);
+	snd_seq_ev_set_subs(event);
+	snd_seq_ev_set_source(event, outport);
+	snd_seq_event_output_direct(seq_handle, event);
+ }
 //===============================================================
 void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
 	if (rule_mapper.applyRules(ev)) {
