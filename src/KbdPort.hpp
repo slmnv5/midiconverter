@@ -20,6 +20,7 @@ public:
   KbdPort(const char* kbdMapFile);
   virtual ~KbdPort() {}
   void start(MidiClient* mc);
+  int get_input_event(MidiEvent& ev);
 private:
   void parse_string(const string& s);
   void parse_file(const char* kbdMapFile);

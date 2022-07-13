@@ -21,10 +21,9 @@ public:
 
     virtual ~MidiConverter() {
     }
-    virtual string toString() const {
-        return rule_mapper->toString();
-    }
-    virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev);
+
+    void process_events();
+    void process_one_event(MidiEvent& ev);
 
 };
 

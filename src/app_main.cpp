@@ -65,7 +65,6 @@ int main(int argc, char* argv[]) {
 
 		MidiConverter midiConverter = MidiConverter(rm, mc, kp);
 
-
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();
 	}

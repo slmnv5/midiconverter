@@ -7,7 +7,7 @@ using namespace std;
 const midi_byte_t MIDI_MAX = 127;
 const midi_byte_t MIDI_MAXCH = 15;
 //========== free functions ==================
-bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev) {
+bool writeMidiEvent(snd_seq_event_t* event, MidiEvent& ev) {
 	// note OFF is note ON with zero velocity
 	if (ev.isNote()) {
 		event->type = SND_SEQ_EVENT_NOTEON;
