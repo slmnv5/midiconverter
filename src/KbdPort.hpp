@@ -2,7 +2,6 @@
 #define KBDPORT_H
 
 #include "pch.hpp"
-#include "MidiClient.hpp"
 
 
 std::string findKbdEvent();
@@ -24,7 +23,7 @@ public:
 private:
   void parse_string(const string& s);
   void parse_file(const char* kbdMapFile);
-  void readKbd(MidiClient* mc);
+ 
 
 };
 

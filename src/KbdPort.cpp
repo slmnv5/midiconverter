@@ -7,7 +7,7 @@
 #include "KbdPort.hpp"
 #include "log.hpp"
 #include "MidiEvent.hpp"
-#include "MidiClient.hpp"
+
 
 
 std::string findKbdEvent() {
@@ -40,44 +40,34 @@ KbdPort::KbdPort(const char* kbdMapFile) {
 }
 
 
-void KbdPort::start(MidiClient* mc) {
-    thread(&KbdPort::readKbd, this, mc).detach();
-}
 
-void KbdPort::readKbd(MidiClient* mc) {
+int KbdPort::get_input_event(MidiEvent& ev) {
     ssize_t n;
     struct input_event kbd_ev;
     MidiEvent ev;
-    LOG(LogLvl::DEBUG) << "Started thread reading typing keyboard";
-    try {
-        while (true) {
-            n = read(fd, &kbd_ev, sizeof kbd_ev);
-            if (n == (ssize_t)-1) {
-                if (errno == EINTR) {
-                    continue;
-                }
-                throw MidiAppError("Error reading typing keyboard.", true);
-            }
-            if (n != sizeof kbd_ev)
-                continue;
-            if (kbd_ev.type != EV_KEY)
-                continue;
-            if (kbd_ev.value < 0 || kbd_ev.value > 1)
-                continue;
-            if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
-                continue;
 
-            ev.evtype = MidiEventType::NOTE;
-            ev.v1 = kbdMap.at((int)kbd_ev.code);
-            ev.v2 = kbd_ev.value == 0 ? 0 : 100;
-            LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-            mc->new_event_input(ev);
+
+    n = read(fd, &kbd_ev, sizeof kbd_ev);
+    if (n == (ssize_t)-1) {
+        if (errno == EINTR) {
+            return -1;
         }
+        throw MidiAppError("Error reading typing keyboard.", true);
     }
-    catch (exception& e) {
-        LOG(LogLvl::ERROR) << "Thread to read typing keyboard has error: " << e.what();
+    if (n != sizeof kbd_ev)
+        return -1;
+    if (kbd_ev.type != EV_KEY)
+        return -1;
+    if (kbd_ev.value < 0 || kbd_ev.value > 1)
+        return -1;
+    if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
+        return -1;
 
-    }
+    ev.evtype = MidiEventType::NOTE;
+    ev.v1 = kbdMap.at((int)kbd_ev.code);
+    ev.v2 = kbd_ev.value == 0 ? 0 : 100;
+    LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
+    return 1;
 }
 
 
