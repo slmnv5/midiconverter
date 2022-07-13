@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "log.hpp"
 #include "MidiClient.hpp"
+#include "MidiConverter.hpp"
 
 using namespace std;
 
@@ -49,18 +50,21 @@ int main(int argc, char* argv[]) {
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
+	RuleMapper* rm = nullptr;
+	MidiClient* mc = nullptr;
+	KbdPort* kp = nullptr;
+
 
 	try {
-		MidiClient midiClient = MidiClient(clientName);
-		MidiConverter midiConverter = MidiConverter(ruleFile, midiClient);
-		LOG(LogLvl::INFO) << endl << "Loaded rules: " << endl
-			<< midiConverter.toString();
-
 		if (kbdMapFile != nullptr) {
-			KbdPort kbdPort = KbdPort(kbdMapFile);
-			kbdPort.start(&midiConverter);
+			kp = new KbdPort(kbdMapFile);
 			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
 		}
+		mc = new MidiClient(clientName);
+		rm = new RuleMapper(ruleFile, mc);
+
+		MidiConverter midiConverter = MidiConverter(rm, mc, kp);
+
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();

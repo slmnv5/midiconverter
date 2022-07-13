@@ -9,8 +9,8 @@ using namespace std;
 
 const int RuleMapper::sleep_ms = 600;
 
-RuleMapper::RuleMapper(const string& fileName, const MidiClient& mc) :
-	midi_client(mc) {
+RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) {
+	midi_client = mc;
 	ifstream f(fileName);
 	string s;
 	int k = 0;
@@ -148,7 +148,7 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< e1.toString();
 		try {
-			midi_client.make_and_send(nullptr, e1);
+			midi_client->make_and_send(nullptr, e1);
 		}
 		catch (exception& e) {
 			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();

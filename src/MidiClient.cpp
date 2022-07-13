@@ -6,9 +6,8 @@
 #include <alsa/asoundlib.h>
 #include "log.hpp"
 
-using namespace std;
 
-void MidiClient::open_alsa_connection(const char* clientName) {
+void MidiClient::open_alsa_connection(const char* clientName, bool with_input = true) {
 	const string clName = string(clientName).substr(0, 15);
 	const string inPortName = clName + "_in";
 	const string outPortName = clName + "_out";
@@ -74,24 +73,16 @@ void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) cons
 	send_event(event);
 }
 
-
- void MidiClient::new_event_input( const MidiEvent& ev) const {
-		snd_seq_event_t event;
-		snd_seq_ev_clear(&event);
-		if (!writeMidiEvent(&event, ev)) {
-			LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
-		};
-		snd_seq_ev_set_direct(event);
-	snd_seq_ev_set_subs(event);
-	snd_seq_ev_set_source(event, outport);
-	snd_seq_event_output_direct(seq_handle, event);
- }
-//===============================================================
-void MidiConverter::process_one_event(snd_seq_event_t* event, MidiEvent& ev) {
-	if (rule_mapper.applyRules(ev)) {
-		LOG(LogLvl::INFO) << "Send mapped event: " << ev.toString();
-		make_and_send(event, ev);
-	}
+void MidiClient::new_event_input(const MidiEvent& ev) const {
+	snd_seq_event_t event;
+	snd_seq_ev_clear(&event);
+	if (!writeMidiEvent(&event, ev)) {
+		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
+		return;
+	};
+	snd_seq_ev_set_direct(&event);
+	snd_seq_ev_set_subs(&event);
+	snd_seq_ev_set_source(&event, inport);
+	snd_seq_event_output_direct(seq_handle, &event);
 }
 
-//===============================================================

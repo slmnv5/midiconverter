@@ -27,28 +27,10 @@ public:
 	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev) {}
 	void make_and_send(snd_seq_event_t*, const MidiEvent& ev) const;
 	void send_event(snd_seq_event_t* event) const;
-	void new_event_input( const MidiEvent& ev);
-	
-}
+	void new_event_input(const MidiEvent& ev) const;
+
 private:
 	void open_alsa_connection(const char* clientName);
-};
-//=============== class that maps in event to out events ============================
-
-class MidiConverter : public MidiClient {
-private:
-	RuleMapper rule_mapper;
-public:
-	MidiConverter(const string& ruleFile, MidiClient& mc) :
-		MidiClient(mc), rule_mapper(ruleFile, *this) {
-	}
-	virtual ~MidiConverter() {
-	}
-	virtual string toString() const {
-		return rule_mapper.toString();
-	}
-	virtual void process_one_event(snd_seq_event_t* event, MidiEvent& ev);
-
 };
 
 #endif

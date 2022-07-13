@@ -10,9 +10,9 @@ class MidiClient;
 class RuleMapper {
 private:
 	static const int sleep_ms;
-
+	const MidiClient* midi_client;
 public:
-	RuleMapper(const string& fileName, const MidiClient&);
+	RuleMapper(const string& fileName, MidiClient* mc);
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const string&);
 	bool applyRules(MidiEvent& ev);
@@ -25,7 +25,7 @@ public:
 	string toString() const;
 
 private:
-	const MidiClient& midi_client;
+
 	//time_point prev_moment = the_clock::now();
 	MidiEvent prev_count_ev;
 	MidiEvent prev_ev;
