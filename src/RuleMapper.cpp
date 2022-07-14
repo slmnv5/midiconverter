@@ -56,7 +56,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 	bool is_found = false;
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule& oneRule = rules[i];
-		const MidiEventRange& inEvent = oneRule.inEventRange;
+		const MidiEventRangeInput& inEvent = oneRule.inEventRange;
 		is_found = inEvent.match(ev);
 		if (!is_found)
 			continue;

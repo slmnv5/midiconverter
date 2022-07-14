@@ -65,9 +65,7 @@ MidiEvent::MidiEvent(const string& s1) {
 
 //========================================================
 
-MidiEventRange::MidiEventRange(const string& s1, bool out) :
-	isOut(out) {
-
+MidiEventRange::MidiEventRange(const string& s1){
 	string s(s1);
 	remove_spaces(s);
 	vector<string> parts = split_string(s, ",");
@@ -93,17 +91,12 @@ string MidiEventRange::toString() const {
 	return ss.str();
 }
 
-bool MidiEventRange::match(const MidiEvent& ev) const {
-	if (isOut)
-		throw MidiAppError("Match used for OUT range");
-
+bool MidiEventRangeInput::match(const MidiEvent& ev) const {
 	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING)
 		&& ch.match(ev.ch) && v1.match(ev.v1) && v2.match(ev.v2);
 }
 
-void MidiEventRange::transform(MidiEvent& ev) const {
-	if (!isOut)
-		throw MidiAppError("Transform used for IN range");
+void MidiEventRangeOutput::transform(MidiEvent& ev) const {
 	if (evtype != MidiEventType::ANYTHING)
 		ev.evtype = evtype;
 	ch.transform(ev.ch);
@@ -111,16 +104,13 @@ void MidiEventRange::transform(MidiEvent& ev) const {
 	v2.transform(ev.v2);
 }
 
-bool MidiEventRange::isValid() const {
-	if (!isOut)
+bool MidiEventRangeInput::isValid() const {
+	return ch.isValid() && v1.isValid() && v2.isValid();
+}
 
-	{
-		return ch.isValid() && v1.isValid() && v2.isValid();
-	}
-	else {
-		return ch.isValidToTransform() && v1.isValidToTransform()
-			&& v2.isValidToTransform();
-	}
+bool MidiEventRangeOutput::isValid() const {
+	return ch.isValidToTransform() && v1.isValidToTransform()
+		&& v2.isValidToTransform();
 }
 
 //===================================================

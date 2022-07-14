@@ -143,13 +143,11 @@ public:
 	MidiEventRange() :
 		evtype(MidiEventType::ANYTHING) {
 	}
-	MidiEventRange(const string&, bool);
-	string toString() const;
-	bool match(const MidiEvent&) const;
-	void transform(MidiEvent& ev) const;
-	bool isValid() const;
 
-	bool isOut = false;
+	MidiEventRange(const string& s);
+	string toString() const;
+	virtual bool isValid() const = 0;
+
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
 	ValueRange v1;	 // MIDI note or cc
@@ -158,19 +156,22 @@ public:
 
 class MidiEventRangeInput : MidiEventRange {
 public:
-	MidiEventRangeInput() : MidiEventRange()
-		{}
-	MidiEventRange(const string&, bool) : MidiEventRange() {}
-	string toString() const;
+	MidiEventRangeInput() : MidiEventRange() {}
+	MidiEventRangeInput(const string& s) : MidiEventRange(s) {}
 	bool match(const MidiEvent&) const;
+	bool isValid() const;
+protected:
+	const bool isOut = false;
+};
+
+class MidiEventRangeOutput : MidiEventRange {
+public:
+	MidiEventRangeOutput() : MidiEventRange() {}
+	MidiEventRangeOutput(const string& s) : MidiEventRange(s) {}
 	void transform(MidiEvent& ev) const;
 	bool isValid() const;
-
-	bool isOut = false;
-	MidiEventType evtype;
-	ChannelRange ch; // MIDI channel
-	ValueRange v1;	 // MIDI note or cc
-	ValueRange v2;	 // MIDI velocity or cc value
+protected:
+	const bool isOut = true;
 };
 //=============================================================
 enum class MidiRuleType : midi_byte_t {
@@ -189,8 +190,8 @@ public:
 	inline bool isTypeValid() const {
 		return MidiEventRule::all_types.find(typeToChar()) != std::string::npos;
 	}
-	MidiEventRange inEventRange;
-	MidiEventRange outEventRange;
+	MidiEventRangeInput inEventRange;
+	MidiEventRangeOutput outEventRange;
 	MidiRuleType ruleType;
 };
 

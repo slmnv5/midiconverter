@@ -5,7 +5,7 @@
 
 TEST_CASE("Test MidiEventRange", "[all][basic]") {
 
-	MidiEventRange r1("n,,,", false);
+	MidiEventRangeInput r1("n,,,", false);
 
 	SECTION("Section rule") {
 		REQUIRE(r1.isOut == false);
@@ -39,6 +39,5 @@ TEST_CASE("Test MidiEventRule 2", "[all][basic]") {
 
 		REQUIRE(rule.inEventRange.match(e1));
 		REQUIRE(!rule.inEventRange.match(e2));
-		REQUIRE_THROWS_AS(rule.outEventRange.match(e1), MidiAppError);
 	}
 }
