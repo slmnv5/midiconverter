@@ -140,7 +140,7 @@ public:
 
 class MidiEventRange {
 protected:
-	MidiEventRange() : evtype(MidiEventType::ANYTHING) {}
+	//MidiEventRange() : evtype(MidiEventType::ANYTHING) {}
 	MidiEventRange(const string& s);
 public:
 	string toString() const;
@@ -153,7 +153,7 @@ public:
 
 class InMidiEventRange : public MidiEventRange {
 public:
-	InMidiEventRange() : MidiEventRange() {}
+	//InMidiEventRange() : MidiEventRange() {}
 	InMidiEventRange(const string& s) : MidiEventRange(s) { validate(); }
 	bool match(const MidiEvent&) const;
 	void validate() const;
@@ -161,7 +161,7 @@ public:
 
 class OutMidiEventRange : public MidiEventRange {
 public:
-	OutMidiEventRange() : MidiEventRange() {}
+	//OutMidiEventRange() : MidiEventRange() {}
 	OutMidiEventRange(const string& s) : MidiEventRange(s) { validate(); }
 	void transform(MidiEvent& ev) const;
 	void validate() const;
@@ -183,8 +183,8 @@ public:
 	inline bool isTypeValid() const {
 		return MidiEventRule::all_types.find(typeToChar()) != std::string::npos;
 	}
-	InMidiEventRange inEventRange;
-	OutMidiEventRange outEventRange;
+	InMidiEventRange* inEventRange;
+	OutMidiEventRange* outEventRange;
 	MidiRuleType ruleType;
 };
 

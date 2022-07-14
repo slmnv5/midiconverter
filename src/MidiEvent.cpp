@@ -132,21 +132,21 @@ MidiEventRule::MidiEventRule(const string& s1) {
 		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
 
-	inEventRange = InMidiEventRange(parts[0]);
-	outEventRange = OutMidiEventRange(parts[1]);
+	inEventRange = new InMidiEventRange(parts[0]);
+	outEventRange = new OutMidiEventRange(parts[1]);
 	ruleType = static_cast<MidiRuleType>(parts[2][0]);
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s, true);
 	}
 	if (ruleType == MidiRuleType::COUNT) {
-		if (outEventRange.evtype != MidiEventType::NOTE)
+		if (outEventRange->evtype != MidiEventType::NOTE)
 			throw MidiAppError("Count rule output must be note message: " + s,
 				true);
-		if (inEventRange.evtype != MidiEventType::NOTE)
+		if (inEventRange->evtype != MidiEventType::NOTE)
 			throw MidiAppError("Count rule input must be note message: " + s,
 				true);
-		if (inEventRange.v2.lower != 0
-			|| inEventRange.v2.upper != ValueRange::max_value)
+		if (inEventRange->v2.lower != 0
+			|| inEventRange->v2.upper != ValueRange::max_value)
 			throw MidiAppError(
 				"Count rule input input range must be 0:127: " + s, true);
 
@@ -155,7 +155,7 @@ MidiEventRule::MidiEventRule(const string& s1) {
 
 std::string MidiEventRule::toString() const {
 	ostringstream ss;
-	ss << inEventRange.toString() << "=" << outEventRange.toString() << "="
+	ss << inEventRange->toString() << "=" << outEventRange->toString() << "="
 		<< static_cast<char>(ruleType);
 	return ss.str();
 }

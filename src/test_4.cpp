@@ -34,7 +34,7 @@ TEST_CASE("Test MidiEventRule 2", "[all][basic]") {
 		MidiEventRule rule("n,5,,=n,2,3,5=p; comment ");
 		MidiEvent e1("n,5,22,33"), e2("n,6,33,22");
 
-		REQUIRE(rule.inEventRange.match(e1));
-		REQUIRE(!rule.inEventRange.match(e2));
+		REQUIRE(rule.inEventRange->match(e1));
+		REQUIRE(!rule.inEventRange->match(e2));
 	}
 }

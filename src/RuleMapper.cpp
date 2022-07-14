@@ -45,7 +45,7 @@ void RuleMapper::parseString(const string& s1) {
 int RuleMapper::findMatchingRule(const MidiEvent& ev, int startPos) const {
 	for (size_t i = startPos; i < getSize(); i++) {
 		const MidiEventRule& oneRule = rules[i];
-		if (oneRule.inEventRange.match(ev))
+		if (oneRule.inEventRange->match(ev))
 			return i;
 	}
 	return -1;
@@ -56,8 +56,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 	bool is_found = false;
 	for (size_t i = 0; i < getSize(); i++) {
 		const MidiEventRule& oneRule = rules[i];
-		const InMidiEventRange& inEvent = oneRule.inEventRange;
-		is_found = inEvent.match(ev);
+		is_found = oneRule.inEventRange->match(ev);
 		if (!is_found)
 			continue;
 
@@ -75,23 +74,23 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 				return  false;
 			}
 			LOG(LogLvl::DEBUG) << "Rule type ONCE executed for event: " << prev_once_ev.toString();
-			oneRule.outEventRange.transform(ev);
+			oneRule.outEventRange->transform(ev);
 			continue;
 		}
 		else if (oneRule.ruleType == MidiRuleType::STOP) {
 			LOG(LogLvl::DEBUG) << "Rule STOP executed for event: " << ev.toString();
-			oneRule.outEventRange.transform(ev);
+			oneRule.outEventRange->transform(ev);
 			return true;
 		}
 		else if (oneRule.ruleType == MidiRuleType::PASS) {
 			LOG(LogLvl::DEBUG) << "Rule PASS executed for event: " << ev.toString();
-			oneRule.outEventRange.transform(ev);
+			oneRule.outEventRange->transform(ev);
 			continue;
 		}
 		else if (oneRule.ruleType == MidiRuleType::COUNT) {
 			LOG(LogLvl::DEBUG) << "Rule COUNT executed for event: " << ev.toString();
 			MidiEvent ev_count = ev;
-			oneRule.outEventRange.transform(ev_count);
+			oneRule.outEventRange->transform(ev_count);
 			update_count(ev_count);
 			bool send_it = count_on == 1 && count_off == 0; // send only 1-st ON for original ev
 			if (ev.isNoteOn()) {
