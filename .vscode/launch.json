@@ -9,7 +9,7 @@
         "name": "my_debug",
         "type": "cppdbg",
         "request": "launch",
-        "program": "sudo ./mimap_d",
+        "program": "./mimap_d",
         "args": ["-r", "rules.txt ", "-k", "kbdmap.txt", "-vvv"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
@@ -20,6 +20,7 @@
             {
                 "description": "Enable pretty-printing for gdb",
                 "text": "-enable-pretty-printing",
+                "sudo": true,
                 "ignoreFailures": true
             }
         ]

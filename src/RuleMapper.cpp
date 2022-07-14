@@ -32,6 +32,7 @@ RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) {
 		}
 	}
 	f.close();
+	LOG(LogLvl::INFO) << "MIDI conversion rules loaded: " << rules.size();
 }
 
 void RuleMapper::parseString(const string& s1) {
@@ -64,34 +65,31 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 			<< ", in rule: " << oneRule.toString();
 		if (oneRule.ruleType == MidiRuleType::KILL) {
 			LOG(LogLvl::DEBUG) << "Rule type KILL got event: " << ev.toString();
-			prev_ev = ev;
 			return  false;
 		}
 		else if (oneRule.ruleType == MidiRuleType::ONCE) {
-			if (ev.isEqual(prev_ev)) {
-				LOG(LogLvl::DEBUG) << "Rule type ONCE ignores the same event: " << ev.toString();
+			bool repeated = ev.isEqual(prev_once_ev);
+			prev_once_ev = ev;
+			if (repeated) {
+				LOG(LogLvl::DEBUG) << "Rule type ONCE ignores the same event: " << prev_once_ev.toString();
 				return  false;
 			}
-			LOG(LogLvl::DEBUG) << "Rule type ONCE executed for event: " << ev.toString();
-			prev_ev = ev;
+			LOG(LogLvl::DEBUG) << "Rule type ONCE executed for event: " << prev_once_ev.toString();
 			oneRule.outEventRange.transform(ev);
 			continue;
 		}
 		else if (oneRule.ruleType == MidiRuleType::STOP) {
 			LOG(LogLvl::DEBUG) << "Rule STOP executed for event: " << ev.toString();
-			prev_ev = ev;
 			oneRule.outEventRange.transform(ev);
 			return true;
 		}
 		else if (oneRule.ruleType == MidiRuleType::PASS) {
 			LOG(LogLvl::DEBUG) << "Rule PASS executed for event: " << ev.toString();
-			prev_ev = ev;
 			oneRule.outEventRange.transform(ev);
 			continue;
 		}
 		else if (oneRule.ruleType == MidiRuleType::COUNT) {
 			LOG(LogLvl::DEBUG) << "Rule COUNT executed for event: " << ev.toString();
-			prev_ev = ev;
 			MidiEvent ev_count = ev;
 			oneRule.outEventRange.transform(ev_count);
 			update_count(ev_count);
@@ -147,7 +145,7 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< e1.toString();
 		try {
-			midi_client->make_and_send(nullptr, e1);
+			midi_client->make_and_send(e1);
 		}
 		catch (exception& e) {
 			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();

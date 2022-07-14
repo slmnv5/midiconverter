@@ -28,7 +28,7 @@ private:
 
 	//time_point prev_moment = the_clock::now();
 	MidiEvent prev_count_ev;
-	MidiEvent prev_ev;
+	MidiEvent prev_once_ev;
 
 	int count_on = 0;
 	int count_off = 0;

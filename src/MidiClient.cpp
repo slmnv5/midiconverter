@@ -88,8 +88,8 @@ void MidiClient::open_alsa_connection(const char* clientName) {
 	if (outport < 0)
 		throw MidiAppError("Error creating seq_handle OUT port");
 
-	cout << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
-		<< client << ":" << outport << endl;
+	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
+		<< client << ":" << outport;
 }
 
 
@@ -117,14 +117,10 @@ void MidiClient::send_event(snd_seq_event_t* event) const {
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiClient::make_and_send(snd_seq_event_t* event, const MidiEvent& ev) const {
-	if (nullptr == event) {
-		snd_seq_event_t e1;
-		event = &e1;
-		snd_seq_ev_clear(event);
-	}
-	if (!writeMidiEvent(event, ev)) {
+void MidiClient::make_and_send(const MidiEvent& ev) const {
+	snd_seq_event_t event;
+	if (!writeMidiEvent(&event, ev)) {
 		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
 	};
-	send_event(event);
+	send_event(&event);
 }

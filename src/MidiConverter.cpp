@@ -26,10 +26,9 @@ void MidiConverter::process_events() {
 
 
 void MidiConverter::process_one_event(MidiEvent& ev) {
-    snd_seq_event_t event;
     if (rule_mapper->applyRules(ev)) {
         LOG(LogLvl::INFO) << "Send mapped event: " << ev.toString();
-        midi_client->make_and_send(&event, ev);
+        midi_client->make_and_send(ev);
     }
 }
 
