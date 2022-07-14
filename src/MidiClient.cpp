@@ -4,7 +4,7 @@
 
 
 //========== free functions ==================
-bool writeMidiEvent(snd_seq_event_t* event, MidiEvent& ev) {
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev) {
 	// note OFF is note ON with zero velocity
 	if (ev.isNote()) {
 		event->type = SND_SEQ_EVENT_NOTEON;
