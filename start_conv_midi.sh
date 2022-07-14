@@ -18,6 +18,8 @@ wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
 ./mimap5 -r rules.txt  -n "$EXT_CONV" "$@" &
+sleep 2
+aconnect -l
 
 # Wait for hardware to appear
 HARDWARE_OUT=""
@@ -33,7 +35,7 @@ done
 
 # connect using linux alsa command
 CLIENT_IN=$(aconnect -l | awk -v nm="$EXT_CONV" '$0 ~ nm {print $2;exit}')
-if aconnect -e "${HARDWARE_OUT}0" "${CLIENT_IN}1"; then
+if aconnect -e "${HARDWARE_OUT}0" "${CLIENT_IN}0"; then
   echo "Connected MIDI ${HARDWARE_OUT}0 to ${EXT_CONV}1"
 else
   echo "Failed connect MIDI ${HARDWARE_OUT}0 to ${EXT_CONV}1"
