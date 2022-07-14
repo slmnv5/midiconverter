@@ -4,11 +4,8 @@
 #include "catch.hpp"
 
 TEST_CASE("Test MidiEventRange", "[all][basic]") {
-
-	MidiEventRangeInput r1("n,,,", false);
-
 	SECTION("Section rule") {
-		REQUIRE(r1.isOut == false);
+		MidiEventRangeInput r1("n,,,");
 		REQUIRE(r1.ch.toString() == "0:15");
 	}
 }
