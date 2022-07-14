@@ -143,25 +143,26 @@ public:
 	MidiEventRange() : evtype(MidiEventType::ANYTHING) {}
 	MidiEventRange(const string& s);
 	string toString() const;
-	virtual bool isValid() const = 0;
+	virtual bool isValid() const;
+
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
 	ValueRange v1;	 // MIDI note or cc
 	ValueRange v2;	 // MIDI velocity or cc value
 };
 
-class MidiEventRangeInput : MidiEventRange {
+class InMidiEventRange : public MidiEventRange {
 public:
-	MidiEventRangeInput() : MidiEventRange() {}
-	MidiEventRangeInput(const string& s) : MidiEventRange(s) {}
+	InMidiEventRange() : MidiEventRange() {}
+	InMidiEventRange(const string& s) : MidiEventRange(s) {}
 	bool match(const MidiEvent&) const;
 	bool isValid() const;
 };
 
-class MidiEventRangeOutput : MidiEventRange {
+class OutMidiEventRange : public MidiEventRange {
 public:
-	MidiEventRangeOutput() : MidiEventRange() {}
-	MidiEventRangeOutput(const string& s) : MidiEventRange(s) {}
+	OutMidiEventRange() : MidiEventRange() {}
+	OutMidiEventRange(const string& s) : MidiEventRange(s) {}
 	void transform(MidiEvent& ev) const;
 	bool isValid() const;
 };
@@ -182,8 +183,8 @@ public:
 	inline bool isTypeValid() const {
 		return MidiEventRule::all_types.find(typeToChar()) != std::string::npos;
 	}
-	MidiEventRangeInput inEventRange;
-	MidiEventRangeOutput outEventRange;
+	InMidiEventRange inEventRange;
+	OutMidiEventRange outEventRange;
 	MidiRuleType ruleType;
 };
 

@@ -5,7 +5,7 @@
 
 TEST_CASE("Test MidiEventRange", "[all][basic]") {
 	SECTION("Section rule") {
-		MidiEventRangeInput r1("n,,,");
+		InMidiEventRange r1("n,,,");
 		REQUIRE(r1.ch.toString() == "0:15");
 	}
 }

@@ -65,7 +65,7 @@ MidiEvent::MidiEvent(const string& s1) {
 
 //========================================================
 
-MidiEventRange::MidiEventRange(const string& s1){
+MidiEventRange::MidiEventRange(const string& s1) {
 	string s(s1);
 	remove_spaces(s);
 	vector<string> parts = split_string(s, ",");
@@ -91,12 +91,12 @@ string MidiEventRange::toString() const {
 	return ss.str();
 }
 
-bool MidiEventRangeInput::match(const MidiEvent& ev) const {
+bool InMidiEventRange::match(const MidiEvent& ev) const {
 	return (evtype == ev.evtype || evtype == MidiEventType::ANYTHING)
 		&& ch.match(ev.ch) && v1.match(ev.v1) && v2.match(ev.v2);
 }
 
-void MidiEventRangeOutput::transform(MidiEvent& ev) const {
+void OutMidiEventRange::transform(MidiEvent& ev) const {
 	if (evtype != MidiEventType::ANYTHING)
 		ev.evtype = evtype;
 	ch.transform(ev.ch);
@@ -104,11 +104,11 @@ void MidiEventRangeOutput::transform(MidiEvent& ev) const {
 	v2.transform(ev.v2);
 }
 
-bool MidiEventRangeInput::isValid() const {
+bool InMidiEventRange::isValid() const {
 	return ch.isValid() && v1.isValid() && v2.isValid();
 }
 
-bool MidiEventRangeOutput::isValid() const {
+bool OutMidiEventRange::isValid() const {
 	return ch.isValidToTransform() && v1.isValidToTransform()
 		&& v2.isValidToTransform();
 }
@@ -129,8 +129,8 @@ MidiEventRule::MidiEventRule(const string& s1) {
 		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
 
-	inEventRange = MidiEventRange(parts[0], false);
-	outEventRange = MidiEventRange(parts[1], true);
+	inEventRange = InMidiEventRange(parts[0]);
+	outEventRange = OutMidiEventRange(parts[1]);
 	ruleType = static_cast<MidiRuleType>(parts[2][0]);
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s, true);
