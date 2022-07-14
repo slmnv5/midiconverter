@@ -143,7 +143,7 @@ public:
 	MidiEventRange() : evtype(MidiEventType::ANYTHING) {}
 	MidiEventRange(const string& s);
 	string toString() const;
-	virtual bool isValid() const;
+	virtual bool isValid() const { return false; }
 
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
