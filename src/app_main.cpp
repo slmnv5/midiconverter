@@ -2,7 +2,6 @@
 #include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
 #include "utils.hpp"
-#include "log.hpp"
 #include "MidiClient.hpp"
 #include "MidiConverter.hpp"
 

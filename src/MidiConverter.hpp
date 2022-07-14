@@ -1,7 +1,7 @@
 #ifndef MIDICONVERTER_H
 #define MIDICONVERTER_H
-#include "pch.hpp"
 
+#include "pch.hpp"
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
 #include "KbdPort.hpp"

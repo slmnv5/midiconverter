@@ -137,10 +137,6 @@ public:
 	}
 };
 
-//============== free functions ==============================
-bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
-bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
-//=============================================================
 
 class MidiEventRange {
 public:

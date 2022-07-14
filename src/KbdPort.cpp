@@ -5,7 +5,6 @@
 
 #include "utils.hpp"
 #include "KbdPort.hpp"
-#include "log.hpp"
 #include "MidiEvent.hpp"
 
 
@@ -31,6 +30,7 @@ std::string getInputDevicePath() {
 }
 
 KbdPort::KbdPort(const char* kbdMapFile) {
+    kbdMap[111] = 10;
     string tmp = getInputDevicePath();
     fd = open(tmp.c_str(), O_RDONLY);
     if (fd == -1) {
@@ -44,9 +44,6 @@ KbdPort::KbdPort(const char* kbdMapFile) {
 int KbdPort::get_input_event(MidiEvent& ev) {
     ssize_t n;
     struct input_event kbd_ev;
-    MidiEvent ev;
-
-
     n = read(fd, &kbd_ev, sizeof kbd_ev);
     if (n == (ssize_t)-1) {
         if (errno == EINTR) {
@@ -73,12 +70,12 @@ int KbdPort::get_input_event(MidiEvent& ev) {
 
 
 void KbdPort::parse_string(const string& s1) {
-    string s(s1);
+    std::string s(s1);
     remove_spaces(s);
     if (s.empty())
         return;
 
-    vector<string> parts = split_string(s, "=");
+    vector<std::string> parts = split_string(s, "=");
     if (parts.size() != 2) {
         throw MidiAppError("Keyboard mapping must have 2 parts: " + s, true);
     }
@@ -87,7 +84,7 @@ void KbdPort::parse_string(const string& s1) {
         int n1 = std::stoi(parts[0]);
         int n2 = std::stoi(parts[1]);
         LOG(LogLvl::DEBUG) << "Mapping typing key code to note: " << n1 << "=" << n2;
-        kbdMap[n1] = n2;
+        kbdMap.insert({ n1, n2 });
     }
     catch (exception& e) {
         throw MidiAppError("Keyboard mapping must have numbers on both sides of '=': " + s, true);
@@ -96,7 +93,7 @@ void KbdPort::parse_string(const string& s1) {
 
 void KbdPort::parse_file(const char* kbdMapFile) {
     ifstream f(kbdMapFile);
-    string s;
+    std::string s;
     int k = 0;
     while (getline(f, s)) {
         try {

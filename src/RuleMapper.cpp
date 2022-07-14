@@ -3,7 +3,6 @@
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
 #include "utils.hpp"
-#include "log.hpp"
 
 using namespace std;
 

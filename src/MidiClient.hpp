@@ -2,10 +2,15 @@
 #define MIDICLIENT_H
 #include "pch.hpp"
 
-#include "RuleMapper.hpp"
-#include "KbdPort.hpp"
+#include "MidiClient.hpp"
+#include "MidiEvent.hpp"
 
-using namespace std;
+
+
+//============== free functions ==============================
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
+//=============================================================
 
 
 
@@ -23,14 +28,10 @@ public:
 	}
 	virtual ~MidiClient() {
 	}
-
-
 	void make_and_send(snd_seq_event_t*, const MidiEvent& ev) const;
 	int get_input_event(MidiEvent& ev) const;
-	void send_event(snd_seq_event_t* event) const;
-	void new_event_input(const MidiEvent& ev) const;
-
 private:
+	void send_event(snd_seq_event_t* event) const;
 	void open_alsa_connection(const char* clientName);
 };
 

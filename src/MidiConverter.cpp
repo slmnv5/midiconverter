@@ -5,7 +5,6 @@
 #include "MidiConverter.hpp"
 
 #include <alsa/asoundlib.h>
-#include "log.hpp"
 
 void MidiConverter::process_events() {
     MidiEvent ev;
