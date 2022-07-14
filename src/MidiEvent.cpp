@@ -80,8 +80,6 @@ MidiEventRange::MidiEventRange(const string& s1) {
 	ch = ChannelRange(parts[1]);
 	v1 = ValueRange(parts[2]);
 	v2 = ValueRange(parts[3]);
-	if (!isValid())
-		throw MidiAppError("Not valid MidiEventRange: " + s, true);
 }
 
 string MidiEventRange::toString() const {
@@ -104,13 +102,18 @@ void OutMidiEventRange::transform(MidiEvent& ev) const {
 	v2.transform(ev.v2);
 }
 
-bool InMidiEventRange::isValid() const {
-	return ch.isValid() && v1.isValid() && v2.isValid();
+void InMidiEventRange::validate() const {
+	if (ch.isValid() && v1.isValid() && v2.isValid())
+		return;
+	throw MidiAppError("Not valid MidiEventRange: " + this->toString(), true);
 }
 
-bool OutMidiEventRange::isValid() const {
-	return ch.isValidToTransform() && v1.isValidToTransform()
-		&& v2.isValidToTransform();
+void OutMidiEventRange::validate() const {
+	if (ch.isValidToTransform() && v1.isValidToTransform()
+		&& v2.isValidToTransform())
+		return;
+
+	throw MidiAppError("Not valid MidiEventRange: " + this->toString(), true);
 }
 
 //===================================================
