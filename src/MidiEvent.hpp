@@ -139,11 +139,12 @@ public:
 
 
 class MidiEventRange {
-public:
+protected:
 	MidiEventRange() : evtype(MidiEventType::ANYTHING) {}
 	MidiEventRange(const string& s);
+public:
 	string toString() const;
-	virtual bool isValid() const { return false; }
+	virtual bool isValid() const { return true; }
 
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
@@ -156,7 +157,7 @@ public:
 	InMidiEventRange() : MidiEventRange() {}
 	InMidiEventRange(const string& s) : MidiEventRange(s) {}
 	bool match(const MidiEvent&) const;
-	bool isValid() const;
+	virtual bool isValid() const;
 };
 
 class OutMidiEventRange : public MidiEventRange {
@@ -164,7 +165,7 @@ public:
 	OutMidiEventRange() : MidiEventRange() {}
 	OutMidiEventRange(const string& s) : MidiEventRange(s) {}
 	void transform(MidiEvent& ev) const;
-	bool isValid() const;
+	virtual bool isValid() const;
 };
 //=============================================================
 enum class MidiRuleType : midi_byte_t {
