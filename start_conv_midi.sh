@@ -6,33 +6,17 @@ HARDWARE_NAME="BlueBoard"
 # MIDI port name that is source of converted messages
 EXT_CONV="PedalCommands"
 
-cd_to_script_dir() {
-  THIS_DIR=$(dirname "$0")
-  cd "$THIS_DIR" || exit 1
-}
-
-cd_to_script_dir
+THIS_DIR=$(dirname "$0")
+cd "$THIS_DIR" || exit 1
 sudo killall mimap5
-
-wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
+#wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
 chmod a+x mimap5
 
 ./mimap5 -r rules.txt  -n "$EXT_CONV" "$@" &
 sleep 2
 aconnect -l
 
-# Wait for hardware to appear
-HARDWARE_OUT=""
-for k in {1..50}; do
-  echo "Waiting for MIDI port $HARDWARE_NAME"
-  HARDWARE_OUT=$(aconnect -l | awk -v nm="$HARDWARE_NAME" '$0 ~ nm {print $2;exit}')
-  if [ -z "$HARDWARE_OUT" ]; then
-    sleep 5
-  else
-    break
-  fi
-done
-
+HARDWARE_OUT=$(aconnect -l | awk -v nm="$HARDWARE_NAME" '$0 ~ nm {print $2;exit}')
 # connect using linux alsa command
 CLIENT_IN=$(aconnect -l | awk -v nm="$EXT_CONV" '$0 ~ nm {print $2;exit}')
 if aconnect -e "${HARDWARE_OUT}0" "${CLIENT_IN}0"; then
