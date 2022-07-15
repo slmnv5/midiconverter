@@ -8,8 +8,8 @@ using namespace std;
 
 const int RuleMapper::sleep_ms = 600;
 
-RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) {
-	midi_client = mc;
+RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) : midi_client(mc)
+{
 	ifstream f(fileName);
 	string s;
 	int k = 0;

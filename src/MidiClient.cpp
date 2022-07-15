@@ -97,12 +97,11 @@ int MidiClient::get_input_event(MidiEvent& ev) const {
 	snd_seq_event_t* event = nullptr;
 	int result = snd_seq_event_input(seq_handle, &event);
 	if (result < 0) {
-		LOG(LogLvl::WARN) << "Possible loss of MIDI event" << result;
+		LOG(LogLvl::WARN) << "Possible loss of MIDI event";
 		return -1;
 	}
 	if (!readMidiEvent(event, ev)) {
-		LOG(LogLvl::DEBUG) << "Unknown MIDI event send as is, type: "
-			<< to_string(event->type);
+		LOG(LogLvl::WARN) << "Unknown MIDI event send as is, type: " << event->type;
 		send_event(event);
 		return -1;
 	}
@@ -119,6 +118,7 @@ void MidiClient::send_event(snd_seq_event_t* event) const {
 
 void MidiClient::make_and_send(const MidiEvent& ev) const {
 	snd_seq_event_t event;
+	snd_seq_ev_clear(&event);
 	if (!writeMidiEvent(&event, ev)) {
 		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
 	};

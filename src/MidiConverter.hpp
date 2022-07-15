@@ -13,12 +13,8 @@ private:
     KbdPort* kbd_port;
 
 public:
-    MidiConverter(RuleMapper* rm, MidiClient* mc, KbdPort* kp) {
-        rule_mapper = rm;
-        midi_client = mc;
-        kbd_port = kp;
-    }
-
+    MidiConverter(RuleMapper* rm, MidiClient* mc, KbdPort* kp) :
+        rule_mapper(rm), midi_client(mc), kbd_port(kp) {}
     virtual ~MidiConverter() {
     }
 
