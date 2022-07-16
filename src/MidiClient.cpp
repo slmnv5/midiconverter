@@ -90,6 +90,8 @@ void MidiClient::open_alsa_connection(const char* clientName) {
 
 	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
 		<< client << ":" << outport;
+
+	list_ports();
 }
 
 
@@ -123,4 +125,37 @@ void MidiClient::make_and_send(const MidiEvent& ev) const {
 		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
 	};
 	send_event(&event);
+}
+
+
+void MidiClient::list_ports() const {
+	snd_seq_client_info_t* cinfo;
+	snd_seq_port_info_t* pinfo;
+
+	snd_seq_client_info_alloca(&cinfo);
+	snd_seq_port_info_alloca(&pinfo);
+
+	snd_seq_client_info_set_client(cinfo, -1);
+	while (snd_seq_query_next_client(seq_handle, cinfo) >= 0) {
+		int cl = snd_seq_client_info_get_client(cinfo);
+
+		snd_seq_port_info_set_client(pinfo, cl);
+		snd_seq_port_info_set_port(pinfo, -1);
+		while (snd_seq_query_next_port(seq_handle, pinfo) >= 0) {
+			/* port must understand MIDI messages */
+			if (!(snd_seq_port_info_get_type(pinfo)
+				& SND_SEQ_PORT_TYPE_MIDI_GENERIC))
+				continue;
+			/* we need both WRITE and SUBS_WRITE
+			if ((snd_seq_port_info_get_capability(pinfo)
+				& (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
+				!= (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
+				continue;
+				*/
+			LOG(LogLvl::INFO) << snd_seq_port_info_get_client(pinfo) << "===" <<
+				snd_seq_port_info_get_port(pinfo) << "===" <<
+				snd_seq_client_info_get_name(cinfo) << "===" <<
+				snd_seq_port_info_get_name(pinfo);
+		}
+	}
 }

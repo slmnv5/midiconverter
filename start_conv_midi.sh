@@ -14,7 +14,7 @@ chmod a+x mimap5
 
 ./mimap5 -r rules.txt  -n "$EXT_CONV" "$@" &
 sleep 2
-aconnect -l
+#aconnect -l
 
 HARDWARE_OUT=$(aconnect -l | awk -v nm="$HARDWARE_NAME" '$0 ~ nm {print $2;exit}')
 # connect using linux alsa command

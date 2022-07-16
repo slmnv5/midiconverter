@@ -1,15 +1,15 @@
 #include "pch.hpp"
 #include "utils.hpp"
 
-using namespace std;
+
 
 //==================== utility functions ===================================
 
-vector<string> split_string(const string& s, const string& delimiter) {
-	vector<string> tokens;
+std::vector<std::string> split_string(const std::string& s, const std::string& delimiter) {
+	std::vector<std::string> tokens;
 	auto start = 0U;
 	auto stop = s.find(delimiter);
-	while (stop != string::npos) {
+	while (stop != std::string::npos) {
 		tokens.push_back(s.substr(start, stop - start));
 		start = stop + delimiter.length();
 		stop = s.find(delimiter, start);
@@ -18,13 +18,13 @@ vector<string> split_string(const string& s, const string& delimiter) {
 	return tokens;
 }
 
-int replace_all(string& s, const string& del, const string& repl) {
-	string::size_type delsz = del.size();
+int replace_all(std::string& s, const std::string& del, const std::string& repl) {
+	std::string::size_type delsz = del.size();
 	if (delsz == 0)
 		return 0;
 	int count = 0;
-	string::size_type n = 0;
-	while ((n = s.find(del, n)) != string::npos) {
+	std::string::size_type n = 0;
+	while ((n = s.find(del, n)) != std::string::npos) {
 		s.replace(n, delsz, repl);
 		n += repl.size();
 		count++;
@@ -32,14 +32,14 @@ int replace_all(string& s, const string& del, const string& repl) {
 	return count;
 }
 
-void remove_spaces(string& s) {
+void remove_spaces(std::string& s) {
 	s = s.substr(0, s.find(";"));
 	replace_all(s, " ", "");
 	replace_all(s, "\n", "");
 	replace_all(s, "\t", "");
 }
 
-string exec_command(const string& cmd) {
+std::string exec_command(const std::string& cmd) {
 	char buffer[128];
 	std::string result = "";
 	FILE* pipe = popen(cmd.c_str(), "r");
@@ -50,11 +50,12 @@ string exec_command(const string& cmd) {
 			result += buffer;
 		}
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		pclose(pipe);
 		throw e;
 	}
 	pclose(pipe);
 	return result;
 }
+
 
