@@ -23,8 +23,8 @@ protected:
 
 
 public:
-	MidiClient(const char* clientName) {
-		open_alsa_connection(clientName);
+	MidiClient(const char* clientName, const char* sourceName) {
+		open_alsa_connection(clientName, sourceName);
 	}
 	virtual ~MidiClient() {
 	}
@@ -32,9 +32,9 @@ public:
 	int get_input_event(MidiEvent& ev) const;
 private:
 	void send_event(snd_seq_event_t* event) const;
-	void open_alsa_connection(const char* clientName);
+	void open_alsa_connection(const char* clientName, const char* sourceName);
 	int find_midi_source(const std::string& name_part, int& cli_id, int& cli_port) const;
-	void subscribe(const int& id, const int& port);
+	void subscribe(const int& id, const int& port) const;
 };
 
 #endif

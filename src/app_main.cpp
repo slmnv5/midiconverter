@@ -11,13 +11,17 @@ void help();
 
 int main(int argc, char* argv[]) {
 
-	char const* ruleFile = nullptr;
-	char const* clientName = nullptr;
-	char const* kbdMapFile = nullptr;
+	const char* ruleFile = nullptr;
+	const char* clientName = nullptr;
+	const char* kbdMapFile = nullptr;
+	const char* sourceName = nullptr;
 	LOG::ReportingLevel() = LogLvl::ERROR;
 
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
+		if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
+			sourceName = argv[i + 1];
+		}
+		else if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
 			ruleFile = argv[i + 1];
 		}
 		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
@@ -44,6 +48,10 @@ int main(int argc, char* argv[]) {
 		help();
 		return 2;
 	}
+	if (sourceName == nullptr) {
+		help();
+		return 2;
+	}
 	if (clientName == nullptr)
 		clientName = "mimap";
 
@@ -59,7 +67,7 @@ int main(int argc, char* argv[]) {
 			kp = new KbdPort(kbdMapFile);
 			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
 		}
-		mc = new MidiClient(clientName);
+		mc = new MidiClient(clientName, sourceName);
 		rm = new RuleMapper(ruleFile, mc);
 
 		MidiConverter midiConverter = MidiConverter(rm, mc, kp);
@@ -75,12 +83,13 @@ int main(int argc, char* argv[]) {
 
 void help() {
 	cout << "Usage: mimap5 -r <file> [options] \n"
-		"  -r <file> load file with rules, see rules.txt for details\n"
+		"  -r <ruleFile> load file with rules, see rules.txt for details and example\n"
+		"  -i <sourceName> MIDI source to connect to\n"
 		"options:\n"
-		"  -k <kbdMapFile> -- use typing keyboard for MIDI notes\n"
-		"  -n [name] -- MIDI port name (mimap if missing)\n"
-		"  -v -- verbose output\n"
-		"  -vv -- more verbose\n"
-		"  -vvv -- even more verbose\n"
-		"  -h -- displays this info\n";
+		"  -k <kbdMapFile> use typing keyboard for MIDI notes, needs sudo\n"
+		"  -n [name] output MIDI port name to create\n"
+		"  -v verbose output\n"
+		"  -vv more verbose\n"
+		"  -vvv even more verbose\n"
+		"  -h displays this info\n";
 }

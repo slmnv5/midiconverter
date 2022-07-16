@@ -65,7 +65,7 @@ bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev) {
 //========================================
 
 
-void MidiClient::open_alsa_connection(const char* clientName) {
+void MidiClient::open_alsa_connection(const char* clientName, const char* sourceName) {
 	const string clName = string(clientName).substr(0, 15);
 	const string inPortName = clName + "_in";
 	const string outPortName = clName + "_out";
@@ -80,18 +80,25 @@ void MidiClient::open_alsa_connection(const char* clientName) {
 		SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
 		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (inport < 0)
-		throw MidiAppError("Error creating seq_handle IN port");
+		throw MidiAppError("Error creating virtual IN port", true);
+
+	if (nullptr == sourceName)
+		return;
 
 	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
 		SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
 		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (outport < 0)
-		throw MidiAppError("Error creating seq_handle OUT port");
+		throw MidiAppError("Error creating virtual OUT port", true);
 
 	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
 		<< client << ":" << outport;
 
-
+	int cli_id = -1;
+	int cli_port = -1;
+	if (find_midi_source(sourceName, cli_id, cli_port) < 0) {
+		throw MidiAppError("Error finding source hardware port: " + string(sourceName), true);
+	}
 }
 
 
@@ -126,7 +133,6 @@ void MidiClient::make_and_send(const MidiEvent& ev) const {
 	};
 	send_event(&event);
 }
-
 
 int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int& cli_port) const {
 	snd_seq_client_info_t* cinfo;
@@ -164,20 +170,8 @@ int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int&
 	return -1;
 }
 
-void MidiClient::subscribe(const int& cli_id, const int& cli_port) {
-
-	snd_seq_addr_t sender, dest;
-	snd_seq_port_subscribe_t* subs;
-	sender.client = id;
-	sender.port = port;
-	dest.client = client;
-	dest.port = inport;
-	snd_seq_port_subscribe_alloca(&subs);
-	snd_seq_port_subscribe_set_sender(subs, &sender);
-	snd_seq_port_subscribe_set_dest(subs, &dest);
-	snd_seq_port_subscribe_set_queue(subs, 1);
-	snd_seq_port_subscribe_set_time_update(subs, 1);
-	snd_seq_port_subscribe_set_time_real(subs, 1);
-	snd_seq_subscribe_port(seq_handle, subs);
-
+void MidiClient::subscribe(const int& cli_id, const int& cli_port) const {
+	if (snd_seq_connect_from(seq_handle, inport, cli_id, cli_port) < 0) {
+		throw new MidiAppError("Cannot connect from port: " + to_string(cli_id) + ":" + to_string(cli_port));
+	}
 }
