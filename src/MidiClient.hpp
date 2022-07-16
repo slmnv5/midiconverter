@@ -33,7 +33,8 @@ public:
 private:
 	void send_event(snd_seq_event_t* event) const;
 	void open_alsa_connection(const char* clientName);
-	void  list_ports() const;
+	int find_midi_source(const std::string& name_part, int& cli_id, int& cli_port) const;
+	void subscribe(const int& id, const int& port);
 };
 
 #endif

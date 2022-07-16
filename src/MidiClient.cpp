@@ -91,7 +91,7 @@ void MidiClient::open_alsa_connection(const char* clientName) {
 	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
 		<< client << ":" << outport;
 
-	list_ports();
+
 }
 
 
@@ -128,7 +128,7 @@ void MidiClient::make_and_send(const MidiEvent& ev) const {
 }
 
 
-void MidiClient::list_ports() const {
+int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int& cli_port) const {
 	snd_seq_client_info_t* cinfo;
 	snd_seq_port_info_t* pinfo;
 
@@ -138,24 +138,46 @@ void MidiClient::list_ports() const {
 	snd_seq_client_info_set_client(cinfo, -1);
 	while (snd_seq_query_next_client(seq_handle, cinfo) >= 0) {
 		int cl = snd_seq_client_info_get_client(cinfo);
+		std::string cl_name(snd_seq_client_info_get_name(cinfo));
+		if (cl_name.find(name_part) == std::string::npos)
+			continue;
 
 		snd_seq_port_info_set_client(pinfo, cl);
 		snd_seq_port_info_set_port(pinfo, -1);
+		unsigned int capability = 0;
 		while (snd_seq_query_next_port(seq_handle, pinfo) >= 0) {
-			/* port must understand MIDI messages */
-			if (!(snd_seq_port_info_get_type(pinfo)
-				& SND_SEQ_PORT_TYPE_MIDI_GENERIC))
+			// port must understand MIDI messages
+			capability = SND_SEQ_PORT_TYPE_MIDI_GENERIC;
+			if ((snd_seq_port_info_get_type(pinfo)
+				& capability) != capability)
 				continue;
-			/* we need both WRITE and SUBS_WRITE
+			// we need both READ and SUBS_READ
+			capability = SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
 			if ((snd_seq_port_info_get_capability(pinfo)
-				& (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
-				!= (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
+				& capability) != capability)
 				continue;
-				*/
-			LOG(LogLvl::INFO) << snd_seq_port_info_get_client(pinfo) << "===" <<
-				snd_seq_port_info_get_port(pinfo) << "===" <<
-				snd_seq_client_info_get_name(cinfo) << "===" <<
-				snd_seq_port_info_get_name(pinfo);
+			cli_id = snd_seq_port_info_get_client(pinfo);
+			cli_port = snd_seq_port_info_get_port(pinfo);
+			return 0;
 		}
 	}
+	return -1;
+}
+
+void MidiClient::subscribe(const int& cli_id, const int& cli_port) {
+
+	snd_seq_addr_t sender, dest;
+	snd_seq_port_subscribe_t* subs;
+	sender.client = id;
+	sender.port = port;
+	dest.client = client;
+	dest.port = inport;
+	snd_seq_port_subscribe_alloca(&subs);
+	snd_seq_port_subscribe_set_sender(subs, &sender);
+	snd_seq_port_subscribe_set_dest(subs, &dest);
+	snd_seq_port_subscribe_set_queue(subs, 1);
+	snd_seq_port_subscribe_set_time_update(subs, 1);
+	snd_seq_port_subscribe_set_time_real(subs, 1);
+	snd_seq_subscribe_port(seq_handle, subs);
+
 }
