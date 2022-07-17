@@ -99,6 +99,8 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 	if (find_midi_source(sourceName, cli_id, cli_port) < 0) {
 		throw MidiAppError("Error finding source hardware port: " + string(sourceName), true);
 	}
+
+	subscribe(cli_id, cli_port);
 }
 
 
@@ -164,6 +166,7 @@ int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int&
 				continue;
 			cli_id = snd_seq_port_info_get_client(pinfo);
 			cli_port = snd_seq_port_info_get_port(pinfo);
+			LOG(LogLvl::INFO) << "Found source: " << name_part << " -- " << cli_id << ":" << cli_port;
 			return 0;
 		}
 	}
@@ -174,4 +177,5 @@ void MidiClient::subscribe(const int& cli_id, const int& cli_port) const {
 	if (snd_seq_connect_from(seq_handle, inport, cli_id, cli_port) < 0) {
 		throw new MidiAppError("Cannot connect from port: " + to_string(cli_id) + ":" + to_string(cli_port));
 	}
+	LOG(LogLvl::INFO) << "Connected to source: " << cli_id << ":" << cli_port;
 }

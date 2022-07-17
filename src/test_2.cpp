@@ -5,7 +5,7 @@
 #include "catch.hpp"
 
 TEST_CASE("Test RuleMapper 1", "[all]") {
-	MidiClient c1("abc");
+	MidiClient c1("abc", nullptr);
 	RuleMapper r1("", &c1);
 	r1.parseString("n,,0:20,10:127=n,2,22,22=  p ; note rule 1");
 	r1.parseString("n,,,=n,2,122,  =p; note rule 2");
@@ -28,7 +28,7 @@ TEST_CASE("Test RuleMapper 1", "[all]") {
 }
 
 TEST_CASE("Test RuleMapper 2", "[all]") {
-	MidiClient c1("abc");
+	MidiClient c1("abc", nullptr);
 	RuleMapper r1("", &c1);
 	r1.parseString("n,,,=n,,,0=p");
 

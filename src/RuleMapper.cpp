@@ -16,7 +16,9 @@ RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) : midi_client(mc)
 	while (getline(f, s)) {
 		try {
 			k++;
-			rules.push_back(MidiEventRule(s));
+			remove_spaces(s);
+			if (!s.empty())
+				rules.push_back(MidiEventRule(s));
 		}
 		catch (MidiAppError& e) {
 			LogLvl level = e.is_critical() ? LogLvl::ERROR : LogLvl::WARN;

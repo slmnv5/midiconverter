@@ -122,7 +122,7 @@ MidiEventRule::MidiEventRule(const string& s1) {
 	string s(s1);
 	remove_spaces(s);
 	if (s.empty()) {
-		throw MidiAppError("Rule is empty or commented out: " + s1);
+		throw MidiAppError("Rule string is empty");
 	}
 	vector<string> parts = split_string(s, "=");
 	if (parts.size() != 3) {
