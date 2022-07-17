@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 		help();
 		return 2;
 	}
-	if (sourceName == nullptr) {
+	if (sourceName == nullptr && kbdMapFile == nullptr) {
 		help();
 		return 2;
 	}
