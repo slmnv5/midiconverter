@@ -82,8 +82,6 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 	if (inport < 0)
 		throw MidiAppError("Error creating virtual IN port", true);
 
-	if (nullptr == sourceName)
-		return;
 
 	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
 		SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
@@ -93,6 +91,9 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 
 	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
 		<< client << ":" << outport;
+
+	if (nullptr == sourceName)
+		return;
 
 	int cli_id = -1;
 	int cli_port = -1;
@@ -175,7 +176,7 @@ int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int&
 
 void MidiClient::subscribe(const int& cli_id, const int& cli_port) const {
 	if (snd_seq_connect_from(seq_handle, inport, cli_id, cli_port) < 0) {
-		throw new MidiAppError("Cannot connect from port: " + to_string(cli_id) + ":" + to_string(cli_port));
+		throw new MidiAppError("Cannot connect to port: " + to_string(cli_id) + ":" + to_string(cli_port));
 	}
 	LOG(LogLvl::INFO) << "Connected to source: " << cli_id << ":" << cli_port;
 }

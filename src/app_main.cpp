@@ -66,6 +66,10 @@ int main(int argc, char* argv[]) {
 		if (kbdMapFile != nullptr) {
 			kp = new KbdPort(kbdMapFile);
 			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
+			sourceName = nullptr;
+		}
+		else {
+			LOG(LogLvl::INFO) << "Using midi source: " << sourceName;
 		}
 		mc = new MidiClient(clientName, sourceName);
 		rm = new RuleMapper(ruleFile, mc);
