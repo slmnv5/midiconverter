@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
+
+
 #include "utils.hpp"
 #include "KbdPort.hpp"
 #include "MidiEvent.hpp"
@@ -30,12 +32,16 @@ std::string getInputDevicePath() {
 }
 
 KbdPort::KbdPort(const char* kbdMapFile) {
-    kbdMap[111] = 10;
     string tmp = getInputDevicePath();
     fd = open(tmp.c_str(), O_RDONLY);
     if (fd == -1) {
         throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
     }
+    // disable kbd echo
+    struct termios t;
+    tcgetattr(fd, &t);
+    t.c_lflag &= ~ECHO;
+    tcsetattr(0, TCSANOW, &t);
     parse_file(kbdMapFile);
 }
 
