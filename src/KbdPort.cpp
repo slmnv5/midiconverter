@@ -3,13 +3,18 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
-
-
 #include "utils.hpp"
 #include "KbdPort.hpp"
 #include "MidiEvent.hpp"
 
-
+KbdPort::KbdPort(const char* kbdMapFile) {
+    string tmp = getInputDevicePath();
+    fd = open(tmp.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
+    }
+    parse_file(kbdMapFile);
+}
 
 std::string findKbdEvent() {
     const char* cmd = "grep -E 'Handlers|EV=' /proc/bus/input/devices | "
@@ -31,42 +36,34 @@ std::string getInputDevicePath() {
     return tmp;
 }
 
-KbdPort::KbdPort(const char* kbdMapFile) {
-    string tmp = getInputDevicePath();
-    fd = open(tmp.c_str(), O_RDONLY);
-    if (fd == -1) {
-        throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
-    }
-}
-
-
-
-int KbdPort::get_input_event(MidiEvent& ev) {
+bool KbdPort::get_input_event(MidiEvent& ev) {
     ssize_t n;
     struct input_event kbd_ev;
     n = read(fd, &kbd_ev, sizeof kbd_ev);
     if (n == (ssize_t)-1) {
         if (errno == EINTR) {
-            return -1;
+            return false;
         }
-        throw MidiAppError("Error reading typing keyboard.", true);
+        throw MidiAppError("Error reading typing keyboard", true);
     }
     if (n != sizeof kbd_ev)
-        return -1;
+        return false;
     if (kbd_ev.type != EV_KEY)
-        return -1;
+        return false;
+
+    LOG(LogLvl::DEBUG) << "Typing keyboard: " << kbd_ev.value << " " << kbd_ev.code;
+
     if (kbd_ev.value < 0 || kbd_ev.value > 1)
-        return -1;
+        return false;
     if (kbdMap.find((int)kbd_ev.code) == kbdMap.end())
-        return -1;
+        return false;
 
     ev.evtype = MidiEventType::NOTE;
     ev.v1 = kbdMap.at((int)kbd_ev.code);
     ev.v2 = kbd_ev.value == 0 ? 0 : 100;
     LOG(LogLvl::DEBUG) << "Typing keyboard event: " << ev.toString();
-    return 1;
+    return true;
 }
-
 
 
 void KbdPort::parse_string(const string& s1) {

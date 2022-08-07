@@ -29,7 +29,7 @@ public:
 	virtual ~MidiClient() {
 	}
 	void make_and_send(const MidiEvent& ev) const;
-	int get_input_event(MidiEvent& ev) const;
+	bool get_input_event(MidiEvent& ev) const;
 private:
 	void send_event(snd_seq_event_t* event) const;
 	void open_alsa_connection(const char* clientName, const char* sourceName);

@@ -18,7 +18,7 @@ public:
   KbdPort(const char* kbdMapFile);
   virtual ~KbdPort() {
   }
-  int get_input_event(MidiEvent& ev);
+  bool get_input_event(MidiEvent& ev);
 private:
   void parse_string(const std::string& s);
   void parse_file(const char* kbdMapFile);

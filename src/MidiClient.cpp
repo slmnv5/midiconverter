@@ -105,19 +105,19 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 }
 
 
-int MidiClient::get_input_event(MidiEvent& ev) const {
+bool MidiClient::get_input_event(MidiEvent& ev) const {
 	snd_seq_event_t* event = nullptr;
 	int result = snd_seq_event_input(seq_handle, &event);
 	if (result < 0) {
 		LOG(LogLvl::WARN) << "Possible loss of MIDI event";
-		return -1;
+		return false;
 	}
 	if (!readMidiEvent(event, ev)) {
 		LOG(LogLvl::WARN) << "Unknown MIDI event send as is, type: " << event->type;
 		send_event(event);
-		return -1;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 
