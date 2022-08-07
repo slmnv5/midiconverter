@@ -3,7 +3,6 @@
 
 #include "pch.hpp"
 #include "MidiEvent.hpp"
-#include <termios.h>
 
 std::string findKbdEvent();
 std::string getInputDevicePath();
@@ -18,11 +17,6 @@ private:
 public:
   KbdPort(const char* kbdMapFile);
   virtual ~KbdPort() {
-    // enable kbd echo
-    struct termios t;
-    tcgetattr(fd, &t);
-    t.c_lflag &= ECHO;
-    tcsetattr(0, TCSANOW, &t);
   }
   int get_input_event(MidiEvent& ev);
 private:

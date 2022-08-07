@@ -37,12 +37,6 @@ KbdPort::KbdPort(const char* kbdMapFile) {
     if (fd == -1) {
         throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
     }
-    // disable kbd echo
-    struct termios t;
-    tcgetattr(fd, &t);
-    t.c_lflag &= ~ECHO;
-    tcsetattr(0, TCSANOW, &t);
-    parse_file(kbdMapFile);
 }
 
 
