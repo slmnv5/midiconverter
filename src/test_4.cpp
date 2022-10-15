@@ -20,7 +20,7 @@ TEST_CASE("Test MidiEventRule 1", "[all][basic]") {
 		REQUIRE_THROWS_AS(MidiEventRule("n,5,,=n,2,3:7,5=p"), MidiAppError);
 
 		MidiEventRule r2("n,5,,=n,,,3=c;count rule is correct");
-		REQUIRE_THROWS_AS(MidiEventRule("n,5,,=c,,,=c"), MidiAppError);
+		REQUIRE_THROWS_AS(MidiEventRule("n,5,,=ca"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEventRule("c,5,,=c,,,=n"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEventRule("n,5,,=c,,,=n"), MidiAppError);
 		REQUIRE_THROWS_AS(MidiEventRule("n,5,,1:127=c,,,=n"), MidiAppError);
