@@ -24,30 +24,26 @@ MousePort::MousePort() {
 
 void MousePort::get_input_event(MidiEvent& ev) {
     struct input_event ie;
-    unsigned char button, bLeft;
     char x, y;
+
 
     while (read(fd, &ie, sizeof(struct input_event)))
     {
         unsigned char* ptr = (unsigned char*)&ie;
-        int i;
+        unsigned char bLeft = ptr[0] & 0x1;
 
-        button = ptr[0];
-        bLeft = button & 0x1;
-
-        x = (char)ptr[1];y = (char)ptr[2];
-        printf("bLEFT:%d, rx: %d  ry=%d\n", bLeft, x, y);
+        x = (char)ptr[1];
+        y = (char)ptr[2];
+        printf("rx: %d  ry=%d\n", x, y);
 
         absolute_x += x;
         absolute_y -= y;
 
-        //
-        printf("Absolute coords from TOP_LEFT= %i %i\n", absolute_x, absolute_y);
+        printf("Absolute coords from TOP_LEFT= %i %i; %i\n", absolute_x, absolute_y, bLeft);
         //
         // comment to disable the display of raw event structure datas
         //
-        for (i = 0; i < sizeof(ie); i++)
-        {
+        for (size_t i = 0; i < sizeof(ie); i++) {
             printf("%02X ", *ptr++);
         }
         printf("\n");

@@ -91,12 +91,10 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 		}
 		else if (oneRule.ruleType == MidiRuleType::COUNT) {
 			LOG(LogLvl::DEBUG) << "Rule COUNT executed for event: " << ev.toString();
-			MidiEvent ev_count = ev;
-			oneRule.outEventRange->transform(ev_count);
-			update_count(ev_count);
+			update_count(ev);
 			bool send_it = count_on == 1 && count_off == 0; // send only 1-st ON for original ev
 			if (ev.isNoteOn()) {
-				thread(&RuleMapper::count_and_send, this, ev_count, count_on).detach();
+				thread(&RuleMapper::count_and_send, this, ev, count_on).detach();
 			}
 			return send_it;
 		}
@@ -135,18 +133,15 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 			<< " vs. " << prev_count_ev.toString();
 	}
 	else {
-		midi_byte_t counted_v1 = ev.v1 + count_on
+		midi_byte_t counted_v2 = count_on
 			+ (count_on > count_off ? 5 : 0);
-		if (counted_v1 > ValueRange::max_value) {
-			counted_v1 %= ValueRange::max_value;
-		}
-		MidiEvent e1 = ev;
-		e1.v1 = counted_v1;
+		MidiEvent ev_new = ev;
+		ev_new.v2 = counted_v2;
 		count_on = count_off = 0;
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
-			<< e1.toString();
+			<< ev_new.toString();
 		try {
-			midi_client->make_and_send(e1);
+			midi_client->make_and_send(ev_new);
 		}
 		catch (exception& e) {
 			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();
