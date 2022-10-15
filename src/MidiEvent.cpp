@@ -125,30 +125,28 @@ MidiEventRule::MidiEventRule(const string& s1) {
 		throw MidiAppError("Rule string is empty");
 	}
 	vector<string> parts = split_string(s, "=");
-	if (parts.size() != 3) {
-		throw MidiAppError("Rule string must have 3 parts: " + s, true);
+	if (parts.size() < 2 || parts.size() > 3) {
+		throw MidiAppError("Rule string must have 2 or 3 parts: " + s, true);
 	}
-	if (parts[2].size() != 1) {
+	string tmp = parts[parts.size()-1]
+	if (tmp.size() != 1) {
 		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
+	ruleType = static_cast<MidiRuleType>(tmp[0]);
 
 	inEventRange = new InMidiEventRange(parts[0]);
-	outEventRange = new OutMidiEventRange(parts[1]);
-	ruleType = static_cast<MidiRuleType>(parts[2][0]);
+	if (parts.size() == 3) {
+		outEventRange = new OutMidiEventRange(parts[1]);
+	} else {
+		outEventRange = inEventRange
+	}
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s, true);
 	}
 	if (ruleType == MidiRuleType::COUNT) {
-		if (outEventRange->evtype != MidiEventType::NOTE)
-			throw MidiAppError("Count rule output must be note message: " + s,
-				true);
-		if (inEventRange->evtype != MidiEventType::NOTE)
-			throw MidiAppError("Count rule input must be note message: " + s,
-				true);
-		if (inEventRange->v2.lower != 0
-			|| inEventRange->v2.upper != ValueRange::max_value)
+		if (inEventRange->v2.lower >= 10)
 			throw MidiAppError(
-				"Count rule input input range must be 0:127: " + s, true);
+				"Count rule - input value range must be >= 10: " + s, true);
 
 	}
 }
