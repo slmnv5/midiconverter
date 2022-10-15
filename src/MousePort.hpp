@@ -10,20 +10,17 @@ std::string getInputDevicePath();
 
 class MousePort {
 private:
-  std::map<int, int> kbdMap;
-  std::string dev;
-  int fd;
+    static const char* dev;
+    int fd;
+    int absolute_x, absolute_y;
 
 public:
-  MousePort(const char* kbdMapFile);
-  virtual ~MousePort() {
-  }
-  bool get_input_event(MidiEvent& ev);
-private:
-  void parse_string(const std::string& s);
-  void parse_file(const char* kbdMapFile);
-
+    MousePort();
+    virtual ~MousePort() {
+    }
+    void get_input_event(MidiEvent& ev);
 
 };
 
+const char* MousePort::dev = "/dev/input/mouse0";
 #endif

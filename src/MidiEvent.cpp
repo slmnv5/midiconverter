@@ -128,7 +128,7 @@ MidiEventRule::MidiEventRule(const string& s1) {
 	if (parts.size() < 2 || parts.size() > 3) {
 		throw MidiAppError("Rule string must have 2 or 3 parts: " + s, true);
 	}
-	string tmp = parts[parts.size()-1]
+	string tmp = parts[parts.size()-1];
 	if (tmp.size() != 1) {
 		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
@@ -138,7 +138,7 @@ MidiEventRule::MidiEventRule(const string& s1) {
 	if (parts.size() == 3) {
 		outEventRange = new OutMidiEventRange(parts[1]);
 	} else {
-		outEventRange = inEventRange
+		outEventRange = nullptr;
 	}
 	if (!isTypeValid()) {
 		throw MidiAppError("Rule type is unknown: " + s, true);
