@@ -7,14 +7,6 @@
 #include "KbdPort.hpp"
 #include "MidiEvent.hpp"
 
-KbdPort::KbdPort(const char* kbdMapFile) {
-    string tmp = getInputDevicePath();
-    fd = open(tmp.c_str(), O_RDONLY);
-    if (fd == -1) {
-        throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
-    }
-    parse_file(kbdMapFile);
-}
 
 std::string findKbdEvent() {
     const char* cmd = "grep -E 'Handlers|EV=' /proc/bus/input/devices | "
@@ -30,10 +22,15 @@ std::string findKbdEvent() {
     return result;
 }
 
-std::string getInputDevicePath() {
+
+
+KbdPort::KbdPort(const char* kbdMapFile) {
     string tmp = "/dev/input/event" + findKbdEvent();
-    LOG(LogLvl::DEBUG) << "Typing keyboard file found: " << tmp;
-    return tmp;
+    fd = open(tmp.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw MidiAppError("Cannot open typing keyboard file: " + tmp, true);
+    }
+    parse_file(kbdMapFile);
 }
 
 bool KbdPort::get_input_event(MidiEvent& ev) {
@@ -104,9 +101,3 @@ void KbdPort::parse_file(const char* kbdMapFile) {
         }
     }
 }
-
-
-
-
-
-

@@ -4,13 +4,12 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
 
-std::string findMouseEvent();
-std::string getInputDevicePath();
+std::string findTouchScreenEvent();
+
 
 
 class MousePort {
 private:
-    static const char* dev;
     int fd;
     int absolute_x, absolute_y;
 
@@ -22,5 +21,5 @@ public:
 
 };
 
-const char* MousePort::dev = "/dev/input/mouse0";
+
 #endif

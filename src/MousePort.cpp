@@ -8,6 +8,20 @@
 #include "MidiEvent.hpp"
 
 
+std::string findTouchScreenEvent() {
+    const char* cmd = "grep -E 'Handlers|EV=' /proc/bus/input/devices | "
+        "grep -B1 'EV=b' | grep -Eo 'event[0-9]+' | grep -Eo '[0-9]+' | tr -d '\n'";
+
+    FILE* pipe = popen(cmd, "r");
+    char buffer[128];
+    std::string result = "";
+    while (!feof(pipe))
+        if (fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    pclose(pipe);
+    return result;
+}
+
 
 
 
@@ -15,17 +29,17 @@ MousePort::MousePort() {
 
     absolute_x = 0;
     absolute_y = 0;
-
-    if ((fd = open(dev, O_RDONLY)) == -1) {
-        LOG(LogLvl::ERROR) << "Mouse device file error: " << dev;
-        exit(EXIT_FAILURE);
+    string tmp = "/dev/input/event" + findTouchScreenEvent();
+    fd = open(tmp.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw MidiAppError("Cannot open touch screen file: " + tmp, true);
     }
+
 }
 
 void MousePort::get_input_event(MidiEvent& ev) {
     struct input_event ie;
     char x, y;
-
 
     while (read(fd, &ie, sizeof(struct input_event)))
     {
