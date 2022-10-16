@@ -19,17 +19,20 @@ MousePort::MousePort() {
     if (fd == -1) {
         throw MidiAppError("Cannot open touch screen file: " + tmp, true);
     }
+    thread(&MousePort::run, this).detach();
 
 }
 
-void MousePort::get_input_event(MidiEvent& ev) {
+
+void MousePort::run() {
     struct input_event ie;
     char x, y;
 
-    while (read(fd, &ie, sizeof(struct input_event)))
+
+    while (read(fd, &ie, sizeof(struct input_event)) > 0)
     {
         unsigned char* ptr = (unsigned char*)&ie;
-        unsigned char bLeft = ptr[0] & 0x1;
+        bLeft = ptr[0] & 0x1;
 
         x = (char)ptr[1];
         y = (char)ptr[2];
@@ -38,14 +41,17 @@ void MousePort::get_input_event(MidiEvent& ev) {
         absolute_x += x;
         absolute_y -= y;
 
-        printf("Absolute coords from TOP_LEFT= %i %i; %i\n", absolute_x, absolute_y, bLeft);
-        //
-        // comment to disable the display of raw event structure datas
-        //
-        for (size_t i = 0; i < sizeof(ie); i++) {
-            printf("%02X ", *ptr++);
-        }
-        printf("\n");
     }
-
 }
+
+bool MousePort::get_input_event(MidiEvent& ev) {
+
+    ev.evtype = MidiEventType::NOTE;
+    ev.v1 = absolute_x;
+    ev.v2 = absolute_y;
+
+
+    printf("Absolute coords from TOP_LEFT= %i %i; %i\n", absolute_x, absolute_y, bLeft);
+    return true;
+}
+

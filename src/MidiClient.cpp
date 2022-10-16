@@ -108,7 +108,7 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 }
 
 
-bool MidiClient::get_input_event(MidiEvent& ev) const {
+bool MidiClient::get_input_event(MidiEvent& ev) {
 	snd_seq_event_t* event = nullptr;
 	int result = snd_seq_event_input(seq_handle, &event);
 	if (result < 0) {
@@ -198,7 +198,7 @@ MidiKbdClient::MidiKbdClient(const char* clientName, const char* sourceName) : M
 	parse_file(sourceName);
 }
 
-bool MidiKbdClient::get_input_event(MidiEvent& ev) const {
+bool MidiKbdClient::get_input_event(MidiEvent& ev) {
 	ssize_t n;
 	struct input_event kbd_ev;
 	n = read(fd, &kbd_ev, sizeof kbd_ev);

@@ -27,7 +27,7 @@ public:
 	virtual ~MidiClient() {
 	}
 	void make_and_send(const MidiEvent& ev) const;
-	virtual bool get_input_event(MidiEvent& ev) const;
+	virtual bool get_input_event(MidiEvent& ev);
 protected:
 	void send_event(snd_seq_event_t* event) const;
 	virtual void open_alsa_connection(const char* clientName, const char* sourceName);
@@ -46,7 +46,7 @@ public:
 	MidiKbdClient(const char* clientName, const char* sourceName);
 	virtual ~MidiKbdClient() {
 	}
-	bool get_input_event(MidiEvent& ev) const;
+	bool get_input_event(MidiEvent& ev);
 private:
 	void parse_string(const std::string& s);
 	void parse_file(const char* kbdMapFile);
