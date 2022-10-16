@@ -10,7 +10,7 @@ class MousePort {
 private:
     int fd;
     int absolute_x, absolute_y;
-    unsigned char bLeft;
+    bool bLeft;
 
 public:
     MousePort();

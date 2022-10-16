@@ -32,13 +32,18 @@ void MousePort::run() {
     while (read(fd, &ie, sizeof(struct input_event)) != -1)
     {
         unsigned char* ptr = (unsigned char*)&ie;
-        bLeft = ptr[0] & 0x1;
+        bLeft = (ptr[0] & 0x1) > 0;
+        bool bMiddle = (ptr[0] & 0x4) > 0;
+        bool bRight = (ptr[0] & 0x2) > 0;
 
         x = (char)ptr[1];
         y = (char)ptr[2];
 
         absolute_x += x;
         absolute_y -= y;
+
+        printf("====bLEFT:%d, bMIDDLE: %d, bRIGHT: %d, rx: %d  ry: %d\n", bLeft, bMiddle, bRight, x, y);
+
 
         for (size_t i = 0; i < sizeof(ie); i++)
             printf("%02X ", *ptr++);
