@@ -44,6 +44,9 @@ void MousePort::run() {
 
         printf("====bLEFT:%d, bMIDDLE: %d, bRIGHT: %d, rx: %d  ry: %d\n", bLeft, bMiddle, bRight, x, y);
 
+        printf("-------time %ld.%06ld\ttype %d\tcode %d\tvalue %d\n",
+            ie.time.tv_sec, ie.time.tv_usec, ie.type, ie.code, ie.value);
+
 
         for (size_t i = 0; i < sizeof(ie); i++)
             printf("%02X ", *ptr++);
