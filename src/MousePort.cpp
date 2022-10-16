@@ -36,11 +36,13 @@ void MousePort::run() {
 
         x = (char)ptr[1];
         y = (char)ptr[2];
-        printf("rx: %d  ry: %d\n", x, y);
-        printf("ax: %d  ay: %d\n", absolute_x, absolute_y);
 
         absolute_x += x;
         absolute_y -= y;
+
+        for (size_t i = 0; i < sizeof(ie); i++)
+            printf("%02X ", *ptr++);
+        printf("\n");
 
     }
 }
