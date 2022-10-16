@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "MidiClient.hpp"
 #include "MidiConverter.hpp"
+#include "MousePort.hpp"
 
 using namespace std;
 
@@ -57,24 +58,26 @@ int main(int argc, char* argv[]) {
 
 	LOG(LogLvl::INFO) << "MIDI client name: " << clientName;
 	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
-	RuleMapper* rm = nullptr;
-	MidiClient* mc = nullptr;
-	KbdPort* kp = nullptr;
+	RuleMapper* ruleMapper = nullptr;
+	MidiClient* midiClient = nullptr;
+	KbdPort* kbdPort = nullptr;
+	MousePort* mousePort = nullptr;
 
 
 	try {
 		if (kbdMapFile != nullptr) {
-			kp = new KbdPort(kbdMapFile);
+			kbdPort = new KbdPort(kbdMapFile);
 			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
 			sourceName = nullptr;
 		}
 		else {
 			LOG(LogLvl::INFO) << "Using midi source: " << sourceName;
 		}
-		mc = new MidiClient(clientName, sourceName);
-		rm = new RuleMapper(ruleFile, mc);
+		midiClient = new MidiClient(clientName, sourceName);
+		ruleMapper = new RuleMapper(ruleFile, midiClient);
+		mousePort = new MousePort();
 
-		MidiConverter midiConverter = MidiConverter(rm, mc, kp);
+		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient, kbdPort, mousePort);
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();

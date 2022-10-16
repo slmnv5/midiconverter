@@ -4,7 +4,8 @@
 #include "pch.hpp"
 
 //==================== utility functions ===================================
-
+std::string findTouchScreenEvent();
+std::string findKbdEvent();
 std::vector<std::string> split_string(const std::string& s,
 	const std::string& delimiter);
 int replace_all(std::string& s, const std::string& del,

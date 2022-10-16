@@ -8,14 +8,8 @@
 
 void MidiConverter::process_events() {
     MidiEvent ev;
-    bool result;
     while (true) {
-        if (kbd_port != nullptr)
-            result = kbd_port->get_input_event(ev);
-        else
-            result = midi_client->get_input_event(ev);
-
-        if (result) {
+        if (midi_client->get_input_event(ev)) {
             LOG(LogLvl::DEBUG) << "Got midi msg: " << ev.toString();
             process_one_event(ev);
         }
