@@ -29,14 +29,15 @@ void MousePort::run() {
     char x, y;
 
 
-    while (read(fd, &ie, sizeof(struct input_event)) > 0)
+    while (read(fd, &ie, sizeof(struct input_event)) != -1)
     {
         unsigned char* ptr = (unsigned char*)&ie;
         bLeft = ptr[0] & 0x1;
 
         x = (char)ptr[1];
         y = (char)ptr[2];
-        printf("rx: %d  ry=%d\n", x, y);
+        printf("rx: %d  ry: %d\n", x, y);
+        printf("ax: %d  ay: %d\n", absolute_x, absolute_y);
 
         absolute_x += x;
         absolute_y -= y;
