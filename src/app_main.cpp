@@ -60,24 +60,23 @@ int main(int argc, char* argv[]) {
 	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 	RuleMapper* ruleMapper = nullptr;
 	MidiClient* midiClient = nullptr;
-	KbdPort* kbdPort = nullptr;
 	MousePort* mousePort = nullptr;
 
 
 	try {
 		if (kbdMapFile != nullptr) {
-			kbdPort = new KbdPort(kbdMapFile);
-			LOG(LogLvl::INFO) << "Using typing keyboard for MIDI input with map: " << kbdMapFile;
-			sourceName = nullptr;
+			midiClient = new MidiKbdClient(clientName, kbdMapFile);
+			LOG(LogLvl::INFO) << "Using typing keyboard as source with map: " << kbdMapFile;
 		}
 		else {
-			LOG(LogLvl::INFO) << "Using midi source: " << sourceName;
+			midiClient = new MidiClient(clientName, sourceName);
+			LOG(LogLvl::INFO) << "Using midi port as source: " << sourceName;
 		}
-		midiClient = new MidiClient(clientName, sourceName);
+
 		ruleMapper = new RuleMapper(ruleFile, midiClient);
 		mousePort = new MousePort();
 
-		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient, kbdPort, mousePort);
+		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient, mousePort);
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();
