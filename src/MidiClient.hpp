@@ -37,23 +37,6 @@ private:
 };
 
 
-class MidiKbdClient : public MidiClient {
-private:
-	std::map<int, int> kbdMap;
-	int fd;
-
-public:
-	MidiKbdClient(const char* clientName, const char* sourceName);
-	virtual ~MidiKbdClient() {
-	}
-	bool get_input_event(MidiEvent& ev);
-private:
-	void parse_string(const std::string& s);
-	void parse_file(const char* kbdMapFile);
-
-};
-
-
 
 
 
