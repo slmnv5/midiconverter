@@ -81,7 +81,6 @@ void help() {
 		"  -r <ruleFile> load file with rules, see rules.txt for details and example\n"
 		"  -i <sourceName> MIDI source to connect to\n"
 		"options:\n"
-		"  -k <kbdMapFile> use typing keyboard for MIDI notes, needs sudo\n"
 		"  -n [name] output MIDI port name to create\n"
 		"  -v verbose output\n"
 		"  -vv more verbose\n"
