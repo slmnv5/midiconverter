@@ -4,7 +4,6 @@
 #include "utils.hpp"
 #include "MidiClient.hpp"
 #include "MidiConverter.hpp"
-#include "MousePort.hpp"
 
 using namespace std;
 
@@ -14,7 +13,6 @@ int main(int argc, char* argv[]) {
 
 	const char* ruleFile = nullptr;
 	const char* clientName = nullptr;
-	const char* kbdMapFile = nullptr;
 	const char* sourceName = nullptr;
 	LOG::ReportingLevel() = LogLvl::ERROR;
 
@@ -27,9 +25,6 @@ int main(int argc, char* argv[]) {
 		}
 		else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
 			clientName = argv[i + 1];
-		}
-		else if (strcmp(argv[i], "-k") == 0 && i + 1 < argc) {
-			kbdMapFile = argv[i + 1];
 		}
 		else if (strcmp(argv[i], "-v") == 0) {
 			LOG::ReportingLevel() = LogLvl::WARN;
@@ -49,7 +44,7 @@ int main(int argc, char* argv[]) {
 		help();
 		return 2;
 	}
-	if (sourceName == nullptr && kbdMapFile == nullptr) {
+	if (sourceName == nullptr) {
 		help();
 		return 2;
 	}
@@ -60,23 +55,17 @@ int main(int argc, char* argv[]) {
 	LOG(LogLvl::INFO) << "Rule file: " << ruleFile;
 	RuleMapper* ruleMapper = nullptr;
 	MidiClient* midiClient = nullptr;
-	MousePort* mousePort = nullptr;
 
 
 	try {
-		if (kbdMapFile != nullptr) {
-			midiClient = new MidiKbdClient(clientName, kbdMapFile);
-			LOG(LogLvl::INFO) << "Using typing keyboard as source with map: " << kbdMapFile;
-		}
-		else {
-			midiClient = new MidiClient(clientName, sourceName);
-			LOG(LogLvl::INFO) << "Using midi port as source: " << sourceName;
-		}
+
+		midiClient = new MidiClient(clientName, sourceName);
+		LOG(LogLvl::INFO) << "Using midi port as source: " << sourceName;
 
 		ruleMapper = new RuleMapper(ruleFile, midiClient);
-		mousePort = new MousePort();
 
-		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient, mousePort);
+
+		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient);
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();

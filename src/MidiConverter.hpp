@@ -4,17 +4,15 @@
 #include "pch.hpp"
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
-#include "MousePort.hpp"
 
 class MidiConverter {
 private:
     RuleMapper* rule_mapper;
     MidiClient* midi_client;
-    MousePort* mouse_port;
 
 public:
-    MidiConverter(RuleMapper* rm, MidiClient* mc, MousePort* mp) :
-        rule_mapper(rm), midi_client(mc), mouse_port(mp) {}
+    MidiConverter(RuleMapper* rm, MidiClient* mc) :
+        rule_mapper(rm), midi_client(mc) {}
     virtual ~MidiConverter() {
     }
 
