@@ -7,7 +7,7 @@ This command line utility for linux is used to:
 As an example notes ON/OFF may be converted to control change (CC).
 
 - #### Count MIDI events to produce new events.
-The same MIDI note sent several times, less than 0.6 seconds apart, makes a series and generates new MIDI event. This is useful for midi controllers with few buttons as the number of possible MIDI commands increases many times.
+The same MIDI note sent several times, less than 0.6 seconds apart, makes a series and generates new MIDI event. This is useful for midi controllers with few buttons (e.g. MIDI foot controllers) as the number of possible MIDI commands increases many times.
 
 Application creates IN and OUT virtual MIDI ports, IN port messages are converted and sent to OUT port.
 For details see [details.txt](details.txt) and for example see [rules.txt](rules.txt)
