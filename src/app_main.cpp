@@ -5,7 +5,6 @@
 #include "MidiClient.hpp"
 #include "MidiConverter.hpp"
 
-using namespace std;
 
 void help();
 

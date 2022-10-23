@@ -3,7 +3,6 @@
 
 #include "pch.hpp"
 
-using namespace std;
 typedef unsigned char midi_byte_t;
 typedef std::map<midi_byte_t, midi_byte_t> count_map_t;
 extern const midi_byte_t MIDI_MAX;
@@ -12,10 +11,10 @@ extern const midi_byte_t MIDI_MAXCH;
 //=============================================================
 class MidiAppError : public std::exception {
 private:
-	const string msg;
+	const std::string msg;
 	const bool critical;
 public:
-	MidiAppError(const string& msg, bool crt = false) noexcept :
+	MidiAppError(const std::string& msg, bool crt = false) noexcept :
 		msg(msg), critical(crt) {
 	}
 
@@ -30,7 +29,7 @@ public:
 template<midi_byte_t max>
 class MidiRange {
 protected:
-	void init(const string&);
+	void init(const std::string&);
 
 public:
 	static const midi_byte_t max_value = max;
@@ -41,16 +40,16 @@ public:
 		upper = max_value;
 	}
 
-	MidiRange(const string& s) {
+	MidiRange(const std::string& s) {
 		init(s);
 		if (!isValid()) {
 			throw MidiAppError(err_msg);
 		}
 	}
 
-	string toString() const {
+	std::string toString() const {
 		std::ostringstream ss;
-		ss << to_string(lower) << ":" << to_string(upper);
+		ss << std::to_string(lower) << ":" << std::to_string(upper);
 		return ss.str();
 	}
 	inline bool isValid() const {
@@ -69,8 +68,8 @@ public:
 	}
 
 private:
-	string err_msg = "Not valid values, must be in range: 0-"
-		+ to_string(max_value);
+	std::string err_msg = "Not valid values, must be in range: 0-"
+		+ std::to_string(max_value);
 };
 
 using ValueRange = MidiRange<127>;
@@ -91,17 +90,17 @@ public:
 		evtype(MidiEventType::ANYTHING), ch(0), v1(0), v2(0) {
 	}
 
-	MidiEvent(const string&);
+	MidiEvent(const std::string&);
 
 	MidiEventType evtype;
 	midi_byte_t ch; // MIDI channel
 	midi_byte_t v1; // MIDI note or cc
 	midi_byte_t v2; // MIDI velocity or cc value
 
-	string toString() const {
+	std::string toString() const {
 		std::ostringstream ss;
-		ss << static_cast<char>(evtype) << "," << to_string(ch) << ","
-			<< to_string(v1) << "," << to_string(v2);
+		ss << static_cast<char>(evtype) << "," << std::to_string(ch) << ","
+			<< std::to_string(v1) << "," << std::to_string(v2);
 		return ss.str();
 	}
 	inline bool isEqual(const MidiEvent& ev) const {
@@ -140,9 +139,9 @@ public:
 
 class MidiEventRange {
 protected:
-	MidiEventRange(const string& s);
+	MidiEventRange(const std::string& s);
 public:
-	string toString() const;
+	std::string toString() const;
 
 	MidiEventType evtype;
 	ChannelRange ch; // MIDI channel
@@ -152,14 +151,14 @@ public:
 
 class InMidiEventRange : public MidiEventRange {
 public:
-	InMidiEventRange(const string& s) : MidiEventRange(s) { validate(); }
+	InMidiEventRange(const std::string& s) : MidiEventRange(s) { validate(); }
 	bool match(const MidiEvent&) const;
 	void validate() const;
 };
 
 class OutMidiEventRange : public MidiEventRange {
 public:
-	OutMidiEventRange(const string& s) : MidiEventRange(s) { validate(); }
+	OutMidiEventRange(const std::string& s) : MidiEventRange(s) { validate(); }
 	void transform(MidiEvent& ev) const;
 	void validate() const;
 };
@@ -171,8 +170,8 @@ enum class MidiRuleType : midi_byte_t {
 class MidiEventRule {
 	const static std::string all_types;
 public:
-	MidiEventRule(const string&);
-	string toString() const;
+	MidiEventRule(const std::string&);
+	std::string toString() const;
 
 	inline char typeToChar() const {
 		return static_cast<char>(ruleType);

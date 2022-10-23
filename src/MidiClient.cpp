@@ -69,9 +69,9 @@ bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev) {
 
 
 void MidiClient::open_alsa_connection(const char* clientName, const char* sourceName) {
-	const string clName = string(clientName).substr(0, 15);
-	const string inPortName = clName + "_in";
-	const string outPortName = clName + "_out";
+	const std::string clName = std::string(clientName).substr(0, 15);
+	const std::string inPortName = clName + "_in";
+	const std::string outPortName = clName + "_out";
 
 	if (snd_seq_open(&seq_handle, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0)
 		throw MidiAppError("Error opening ALSA seq_handle");
@@ -101,7 +101,7 @@ void MidiClient::open_alsa_connection(const char* clientName, const char* source
 	int cli_id = -1;
 	int cli_port = -1;
 	if (find_midi_source(sourceName, cli_id, cli_port) < 0) {
-		throw MidiAppError("Error finding source hardware port: " + string(sourceName), true);
+		throw MidiAppError("Error finding source hardware port: " + std::string(sourceName), true);
 	}
 
 	subscribe(cli_id, cli_port);
@@ -179,7 +179,7 @@ int MidiClient::find_midi_source(const std::string& name_part, int& cli_id, int&
 
 void MidiClient::subscribe(const int& cli_id, const int& cli_port) const {
 	if (snd_seq_connect_from(seq_handle, inport, cli_id, cli_port) < 0) {
-		throw new MidiAppError("Cannot connect to port: " + to_string(cli_id) + ":" + to_string(cli_port));
+		throw new MidiAppError("Cannot connect to port: " + std::to_string(cli_id) + ":" + std::to_string(cli_port));
 	}
 	LOG(LogLvl::INFO) << "Connected to source: " << cli_id << ":" << cli_port;
 }
