@@ -4,14 +4,13 @@
 #include "MidiClient.hpp"
 #include "utils.hpp"
 
-using namespace std;
 
 const int RuleMapper::sleep_ms = 600;
 
-RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) : midi_client(mc)
+RuleMapper::RuleMapper(const std::string& fileName, MidiClient* mc) : midi_client(mc)
 {
-	ifstream f(fileName);
-	string s;
+	std::ifstream f(fileName);
+	std::string s;
 	int k = 0;
 	while (getline(f, s)) {
 		try {
@@ -27,7 +26,7 @@ RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) : midi_client(mc)
 				<< e.what();
 
 		}
-		catch (exception& e) {
+		catch (std::exception& e) {
 			LOG(LogLvl::ERROR)
 				<< "Line: " << k << " in " << fileName << " Error: "
 				<< e.what();
@@ -37,8 +36,8 @@ RuleMapper::RuleMapper(const string& fileName, MidiClient* mc) : midi_client(mc)
 	LOG(LogLvl::INFO) << "MIDI conversion rules loaded: " << rules.size();
 }
 
-void RuleMapper::parseString(const string& s1) {
-	string s(s1);
+void RuleMapper::parseString(const std::string& s1) {
+	std::string s(s1);
 	remove_spaces(s);
 	if (!s.empty())
 		rules.push_back(MidiEventRule(s));
@@ -94,7 +93,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 			update_count(ev);
 			bool send_it = count_on == 1 && count_off == 0; // send only 1-st ON for original ev
 			if (ev.isNoteOn()) {
-				thread(&RuleMapper::count_and_send, this, ev, count_on).detach();
+				std::thread(&RuleMapper::count_and_send, this, ev, count_on).detach();
 			}
 			return send_it;
 		}
@@ -143,16 +142,16 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		try {
 			midi_client->make_and_send(ev_new);
 		}
-		catch (exception& e) {
+		catch (std::exception& e) {
 			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();
 		}
 	}
 }
 
-string RuleMapper::toString() const {
-	ostringstream ss;
+std::string RuleMapper::toString() const {
+	std::ostringstream ss;
 	for (size_t i = 0; i < getSize(); i++) {
-		ss << "#" << i << '\t' << rules[i].toString() << endl;
+		ss << "#" << i << '\t' << rules[i].toString() << std::endl;
 	}
 	return ss.str();
 }

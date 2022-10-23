@@ -2,12 +2,11 @@
 #include "MidiEvent.hpp"
 #include "utils.hpp"
 
-using namespace std;
 const midi_byte_t MIDI_MAX = 127;
 const midi_byte_t MIDI_MAXCH = 15;
 template<midi_byte_t max>
 void MidiRange<max>::init(const std::string& s1) {
-	string s(s1);
+	std::string s(s1);
 	remove_spaces(s);
 	if (s.empty()) {
 		lower = 0;
@@ -15,7 +14,7 @@ void MidiRange<max>::init(const std::string& s1) {
 		return;
 	}
 
-	vector<string> parts = split_string(s, ":");
+	std::vector<std::string> parts = split_string(s, ":");
 	if (parts.size() == 1) {
 		parts.push_back(parts[0]);
 	}
@@ -27,7 +26,7 @@ void MidiRange<max>::init(const std::string& s1) {
 		lower = stoi(parts[0]);
 		upper = stoi(parts[1]);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		throw MidiAppError("ValueRange incorrect values: " + s);
 	}
 }
@@ -38,9 +37,9 @@ const std::string MidiEvent::all_types("ancp");
 const std::string MidiEventRule::all_types("cpsko");
 
 MidiEvent::MidiEvent(const std::string& s1) {
-	string s(s1);
+	std::string s(s1);
 	remove_spaces(s);
-	vector<string> parts = split_string(s, ",");
+	std::vector<std::string> parts = split_string(s, ",");
 
 	if (parts.size() != 4) {
 		throw MidiAppError("Not valid MidiEvent, must have 4 parts: " + s);
@@ -56,7 +55,7 @@ MidiEvent::MidiEvent(const std::string& s1) {
 		v1 = stoi(parts[2]);
 		v2 = stoi(parts[3]);
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		throw MidiAppError("Not valid MidiEvent: " + std::string(e.what()), true);
 	}
 	if (!isValid())
@@ -66,9 +65,9 @@ MidiEvent::MidiEvent(const std::string& s1) {
 //========================================================
 
 MidiEventRange::MidiEventRange(const std::string& s1) {
-	string s(s1);
+	std::string s(s1);
 	remove_spaces(s);
-	vector<string> parts = split_string(s, ",");
+	std::vector<std::string> parts = split_string(s, ",");
 
 	while (parts.size() != 4) {
 		throw MidiAppError("MidiEventRange must have 4 parts: " + s, true);
@@ -82,8 +81,8 @@ MidiEventRange::MidiEventRange(const std::string& s1) {
 	v2 = ValueRange(parts[3]);
 }
 
-string MidiEventRange::toString() const {
-	ostringstream ss;
+std::string MidiEventRange::toString() const {
+	std::ostringstream ss;
 	ss << static_cast<char>(evtype) << "," << ch.toString() << ","
 		<< v1.toString() << "," << v2.toString();
 	return ss.str();
@@ -119,16 +118,16 @@ void OutMidiEventRange::validate() const {
 //===================================================
 
 MidiEventRule::MidiEventRule(const std::string& s1) {
-	string s(s1);
+	std::string s(s1);
 	remove_spaces(s);
 	if (s.empty()) {
 		throw MidiAppError("Rule is empty");
 	}
-	vector<string> parts = split_string(s, "=");
+	std::vector<std::string> parts = split_string(s, "=");
 	if (parts.size() < 2 || parts.size() > 3) {
 		throw MidiAppError("Rule must have 2 or 3 parts: " + s, true);
 	}
-	string tmp = parts[parts.size() - 1];
+	std::string tmp = parts[parts.size() - 1];
 	if (tmp.size() != 1) {
 		throw MidiAppError("Rule type must be one character: " + s, true);
 	}
@@ -153,7 +152,7 @@ MidiEventRule::MidiEventRule(const std::string& s1) {
 }
 
 std::string MidiEventRule::toString() const {
-	ostringstream ss;
+	std::ostringstream ss;
 	ss << inEventRange->toString() << "=" << outEventRange->toString() << "="
 		<< static_cast<char>(ruleType);
 	return ss.str();

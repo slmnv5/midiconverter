@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();
 	}
-	catch (exception& e) {
+	catch (std::exception& e) {
 		LOG(LogLvl::ERROR) << "Completed with error: " << e.what();
 		return 1;
 	}
