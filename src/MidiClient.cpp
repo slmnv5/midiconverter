@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "MidiClient.hpp"
-#include "utils.hpp"
+#include "lib/utils.hpp"
 #include <fcntl.h>
 #include <linux/input.h>
 
@@ -108,11 +108,11 @@ void MidiClient::send_event(snd_seq_event_t* event) const
 	snd_seq_event_output_direct(seq_handle, event);
 }
 
-void MidiClient::make_and_send(const MidiEvent& ev) const {
-	snd_seq_event_t event;
-	snd_seq_ev_clear(&event);
-	if (!writeMidiEvent(&event, ev)) {
-		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
-	};
-	send_event(&event);
+snd_seq_event_t* MidiClient::get_input_event() const {
+	snd_seq_event_t* event = nullptr;
+	int result = snd_seq_event_input(seq_handle, &event);
+	if (result < 0) {
+		LOG(LogLvl::WARN) << "Possible loss of MIDI event";
+	}
+	return event;
 }

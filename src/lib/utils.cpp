@@ -1,7 +1,62 @@
-#include "pch.hpp"
 #include "utils.hpp"
 
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev) {
+	// note OFF is note ON with zero velocity
+	if (ev.isNote()) {
+		event->type = SND_SEQ_EVENT_NOTEON;
+		event->data.note.channel = ev.ch;
+		event->data.note.note = ev.v1;
+		event->data.note.velocity = ev.v2;
+		return true;
+	}
 
+	else if (ev.evtype == MidiEventType::PROGCHANGE) {
+		event->type = SND_SEQ_EVENT_PGMCHANGE;
+		event->data.control.channel = ev.ch;
+		event->data.control.value = ev.v1;
+		return true;
+	}
+
+	else if (ev.evtype == MidiEventType::CONTROLCHANGE) {
+		event->type = SND_SEQ_EVENT_CONTROLLER;
+		event->data.control.channel = ev.ch;
+		event->data.control.param = ev.v1;
+		event->data.control.value = ev.v2;
+		return true;
+	}
+	return false;
+}
+
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev) {
+	if (event->type == SND_SEQ_EVENT_NOTEOFF) {
+		ev.evtype = MidiEventType::NOTE;
+		ev.ch = event->data.note.channel;
+		ev.v1 = event->data.note.note;
+		ev.v2 = 0;
+		return true;
+	}
+	if (event->type == SND_SEQ_EVENT_NOTEON) {
+		ev.evtype = MidiEventType::NOTE;
+		ev.ch = event->data.note.channel;
+		ev.v1 = event->data.note.note;
+		ev.v2 = event->data.note.velocity;
+		return true;
+	}
+	if (event->type == SND_SEQ_EVENT_PGMCHANGE) {
+		ev.evtype = MidiEventType::PROGCHANGE;
+		ev.ch = event->data.control.channel;
+		ev.v1 = event->data.control.value;
+		return true;
+	}
+	if (event->type == SND_SEQ_EVENT_CONTROLLER) {
+		ev.evtype = MidiEventType::CONTROLCHANGE;
+		ev.ch = event->data.control.channel;
+		ev.v1 = event->data.control.param;
+		ev.v2 = event->data.control.value;
+		return true;
+	}
+	return false;
+}
 
 //==================== utility functions ===================================
 
@@ -33,8 +88,6 @@ std::string findTouchScreenEvent() {
 	pclose(pipe);
 	return result;
 }
-
-
 
 
 std::vector<std::string> split_string(const std::string& s, const std::string& delimiter) {

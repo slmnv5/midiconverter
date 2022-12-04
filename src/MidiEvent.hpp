@@ -3,6 +3,7 @@
 
 #include "pch.hpp"
 
+
 typedef unsigned char midi_byte_t;
 typedef std::map<midi_byte_t, midi_byte_t> count_map_t;
 extern const midi_byte_t MIDI_MAX;

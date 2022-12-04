@@ -2,7 +2,7 @@
 #define MIDICLIENT_H
 #include "pch.hpp"
 
-int find_midi_client(const std::string& name_part, unsigned int capability, int& cli_id, int& cli_port);
+
 
 class MidiClient
 {
@@ -20,15 +20,12 @@ public:
 	virtual ~MidiClient()
 	{
 	}
-
-	void make_and_send(const MidiEvent& ev) const;
+	void send_event(snd_seq_event_t* event) const;
+	snd_seq_event_t* get_input_event() const;
 
 protected:
-	void send_event(snd_seq_event_t* event) const;
 	virtual void open_alsa_connections(const char* clientName, const char* srcName, const char* dstName);
 	int find_midi_client(const std::string& name_part, unsigned int capability, int& cli_id, int& cli_port);
-
-private:
 	void subscribe(const char* name_part, bool is_input);
 };
 

@@ -1,8 +1,5 @@
-#include "pch.hpp"
-#include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
-#include "MidiClient.hpp"
-#include "utils.hpp"
+
 
 
 const int RuleMapper::sleep_ms = 600;
@@ -139,12 +136,7 @@ void RuleMapper::count_and_send(const MidiEvent& ev, int cnt_on) {
 		count_on = count_off = 0;
 		LOG(LogLvl::INFO) << "Delayed check, send counted note: "
 			<< ev_new.toString();
-		try {
-			midi_client->make_and_send(ev_new);
-		}
-		catch (std::exception& e) {
-			LOG(LogLvl::ERROR) << "Thread to cont events has error: " << e.what();
-		}
+		make_and_send(ev_new);
 	}
 }
 
@@ -154,4 +146,13 @@ std::string RuleMapper::toString() const {
 		ss << "#" << i << '\t' << rules[i].toString() << std::endl;
 	}
 	return ss.str();
+}
+
+void RuleMapper::make_and_send(const MidiEvent& ev) const {
+	snd_seq_event_t event;
+	snd_seq_ev_clear(&event);
+	if (!writeMidiEvent(&event, ev)) {
+		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
+	};
+	midi_client->send_event(&event);
 }

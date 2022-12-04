@@ -2,9 +2,11 @@
 #define RULEMAPPER_H
 #include "pch.hpp"
 #include "MidiEvent.hpp"
+#include "lib/utils.hpp"
+#include "MidiClient.hpp"
 
 
-class MidiClient;
+
 
 class RuleMapper {
 private:
@@ -15,6 +17,10 @@ public:
 	int findMatchingRule(const MidiEvent&, int startPos = 0) const;
 	void parseString(const std::string&);
 	bool applyRules(MidiEvent& ev);
+	const MidiClient* get_midi_client() const {
+		return midi_client;
+	}
+
 	MidiEventRule& getRule(int i) {
 		return rules[i];
 	}
@@ -22,6 +28,8 @@ public:
 		return rules.size();
 	}
 	std::string toString() const;
+
+	void make_and_send(const MidiEvent& ev) const;
 
 private:
 

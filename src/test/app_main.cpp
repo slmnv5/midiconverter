@@ -1,7 +1,6 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
-#include "utils.hpp"
 #include "MidiClient.hpp"
 #include "MidiConverter.hpp"
 
@@ -63,8 +62,7 @@ int main(int argc, char* argv[]) {
 
 		ruleMapper = new RuleMapper(ruleFile, midiClient);
 
-
-		MidiConverter midiConverter = MidiConverter(ruleMapper, midiClient);
+		MidiConverter midiConverter = MidiConverter(ruleMapper);
 
 		LOG(LogLvl::INFO) << "Starting MIDI messages processing";
 		midiConverter.process_events();

@@ -1,6 +1,6 @@
-#include "pch.hpp"
+
 #include "MidiEvent.hpp"
-#include "utils.hpp"
+#include "lib/utils.hpp"
 
 const midi_byte_t MIDI_MAX = 127;
 const midi_byte_t MIDI_MAXCH = 15;

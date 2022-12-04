@@ -2,8 +2,11 @@
 #define UTILS_H
 
 #include "pch.hpp"
+#include "MidiEvent.hpp"
 
-//==================== utility functions ===================================
+bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
+bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
+
 std::string findTouchScreenEvent();
 std::string findKbdEvent();
 std::vector<std::string> split_string(const std::string& s,

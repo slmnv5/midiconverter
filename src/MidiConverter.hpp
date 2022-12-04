@@ -2,17 +2,23 @@
 #define MIDICONVERTER_H
 
 #include "pch.hpp"
+#include "lib/utils.hpp"
+#include "MidiClient.hpp"
+#include <alsa/asoundlib.h>
+#include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
+#include "MidiConverter.hpp"
+
+
 
 class MidiConverter {
 private:
     RuleMapper* rule_mapper;
-    MidiClient* midi_client;
 
 public:
-    MidiConverter(RuleMapper* rm, MidiClient* mc) :
-        rule_mapper(rm), midi_client(mc) {}
+    MidiConverter(RuleMapper* rm) :
+        rule_mapper(rm) {}
     virtual ~MidiConverter() {
     }
 
