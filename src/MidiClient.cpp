@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <linux/input.h>
 
-void MidiClient::subscribe(const char *name_part, bool is_input)
+void MidiClient::subscribe(const char* name_part, bool is_input)
 {
 	if (nullptr == name_part)
 	{
@@ -31,11 +31,11 @@ void MidiClient::subscribe(const char *name_part, bool is_input)
 	LOG(LogLvl::INFO) << "Connected to MIDI port: " << name_part << (is_input ? " input " : " output ") << id << ":" << port;
 }
 
-int MidiClient::find_midi_client(const std::string &name_part, unsigned int capability, int &cli_id, int &cli_port)
+int MidiClient::find_midi_client(const std::string& name_part, unsigned int capability, int& cli_id, int& cli_port)
 {
 	cli_id = cli_port = -1;
-	snd_seq_client_info_t *cinfo;
-	snd_seq_port_info_t *pinfo;
+	snd_seq_client_info_t* cinfo;
+	snd_seq_port_info_t* pinfo;
 
 	snd_seq_client_info_alloca(&cinfo);
 	snd_seq_port_info_alloca(&pinfo);
@@ -69,7 +69,7 @@ int MidiClient::find_midi_client(const std::string &name_part, unsigned int capa
 	return -1;
 }
 
-void MidiClient::open_alsa_connections(const char *clientName, const char *srcName, const char *dstName)
+void MidiClient::open_alsa_connections(const char* clientName, const char* srcName, const char* dstName)
 {
 	const std::string clName = std::string(clientName).substr(0, 15);
 	const std::string inPortName = clName + "_in";
@@ -82,28 +82,37 @@ void MidiClient::open_alsa_connections(const char *clientName, const char *srcNa
 	client = snd_seq_client_id(seq_handle);
 
 	inport = snd_seq_create_simple_port(seq_handle, inPortName.c_str(),
-										SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
-										SND_SEQ_PORT_TYPE_APPLICATION);
+		SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
+		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (inport < 0)
 		throw std::runtime_error("Error creating virtual IN port");
 
 	outport = snd_seq_create_simple_port(seq_handle, outPortName.c_str(),
-										 SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
-										 SND_SEQ_PORT_TYPE_APPLICATION);
+		SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+		SND_SEQ_PORT_TYPE_APPLICATION);
 	if (outport < 0)
 		throw std::runtime_error("Error creating virtual OUT port");
 
 	LOG(LogLvl::INFO) << "MIDI ports created: IN=" << client << ":" << inport << " OUT="
-					  << client << ":" << outport;
+		<< client << ":" << outport;
 
 	subscribe(srcName, true);
 	subscribe(dstName, false);
 }
 
-void MidiClient::send_event(snd_seq_event_t *event) const
+void MidiClient::send_event(snd_seq_event_t* event) const
 {
 	snd_seq_ev_set_direct(event);
 	snd_seq_ev_set_subs(event);
 	snd_seq_ev_set_source(event, outport);
 	snd_seq_event_output_direct(seq_handle, event);
+}
+
+void MidiClient::make_and_send(const MidiEvent& ev) const {
+	snd_seq_event_t event;
+	snd_seq_ev_clear(&event);
+	if (!writeMidiEvent(&event, ev)) {
+		LOG(LogLvl::ERROR) << "Failed to write event: " << ev.toString();
+	};
+	send_event(&event);
 }

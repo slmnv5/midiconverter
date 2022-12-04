@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 
-		midiClient = new MidiClient(clientName, sourceName);
+		midiClient = new MidiClient(clientName, sourceName, nullptr);
 		LOG(LogLvl::INFO) << "Using midi port as source: " << sourceName;
 
 		ruleMapper = new RuleMapper(ruleFile, midiClient);
