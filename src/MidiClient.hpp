@@ -2,43 +2,32 @@
 #define MIDICLIENT_H
 #include "pch.hpp"
 
-#include "MidiClient.hpp"
-#include "MidiEvent.hpp"
+int find_midi_client(const std::string &name_part, unsigned int capability, int &cli_id, int &cli_port);
 
-
-
-//============== free functions ==============================
-bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
-bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
-//=============================================================
-
-
-
-class MidiClient {
+class MidiClient
+{
 protected:
 	int client = -1;
 	int inport = -1;
 	int outport = -1;
-	snd_seq_t* seq_handle = nullptr;
+	snd_seq_t *seq_handle = nullptr;
+
 public:
-	MidiClient(const char* clientName, const char* sourceName) {
-		open_alsa_connection(clientName, sourceName);
+	MidiClient(const char *clientName, const char *srcName, const char *dstName)
+	{
+		open_alsa_connections(clientName, srcName, dstName);
 	}
-	virtual ~MidiClient() {
+	virtual ~MidiClient()
+	{
 	}
-	void make_and_send(const MidiEvent& ev) const;
-	virtual bool get_input_event(MidiEvent& ev);
+
 protected:
-	void send_event(snd_seq_event_t* event) const;
-	virtual void open_alsa_connection(const char* clientName, const char* sourceName);
+	void send_event(snd_seq_event_t *event) const;
+	virtual void open_alsa_connections(const char *clientName, const char *srcName, const char *dstName);
+	int find_midi_client(const std::string &name_part, unsigned int capability, int &cli_id, int &cli_port);
+
 private:
-	int find_midi_source(const std::string& name_part, int& cli_id, int& cli_port) const;
-	void subscribe(const int& id, const int& port) const;
+	void subscribe(const char *name_part, bool is_input);
 };
-
-
-
-
-
 
 #endif
