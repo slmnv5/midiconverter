@@ -13,21 +13,22 @@ LDFLAGS := -pthread -lasound
 CPPFLAGS := -I$(SRC_DIR) -MMD -MP
 CXXFLAGS := -std=c++11 -g -Wno-psabi -Wall
  
-mimap_t: $(OBJ_TST)
-	@echo "build app test and run unit tests"
+app_t: $(OBJ_TST)
+	@echo "build app for unit tests"
 	cd $(PROJECT_ROOT)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
-	./mimap_t
 
-mimap_d: $(OBJ_APP)
+
+app_d: $(OBJ_APP)
+	@echo "build app with debug settings"
 	cd $(PROJECT_ROOT)
 	@echo "build debug version"
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
 	
 
-mimap5: CXXFLAGS = -std=c++11 -O2 -Wall
-mimap5: $(OBJ_APP)
-	@echo "Build release version"
+app: CXXFLAGS = -std=c++11 -O2 -Wall
+app: $(OBJ_APP)
+	@echo "build app with release settings"
 	cd $(PROJECT_ROOT)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^  $(LDFLAGS)
  

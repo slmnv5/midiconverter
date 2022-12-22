@@ -1,7 +1,7 @@
 /build
-/mimap
-/mimap_d
-/mimap_t
+/app
+/app_d
+/app_t
 /test
 
 *.log

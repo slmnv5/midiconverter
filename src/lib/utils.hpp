@@ -7,8 +7,6 @@
 bool writeMidiEvent(snd_seq_event_t* event, const MidiEvent& ev);
 bool readMidiEvent(const snd_seq_event_t* event, MidiEvent& ev);
 
-std::string findTouchScreenEvent();
-std::string findKbdEvent();
 std::vector<std::string> split_string(const std::string& s,
 	const std::string& delimiter);
 int replace_all(std::string& s, const std::string& del,
