@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
 #include "lib/utils.hpp"
-#include "lib/catch.hpp"
+#include "catch.hpp"
 
 TEST_CASE("Test LOG 1", "[all][basic]") {
 

@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
-#include "lib/catch.hpp"
+#include "catch.hpp"
 
 TEST_CASE("Test 2", "[all]") {
 	SECTION("Section 3") {

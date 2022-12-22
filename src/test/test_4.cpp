@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "MidiEvent.hpp"
 #include "lib/utils.hpp"
-#include "lib/catch.hpp"
+#include "catch.hpp"
 
 TEST_CASE("Test MidiEventRange", "[all][basic]") {
 	SECTION("Section rule") {

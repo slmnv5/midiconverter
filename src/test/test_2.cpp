@@ -2,7 +2,7 @@
 #include "MidiEvent.hpp"
 #include "RuleMapper.hpp"
 #include "MidiClient.hpp"
-#include "lib/catch.hpp"
+#include "catch.hpp"
 
 TEST_CASE("Test RuleMapper 1", "[all]") {
 	MidiClient c1("abc", nullptr, nullptr);

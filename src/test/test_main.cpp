@@ -1,7 +1,7 @@
 // custom main() and we need this in 1-st line:
 #define CATCH_CONFIG_RUNNER
 
-#include "lib/catch.hpp"
+#include "catch.hpp"
 #include "lib/log.hpp"
 
 int main(int argc, char* argv[]) {
