@@ -12,7 +12,7 @@ The same MIDI note sent several times, less than 0.6 seconds apart, makes a seri
 Application creates IN and OUT virtual MIDI ports, IN port messages are converted and sent to OUT port.
 For details see [details.txt](details.txt) and for example see [rules.txt](rules.txt)
 
-I use this utility with [Pepelats audio looper on Raspberry Pi](https://github.com/slmnv5/pepelats.git) and the [rules.txt](rules.txt) is written for this. This allows me to use 6 buttons to make about 30 different MIDI notes.
+I use this utility with [Pepelats audio looper on Raspberry Pi](https://github.com/slmnv5/pepelats.git) and the [rules.txt](rules.txt) is written for this, only 6 buttons can make about 30 different MIDI notes.
 
 ## Installation
 Install dependencies. RaspberryPi OS Lite was missing packages that I installed:
