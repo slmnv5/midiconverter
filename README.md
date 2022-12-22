@@ -18,7 +18,7 @@ I use this utility with [Pepelats audio looper on Raspberry Pi](https://github.c
 Install dependencies. RaspberryPi OS Lite was missing packages that I installed:
 - sudo apt install libasound2-dev libasound2
 
-There is make file to build application (some other build test targets available):
+There is make file to build application (some other targets available):
 make clean app
 
 
