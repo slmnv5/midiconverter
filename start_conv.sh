@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script starts MIDI converter mimap5 (github link below)
+# This script starts MIDI converter midiconverter (github link below)
 
 # Part of hardware MIDI port name - source of messages
 HARDWARE_NAME="BlueBoard"
@@ -8,10 +8,10 @@ EXT_CONV="PedalCommands"
 
 THIS_DIR=$(dirname "$0")
 cd "$THIS_DIR" || exit 1
-sudo killall mimap5
+sudo killall midiconverter
 sleep 1
-#wget -nc -O mimap5 https://github.com/slmnv5/mimap5/blob/master/mimap5?raw=true
-chmod a+x mimap5
+#wget -nc -O midiconverter https://github.com/slmnv5/midiconverter/blob/master/midiconverter?raw=true
+chmod a+x midiconverter
 
-./mimap5 -r rules.txt -i "$HARDWARE_NAME" -n "$EXT_CONV" "$@" &
+./midiconverter -r rules.txt -i "$HARDWARE_NAME" -n "$EXT_CONV" "$@" &
 

@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 }
 
 void help() {
-	cout << "Usage: mimap5 -r <file> [options] \n"
+	cout << "Usage: midiconverter -r <file> [options] \n"
 		"  -r <ruleFile> load file with rules, see rules.txt for details and example\n"
 		"  -i <sourceName> MIDI source to connect to\n"
 		"options:\n"

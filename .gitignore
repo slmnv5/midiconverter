@@ -1,8 +1,7 @@
-/build
-/app
-/app_d
-/app_t
-/test
+app
+app_d
+app_t
+midiconverter*
 
 *.log
 #*.json
