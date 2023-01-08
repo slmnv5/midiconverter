@@ -32,11 +32,9 @@ n,2,30:40,1:127=c,2,,,=p
 
 c,,,120:127=n,15,,20,=s 
 
-;CC on any channel (0:15), any control number (0:127), value 120:127 = convert to note ON channel 15, 
+;CC on any channel (0:15), any control number (0:127), value 120:127 = convert to note ON channel 15, keep same MIDI value for note number, velocity 20 = stop, do not scan remaining rules
 
-;keep same MIDI value for note number, velocity 20 = stop, do not scan remaining rules
-
-;Less verbose rule description
+#### Less verbose rule description
 
 n,,,1:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
 
@@ -51,8 +49,6 @@ n,,,=n,,,=k; any note is killed
 c,,,=c,2,,=s; any CC is moved to channel 2
 
 n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channel 0 
-
-
 
 
 ### Command line parameters:
