@@ -5,7 +5,7 @@ Every incoming MIDI event goes trough the list of rules from top to bottom.
 ### Count rule
 Count rule type has 2 parts. Example: n,0,12,=c
 If MIDI note event matches first part, it is counted. New note is created, its velocity depends on count. 
-Count stops after 0.6 seconds of inactiviuty or if anotherer MIDI event interrupts count.
+Count stops after 0.6 seconds of inactivity or if another MIDI event interrupts count.
 This rule adds number of notes in series, adds 5 if the last note was released with a delay and set velocity of note to that value.
 
 #### Example of count rule:
