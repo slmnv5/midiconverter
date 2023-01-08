@@ -165,7 +165,7 @@ public:
 };
 //=============================================================
 enum class MidiRuleType : midi_byte_t {
-	PASS = 'p', STOP = 's', COUNT = 'c', ONCE = 'o', KILL = 'k'
+	PASS = 'p', STOP = 's', COUNT = 'c', ONCE = 'o'
 };
 
 class MidiEventRule {

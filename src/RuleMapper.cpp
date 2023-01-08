@@ -60,11 +60,7 @@ bool RuleMapper::applyRules(MidiEvent& ev) {
 
 		LOG(LogLvl::DEBUG) << "Found match for event: " << ev.toString()
 			<< ", in rule: " << oneRule.toString();
-		if (oneRule.ruleType == MidiRuleType::KILL) {
-			LOG(LogLvl::DEBUG) << "Rule type KILL got event: " << ev.toString();
-			return  false;
-		}
-		else if (oneRule.ruleType == MidiRuleType::ONCE) {
+		if (oneRule.ruleType == MidiRuleType::ONCE) {
 			bool repeated = ev.isEqual(prev_once_ev);
 			prev_once_ev = ev;
 			if (repeated) {
