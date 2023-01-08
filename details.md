@@ -47,10 +47,17 @@ n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channe
 
 ### Command line parameters:
 Usage: midiconverter -r <file> [options]
+
 		-r <file> load file with rules, see rules.txt for details
+
 		options:
+
 		  -h displays this info
+
 		  -n [name] optional MIDI client name
+
 		  -v verbose output
+
 		  -vv more verbose
+
 		  -vvv even more verbose
