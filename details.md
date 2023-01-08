@@ -4,18 +4,21 @@ Every incoming MIDI event goes trough the list of rules from top to bottom.
 
 ### Count rule
 Count rule type has 2 parts. Example: n,0,12,=c
+
 If MIDI note event matches first part, it is counted. New note is created, its velocity depends on count. 
 Count stops after 0.6 seconds of inactivity or if another MIDI event interrupts count.
 This rule adds number of notes in series, adds 5 if the last note was released with a delay and set velocity of note to that value.
 
 #### Example of count rule:
 n,0,12,=c; this counts note 12.
+
 Double tap will create new note 12 with velocity = 2. Double tap and hold velocity = 2+5 = 7, etc.
 Count rule does not send note OFF only note ON
 
 
 ### Conversion rule
 Conversion rule has 3 parts separated by '='. Example: c,0,12,0:70=n,,12,77=p
+
 If MIDI event matches first part, it is converted to match second part. 
 The last part is rule type. Conversion rule types are: 's' - stop, 'p' - pass, 'o' - once 
 
