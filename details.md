@@ -27,19 +27,29 @@ The last part is rule type. Conversion rule types are: 's' - stop, 'p' - pass, '
 #### Examples of conversion rule:
 
 n,2,30:40,1:127=c,2,,,=p 
+
 ;note ON channel 2, note number 30:40, any velocity = convert to CC on channel 2, keep MIDI values the same = pass to next rule
 
 c,,,120:127=n,15,,20,=s 
+
 ;CC on any channel (0:15), any control number (0:127), value 120:127 = convert to note ON channel 15, 
+
 ;keep same MIDI value for note number, velocity 20 = stop, do not scan remaining rules
 
 ;Less verbose rule description
+
 n,,,1:5=n,0,0,0=s; all quiet notes silenced, stop scanning remaining rules  
+
 n,,,101:127=n,2,,=p; all loud notes sent to channel #2, scan remaining rules using converted note 
+
 a,,,=n,0,0,0=s; catch any event and convert to a zero note off, stop rule
+
 a,,,=a,,,=s; any message passed as is, without changes
+
 n,,,=n,,,=k; any note is killed
+
 c,,,=c,2,,=s; any CC is moved to channel 2
+
 n,1,,0=c,0,7,0=s; all note OFF on channel 1 convert to CC 7 value zero on channel 0 
 
 
